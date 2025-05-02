@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{4de8ed3d-c215-44b3-9281-cb56d3b77447}</ProjectGuid>
+    <RootNamespace>HowlEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;HOWLENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionsDir)Source\PCH;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;HOWLENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Renderer\DirectX11\Core.h" />
+    <ClInclude Include="Source\Renderer\ShaderCompiler.h" />
+    <ClInclude Include="Source\Renderer\DirectX11\DebugInfoManager.h" />
+    <ClInclude Include="Source\Renderer\DX11Renderer.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\MemoryManagement\BufferUploader.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Descriptors\DX12DescriptorHeap.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Pipeline\DX12PipelineState.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Pipeline\DX12RootSignature.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Pipeline\HLSLShader.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Resource\DX12Resource.h" />
+    <ClInclude Include="Source\Config\EngineGlobalSettings.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\DXGI\DXGISwapChain.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Commands\DXCommandList.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Commands\DXCommandQueue.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Debug\DXGIDebug.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Debug\DXDebug.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\Device\DXDevice.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\DXGI\DXGIAdapter.h" />
+    <ClInclude Include="Source\Renderer\DirectX12\DXGI\DXGIFactory.h" />
+    <ClInclude Include="Source\Renderer\IRenderer.h" />
+    <ClInclude Include="Source\Renderer\RenderTypes\RenderDataTypes.h" />
+    <ClInclude Include="Source\Renderer\DX12Renderer.h" />
+    <ClInclude Include="Source\Launch.h" />
+    <ClInclude Include="Source\Config\EngineDLLConfig.h" />
+    <ClInclude Include="Source\PCH\pch.h" />
+    <ClInclude Include="Source\Renderer\RenderTypes\GraphicsAPI.h" />
+    <ClInclude Include="Source\Window\Window.h" />
+    <ClInclude Include="Source\Utils\Utils.h" />
+    <ClInclude Include="Source\Systems\Timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Renderer\DirectX11\Core.cpp" />
+    <ClCompile Include="Source\Renderer\ShaderCompiler.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX11\DebugInfoManager.cpp" />
+    <ClCompile Include="Source\Renderer\DX11Renderer.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\MemoryManagement\BufferUploader.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Descriptors\DX12DescriptorHeap.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Pipeline\DX12PipelineState.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Pipeline\DX12RootSignature.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Pipeline\HLSLShader.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Resource\DX12Resource.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\DXGI\DXGISwapChain.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Commands\DXCommandList.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Commands\DXCommandQueue.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Debug\DXGIDebug.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Debug\DXDebug.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\Device\DXDevice.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\DXGI\DXGIAdapter.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX12\DXGI\DXGIFactory.cpp" />
+    <ClCompile Include="Source\Renderer\DX12Renderer.cpp" />
+    <ClCompile Include="Source\Launch.cpp" />
+    <ClCompile Include="Source\PCH\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Window\Window.cpp" />
+    <ClCompile Include="Source\Utils\Utils.cpp" />
+    <ClCompile Include="Source\Systems\Timer.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

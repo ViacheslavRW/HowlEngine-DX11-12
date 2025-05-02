@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35806.99
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HowlEngine", "HowlEngine\HowlEngine.vcxproj", "{4DE8ED3D-C215-44B3-9281-CB56D3B77447}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\Application.vcxproj", "{E6322CF5-8944-4897-8997-FA309294CBF0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DE8ED3D-C215-44B3-9281-CB56D3B77447}.Debug|x64.ActiveCfg = Debug|x64
+		{4DE8ED3D-C215-44B3-9281-CB56D3B77447}.Debug|x64.Build.0 = Debug|x64
+		{4DE8ED3D-C215-44B3-9281-CB56D3B77447}.Release|x64.ActiveCfg = Release|x64
+		{4DE8ED3D-C215-44B3-9281-CB56D3B77447}.Release|x64.Build.0 = Release|x64
+		{E6322CF5-8944-4897-8997-FA309294CBF0}.Debug|x64.ActiveCfg = Debug|x64
+		{E6322CF5-8944-4897-8997-FA309294CBF0}.Debug|x64.Build.0 = Debug|x64
+		{E6322CF5-8944-4897-8997-FA309294CBF0}.Release|x64.ActiveCfg = Release|x64
+		{E6322CF5-8944-4897-8997-FA309294CBF0}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FDD540B3-DDDA-4F22-ACED-E3219AD5BD06}
+	EndGlobalSection
+EndGlobal

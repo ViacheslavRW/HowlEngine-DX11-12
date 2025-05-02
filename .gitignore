@@ -1,0 +1,36 @@
+# Visual Studio cache directory
+*.vs
+.vs/
+
+#Build
+x64/
+Build/
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+*.cache
+*.pid
+*.gz
+*.zip
+*.tar
+*.bak
+*.swp
+*~
+
+# Shader binary files
+*.spv
+*.shader_cache
+
+# Log files
+*.log
+*.trace
