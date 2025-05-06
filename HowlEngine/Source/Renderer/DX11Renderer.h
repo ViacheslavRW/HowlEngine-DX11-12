@@ -18,7 +18,7 @@ namespace HEngine
 		~DX11Renderer() override;
 
 		void Initialize(HWND hwnd, const UINT width, const UINT height) override;
-		void Update() override;
+		void Update(const double deltaTime) override;
 		void Release() override;
 
 	private:
@@ -27,11 +27,14 @@ namespace HEngine
 		ComPtr<IDXGISwapChain> mSwapChain = nullptr;
 		ComPtr<ID3D11DeviceContext> mDeviceContext = nullptr;
 		ComPtr<ID3D11RenderTargetView> mRenderTargetView = nullptr;
-
+		// depth stencil
+		ComPtr<ID3D11DepthStencilState> mDepthStencilState = nullptr;
+		ComPtr<ID3D11Texture2D> mDepthStencilTexture = nullptr;
+		ComPtr<ID3D11DepthStencilView> mDepthStencilView = nullptr;
 	private:
 		// viewport
-		D3D11_VIEWPORT mViewPort;
-		XMMATRIX mViewProjectionMatrix;
+		D3D11_VIEWPORT mViewPort = {};
+		XMMATRIX mViewProjectionMatrix = {};
 
 	private:
 		// Debug
@@ -51,7 +54,7 @@ namespace HEngine
 		ComPtr<ID3D11PixelShader> mPixelShader;
 
 		void InitCube(TR::Vertex3D vertices[], unsigned short indices[]);
-		void DrawCube(UINT indices, float angle);
+		void DrawCube(const double deltaTime, UINT indices, float angle);
 		UINT size = 36;
 	};
 }

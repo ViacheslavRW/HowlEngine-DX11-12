@@ -17,8 +17,15 @@ namespace HEngine
 		HWND WndHandle = nullptr;
 		bool isWindowRunning = false;
 
+		// toggle windowed and fullscreen
+		void SetFullScreen();
+		void SetWindowed();
+		bool isFullScreen = false;
+		bool isWindowed = true;
 	private:
 		Launch* mLaunchPtr = nullptr;
+		UINT mLastWidth = 0;
+		UINT mLastHeight = 0;
 	};
 }
 

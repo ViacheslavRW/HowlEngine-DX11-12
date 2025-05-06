@@ -30,7 +30,7 @@ namespace HEngine
 		~DX12Renderer() override;
 
 		void Initialize(HWND hwnd, const UINT width, const UINT height) override;
-		void Update() override;
+		void Update(const double deltaTime) override;
 		void Release() override;
 
 	private:

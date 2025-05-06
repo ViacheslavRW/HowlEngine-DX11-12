@@ -34,7 +34,7 @@ namespace HEngine
 	}
 
 	Window::Window(const int width, const int height, Launch* pLaunch)
-		: mLaunchPtr(pLaunch)
+		: mLaunchPtr(pLaunch), mLastWidth(width), mLastHeight(height)
 	{
 		WNDCLASS wc = {};
 		wc.style = NULL;
@@ -59,7 +59,7 @@ namespace HEngine
 			isWindowRunning = false;
 			return;
 		}
-
+		//SetFullScreen();
 		ShowWindow(WndHandle, SW_SHOW);
 		UpdateWindow(WndHandle);
 
@@ -79,5 +79,41 @@ namespace HEngine
 	void Window::OnWindowDestroy()
 	{
 		DXGIDebug::Get().GetLiveObjects();
+	}
+
+	void Window::SetFullScreen()
+	{
+		if (!isFullScreen)
+		{
+			HMONITOR monitor = MonitorFromWindow(WndHandle, MONITOR_DEFAULTTOPRIMARY);
+			MONITORINFO monitorInfo = {};
+			monitorInfo.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo(monitor, &monitorInfo);
+			RECT rcMonitor = monitorInfo.rcMonitor;
+
+			SetWindowLongPtr(WndHandle, GWL_STYLE, WS_POPUP);
+			SetWindowPos(WndHandle, HWND_TOP,
+				rcMonitor.left, rcMonitor.top,
+				rcMonitor.right - rcMonitor.left,
+				rcMonitor.bottom - rcMonitor.top,
+				SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+
+			isFullScreen = true;
+			isWindowed = false;
+		}
+	}
+
+	void Window::SetWindowed()
+	{
+		if (!isWindowed)
+		{
+			SetWindowLongPtr(WndHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+			SetWindowPos(WndHandle, HWND_TOP,
+				250, 250, mLastWidth, mLastHeight,
+				SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+
+			isWindowed = true;
+			isFullScreen = false;
+		}
 	}
 }

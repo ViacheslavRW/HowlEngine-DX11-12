@@ -69,4 +69,40 @@ namespace HEngine
          HRESULT rtvRes = pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, pRTV.GetAddressOf());
          if (FAILED(rtvRes)) std::cout << "FAILED_TO_CREATE_RTV" << std::endl;
      }
+
+     void Core::InitializeDepthStencilView(ComPtr<ID3D11DepthStencilState>& pDepthStencilState, ComPtr<ID3D11Texture2D>& pDepthStencilTexture, ComPtr<ID3D11DepthStencilView>& pDepthStencilView, ComPtr<ID3D11Device> pDevice, const UINT width, const UINT height)
+     {
+         // depth buffer
+         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+         dsDesc.DepthEnable = true;
+         dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+         dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+         HRESULT hr1 = pDevice->CreateDepthStencilState(&dsDesc, pDepthStencilState.GetAddressOf());
+         if (FAILED(hr1)) std::cout << "FAILED_TO_DEPTH_BUFFER" << std::endl;
+
+         // depth stencil texture
+         D3D11_TEXTURE2D_DESC tDesc = {};
+         tDesc.Width = width;
+         tDesc.Height = height;
+         tDesc.MipLevels = 1;
+         tDesc.ArraySize = 1;
+         tDesc.Format = DXGI_FORMAT_D32_FLOAT;
+         tDesc.SampleDesc.Count = 1;
+         tDesc.SampleDesc.Quality = 0;
+         tDesc.Usage = D3D11_USAGE_DEFAULT;
+         tDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+         HRESULT hr2 = pDevice->CreateTexture2D(&tDesc, nullptr, pDepthStencilTexture.GetAddressOf());
+         if (FAILED(hr2)) std::cout << "FAILED_TO_DEPTH_STENCIL_TEXTURE" << std::endl;
+
+         // depth stencil view
+         D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+         dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+         dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+         dsvDesc.Texture2D.MipSlice = 0;
+
+         HRESULT hr3 = pDevice->CreateDepthStencilView(pDepthStencilTexture.Get(), &dsvDesc, pDepthStencilView.GetAddressOf());
+         if (FAILED(hr3)) std::cout << "FAILED_TO_DEPTH_STENCIL_VIEW" << std::endl;
+     }
 }

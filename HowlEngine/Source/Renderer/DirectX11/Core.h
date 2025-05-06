@@ -26,6 +26,15 @@ namespace HEngine
 			ComPtr<ID3D11Device>& pDevice,
 			ComPtr<IDXGISwapChain>& pSwapChain
 		);
+
+		static void InitializeDepthStencilView(
+			ComPtr<ID3D11DepthStencilState>& pDepthStencilState,
+			ComPtr<ID3D11Texture2D>& pDepthStencilTexture,
+			ComPtr<ID3D11DepthStencilView>& pDepthStencilView,
+			ComPtr<ID3D11Device> pDevice,
+			const UINT width, 
+			const UINT height
+		);
 	};
 }
 

@@ -31,7 +31,7 @@ namespace HEngine
 			DispatchMessage(&msg);
 		}
 
-		mRenderer->Update();
+		mRenderer->Update(gTimer.GetDeltaTime());
 		gTimer.Tick();
 		CalculateFrameStats();
 	}

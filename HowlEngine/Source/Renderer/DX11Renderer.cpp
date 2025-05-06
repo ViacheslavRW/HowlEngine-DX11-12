@@ -25,6 +25,8 @@ namespace HEngine
         mViewPort.MaxDepth = 1.0f;
         mDeviceContext->RSSetViewports(1, &mViewPort);
 
+        Core::InitializeDepthStencilView(mDepthStencilState, mDepthStencilTexture, mDepthStencilView, mDevice, width, height);
+
         // -- test --
         TR::Vertex3D vertices[] = {
             // front face
@@ -56,17 +58,19 @@ namespace HEngine
         InitCube(vertices, indices);
     }
 
-    void DX11Renderer::Update()
+    void DX11Renderer::Update(const double deltaTime)
     {
 #if defined(DEBUG) || defined(_DEBUG)
         mDebugInfoManager.Set();
 #endif
 
         mDeviceContext->ClearRenderTargetView(mRenderTargetView.Get(), CLEAR_BUFFER_COLOR);
+        mDeviceContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-        mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), nullptr);
+        mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
+        mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
-        DrawCube(size, mAngle);
+        DrawCube(deltaTime, size, mAngle);
 
         HRESULT scRes = mSwapChain->Present( 1, 0 );
         if (FAILED(scRes))
@@ -167,10 +171,10 @@ namespace HEngine
         if (FAILED(ciRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
     }
 
-    void DX11Renderer::DrawCube(UINT indices, float angle)
+    void DX11Renderer::DrawCube(const double deltaTime, UINT indices, float angle)
     {
         XMMATRIX modelMatrix = XMMatrixRotationZ(angle) * XMMatrixRotationX(angle);
-        XMMATRIX viewMatrix = XMMatrixTranslation(0.0f, 0.0f, 2.3f); 
+        XMMATRIX viewMatrix = XMMatrixTranslation(0.0f, 0.0f, 2.5f); 
         XMMATRIX projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 1.0f / 0.75f, 0.1f, 10.0f);
 
         XMMATRIX mvp = modelMatrix * viewMatrix * projectionMatrix;
@@ -192,6 +196,6 @@ namespace HEngine
         // drawing 
         mDeviceContext->DrawIndexed(indices, 0, 0);
 
-        mAngle += 0.0001f;
+        mAngle += 0.5f * deltaTime;
     }
 }
