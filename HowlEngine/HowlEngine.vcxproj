@@ -79,6 +79,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Mesh\Binder.h" />
+    <ClInclude Include="Source\Mesh\CubeMesh.h" />
     <ClInclude Include="Source\Renderer\DirectX11\Core.h" />
     <ClInclude Include="Source\Renderer\ShaderCompiler.h" />
     <ClInclude Include="Source\Renderer\DirectX11\DebugInfoManager.h" />
@@ -108,8 +110,11 @@
     <ClInclude Include="Source\Window\Window.h" />
     <ClInclude Include="Source\Utils\Utils.h" />
     <ClInclude Include="Source\Systems\Timer.h" />
+    <ClInclude Include="Source\Renderer\DirectX11\Texture.h" />
+    <ClInclude Include="Source\Renderer\DirectX11\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Mesh\CubeMesh.cpp" />
     <ClCompile Include="Source\Renderer\DirectX11\Core.cpp" />
     <ClCompile Include="Source\Renderer\ShaderCompiler.cpp" />
     <ClCompile Include="Source\Renderer\DirectX11\DebugInfoManager.cpp" />
@@ -137,8 +142,20 @@
     <ClCompile Include="Source\Window\Window.cpp" />
     <ClCompile Include="Source\Utils\Utils.cpp" />
     <ClCompile Include="Source\Systems\Timer.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX11\Texture.cpp" />
+    <ClCompile Include="Source\Renderer\DirectX11\TextureManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\directxtex_desktop_win10.2025.3.25.2\build\native\directxtex_desktop_win10.targets" Condition="Exists('..\packages\directxtex_desktop_win10.2025.3.25.2\build\native\directxtex_desktop_win10.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\directxtex_desktop_win10.2025.3.25.2\build\native\directxtex_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_win10.2025.3.25.2\build\native\directxtex_desktop_win10.targets'))" />
+  </Target>
 </Project>

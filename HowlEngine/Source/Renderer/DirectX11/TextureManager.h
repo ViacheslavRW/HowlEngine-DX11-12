@@ -1,0 +1,19 @@
+#pragma once
+#include "./Texture.h"
+#include <unordered_map>
+
+namespace HEngine
+{
+	class TextureManager
+	{
+	public:
+		bool LoadTexture(const std::string& name, const std::wstring path, ID3D11Device* pDevice);
+		ComPtr<ID3D11ShaderResourceView> GetTextureSRV(const std::string& name);
+		void Clear();
+
+	private:
+		std::unordered_map<std::string, std::unique_ptr<Texture>> mTextures;
+	};
+}
+
+

@@ -3,6 +3,8 @@
 #include "IRenderer.h"
 #include "DirectX11/DebugInfoManager.h"
 #include "./RenderTypes/RenderDataTypes.h"
+#include "./DirectX11/TextureManager.h"
+#include "../Mesh/CubeMesh.h"
 
 namespace HEngine
 {
@@ -31,31 +33,36 @@ namespace HEngine
 		ComPtr<ID3D11DepthStencilState> mDepthStencilState = nullptr;
 		ComPtr<ID3D11Texture2D> mDepthStencilTexture = nullptr;
 		ComPtr<ID3D11DepthStencilView> mDepthStencilView = nullptr;
+		ComPtr<ID3D11RasterizerState> mRasterizer = nullptr;
+		// input layout
+		ComPtr<ID3D11InputLayout> mInputLayout = nullptr;
+		// shaders
+		ComPtr<ID3D11VertexShader> mVertexShader;
+		ComPtr<ID3D11PixelShader> mPixelShader;
 	private:
 		// viewport
 		D3D11_VIEWPORT mViewPort = {};
-		XMMATRIX mViewProjectionMatrix = {};
+		XMMATRIX mViewMatrix = XMMatrixTranslation(0.0f, 0.0f, 4.5f);
+		XMMATRIX mProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 1.0f / 0.75f, 0.1f, 10.0f);
+
+	private:
+		// textures
+		ComPtr<ID3D11SamplerState> mSamplerState = nullptr;
+		TextureManager mTextureManager = {};
+	private:
+		// Mesh
+		std::unique_ptr<CubeMeshT> cube1;
+		std::unique_ptr<CubeMeshT> cube2;
+		std::unique_ptr<CubeMeshT> cube3;
+
+		// Other
+		float mAngle = 45.0f;
 
 	private:
 		// Debug
 #if defined(DEBUG) || defined(_DEBUG)
 		DebugInfoManager mDebugInfoManager;
 #endif
-
-	private:
-		// Test
-		float mAngle = 45.0f;
-		
-		ComPtr<ID3D11Buffer> mVertexBuffer = nullptr;
-		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;
-		ComPtr<ID3D11Buffer> mConstantBuffer = nullptr;
-		ComPtr<ID3D11InputLayout> mInputLayout = nullptr;
-		ComPtr<ID3D11VertexShader> mVertexShader;
-		ComPtr<ID3D11PixelShader> mPixelShader;
-
-		void InitCube(TR::Vertex3D vertices[], unsigned short indices[]);
-		void DrawCube(const double deltaTime, UINT indices, float angle);
-		UINT size = 36;
 	};
 }
 

@@ -70,6 +70,17 @@ namespace HEngine
          if (FAILED(rtvRes)) std::cout << "FAILED_TO_CREATE_RTV" << std::endl;
      }
 
+     void Core::SetViewPort(const UINT width, const UINT height, ComPtr<ID3D11DeviceContext>& pDeviceContext, D3D11_VIEWPORT& pViewPort)
+     {
+         pViewPort.TopLeftX = 0.0f;
+         pViewPort.TopLeftY = 0.0f;
+         pViewPort.Width = static_cast<float>(width);
+         pViewPort.Height = static_cast<float>(height);
+         pViewPort.MinDepth = 0.0f;
+         pViewPort.MaxDepth = 1.0f;
+         pDeviceContext->RSSetViewports(1, &pViewPort);
+     }
+
      void Core::InitializeDepthStencilView(ComPtr<ID3D11DepthStencilState>& pDepthStencilState, ComPtr<ID3D11Texture2D>& pDepthStencilTexture, ComPtr<ID3D11DepthStencilView>& pDepthStencilView, ComPtr<ID3D11Device> pDevice, const UINT width, const UINT height)
      {
          // depth buffer
@@ -77,6 +88,7 @@ namespace HEngine
          dsDesc.DepthEnable = true;
          dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
          dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+         dsDesc.StencilEnable = false;
 
          HRESULT hr1 = pDevice->CreateDepthStencilState(&dsDesc, pDepthStencilState.GetAddressOf());
          if (FAILED(hr1)) std::cout << "FAILED_TO_DEPTH_BUFFER" << std::endl;
@@ -104,5 +116,24 @@ namespace HEngine
 
          HRESULT hr3 = pDevice->CreateDepthStencilView(pDepthStencilTexture.Get(), &dsvDesc, pDepthStencilView.GetAddressOf());
          if (FAILED(hr3)) std::cout << "FAILED_TO_DEPTH_STENCIL_VIEW" << std::endl;
+     }
+
+     void Core::InitializeRasterizer(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11DeviceContext>& pDeviceContext, ComPtr<ID3D11RasterizerState>& pRasterizer)
+     {
+         D3D11_RASTERIZER_DESC rasterDesc;
+         ZeroMemory(&rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
+
+         rasterDesc.FillMode = D3D11_FILL_SOLID; // D3D11_FILL_WIREFRAME may be used
+         rasterDesc.CullMode = D3D11_CULL_NONE;
+         rasterDesc.FrontCounterClockwise = false;
+         rasterDesc.DepthBias = 0;
+         rasterDesc.SlopeScaledDepthBias = 0.0f;
+         rasterDesc.DepthBiasClamp = 0.0f;
+         rasterDesc.ScissorEnable = false;
+         rasterDesc.MultisampleEnable = false;
+         rasterDesc.AntialiasedLineEnable = false;
+         HRESULT hr = pDevice->CreateRasterizerState(&rasterDesc, &pRasterizer);
+         if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_RASTERIZER" << std::endl;
+         pDeviceContext->RSSetState(pRasterizer.Get());
      }
 }

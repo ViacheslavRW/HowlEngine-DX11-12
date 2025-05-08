@@ -22,16 +22,23 @@ namespace HEngine
 			DirectX::XMMATRIX viewProjMatrix = DirectX::XMMatrixIdentity();
 		};
 
-		struct Vertex2D
+		struct Vertex3C
 		{
-			DirectX::XMFLOAT2 position = {0.0f, 0.0f};
-			DirectX::XMFLOAT4 color = { 0.1f, 0.1f, 0.1f, 1.0f };
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT4 color;
 		};
 
-		struct Vertex3D
+		struct Vertex3T
 		{
-			DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
-			DirectX::XMFLOAT4 color = { 0.1f, 0.1f, 0.8f, 1.0f };
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT3 normal;
+			DirectX::XMFLOAT2 texture;
+		};
+
+		struct Vertex3M
+		{
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT3 material;
 		};
 
 		struct TransformBuffer

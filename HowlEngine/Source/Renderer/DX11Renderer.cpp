@@ -3,6 +3,8 @@
 #include "../Config/EngineGlobalSettings.h"
 #include "ShaderCompiler.h"
 #include "./DirectX11/Core.h"
+#include "../Mesh/Binder.h"
+
 
 namespace HEngine
 {
@@ -15,33 +17,71 @@ namespace HEngine
     {
         Core::InitializeDeviceAndSwapChain(hwnd, width, height, mDevice, mSwapChain, mDeviceContext);
         Core::InitializeRenderTargetView(mRenderTargetView, mDevice, mSwapChain);
-
-        // viewport
-        mViewPort.TopLeftX = 0.0f;
-        mViewPort.TopLeftY = 0.0f;
-        mViewPort.Width = static_cast<float>(width);
-        mViewPort.Height = static_cast<float>(height);
-        mViewPort.MinDepth = 0.0f;
-        mViewPort.MaxDepth = 1.0f;
-        mDeviceContext->RSSetViewports(1, &mViewPort);
-
+        Core::SetViewPort(width, height, mDeviceContext, mViewPort);
         Core::InitializeDepthStencilView(mDepthStencilState, mDepthStencilTexture, mDepthStencilView, mDevice, width, height);
+        Core::InitializeRasterizer(mDevice, mDeviceContext, mRasterizer);
 
-        // -- test --
-        TR::Vertex3D vertices[] = {
-            // front face
-            {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-            {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 1.0f, 1.0f}},
-            {{0.5f, 0.5f, -0.5f}, {0.5f, 0.0f, 0.0f, 1.0f}},
-            // back face
-            {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-            {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-            {{0.5f, 0.5f, 0.5f}, {0.5f, 0.0f, 0.0f, 1.0f}},
+        // compile shaders to bytecode
+        Microsoft::WRL::ComPtr<ID3DBlob> vsBlob;
+        Microsoft::WRL::ComPtr<ID3DBlob> psBlob;
+        ShaderCompiler compiler;
+        compiler.Compile(L"shaders/VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlob);
+        compiler.Compile(L"shaders/PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlob);
+
+        // create and bind vertex shader and pixel shader
+        HRESULT vsRes = mDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &mVertexShader);
+        if (FAILED(vsRes)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER" << std::endl;
+        HRESULT psRes = mDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &mPixelShader);
+        if (FAILED(psRes)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER" << std::endl;
+
+        // set compiled shaders
+        mDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
+        mDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
+
+        // create input layout
+        D3D11_INPUT_ELEMENT_DESC layout[] =
+        {
+            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+                  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
+                    D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
+            D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        };
+        HRESULT ciRes = mDevice->CreateInputLayout(layout, (UINT)std::size(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &mInputLayout);
+        if (FAILED(ciRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
+        
+        // load textures
+        mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get());
+        mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get());
+        mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get());
+
+        // texture sampler
+        D3D11_SAMPLER_DESC sampDesc = {};
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP ;
+        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+        mDevice->CreateSamplerState(&sampDesc, mSamplerState.GetAddressOf());
+        mDeviceContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
+
+        // -- new system
+        std::vector<TR::Vertex3T> _vertices = {
+            // Front face
+            {{-0.5f, -0.5f, -0.5f}, {}, {0.0f, 1.0f}}, // bottom-left
+            {{ 0.5f, -0.5f, -0.5f}, {}, {1.0f, 1.0f}}, // bottom-right
+            {{-0.5f,  0.5f, -0.5f}, {}, {0.0f, 0.0f}}, // top-left
+            {{ 0.5f,  0.5f, -0.5f}, {}, {1.0f, 0.0f}}, // top-right
+
+            // Back face
+            {{-0.5f, -0.5f,  0.5f}, {}, {1.0f, 1.0f}}, // bottom-right (mirrored)
+            {{ 0.5f, -0.5f,  0.5f}, {}, {0.0f, 1.0f}}, // bottom-left
+            {{-0.5f,  0.5f,  0.5f}, {}, {1.0f, 0.0f}}, // top-right
+            {{ 0.5f,  0.5f,  0.5f}, {}, {0.0f, 0.0f}}, // top-left
         };
 
-        unsigned short indices[] = {
+        std::vector<UINT16> _indices = {
             // Front face
             0, 1, 2,  1, 3, 2,
             // Right face
@@ -55,7 +95,17 @@ namespace HEngine
             // Bottom face
             4, 5, 0,  5, 1, 0
         };
-        InitCube(vertices, indices);
+
+        cube1 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
+        cube1->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "crumpled_paper");
+
+        cube2 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
+        cube2->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "brick");
+        cube2->SetPosition(1.5f, 0.0f, 0.0f);
+
+        cube3 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
+        cube3->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "metal");
+        cube3->SetPosition(-1.5f, 0.0f, 0.0f);
     }
 
     void DX11Renderer::Update(const double deltaTime)
@@ -63,6 +113,8 @@ namespace HEngine
 #if defined(DEBUG) || defined(_DEBUG)
         mDebugInfoManager.Set();
 #endif
+        // specifing primitive type
+        mDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         mDeviceContext->ClearRenderTargetView(mRenderTargetView.Get(), CLEAR_BUFFER_COLOR);
         mDeviceContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -70,7 +122,19 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
-        DrawCube(deltaTime, size, mAngle);
+        cube1->SetRotation(mAngle, 0.0f, mAngle);
+        cube1->BindRes(mViewMatrix);
+        cube1->Draw();
+
+        cube2->SetRotation(-mAngle, mAngle, 0.0f);
+        cube2->BindRes(mViewMatrix);
+        cube2->Draw();
+
+        cube3->SetRotation(mAngle, 0.0f, -mAngle);
+        cube3->BindRes(mViewMatrix);
+        cube3->Draw();
+
+        mAngle += 0.5f * deltaTime;
 
         HRESULT scRes = mSwapChain->Present( 1, 0 );
         if (FAILED(scRes))
@@ -97,105 +161,6 @@ namespace HEngine
         if (mSwapChain) mSwapChain = nullptr;
         if (mDevice) mDevice = nullptr;
         if (mRenderTargetView) mRenderTargetView = nullptr;
-    }
-
-    // ---- TEST FUNCTIONS ----
-    void DX11Renderer::InitCube(TR::Vertex3D vertices[], unsigned short indices[])
-    {
-        // creating vertex buffer
-        D3D11_BUFFER_DESC bDesc = {};
-        bDesc.ByteWidth = sizeof(TR::Vertex3D) * 8;
-        bDesc.Usage = D3D11_USAGE_DEFAULT;
-        bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        bDesc.CPUAccessFlags = 0;
-        bDesc.MiscFlags = 0;
-        bDesc.StructureByteStride = sizeof(TR::Vertex3D);
-
-        D3D11_SUBRESOURCE_DATA srData = {};
-        srData.pSysMem = vertices;
-        srData.SysMemPitch = 0;
-        srData.SysMemSlicePitch = 0;
-
-        HRESULT res = mDevice->CreateBuffer(&bDesc, &srData, &mVertexBuffer);
-        if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_BUFFER" << std::endl;
-
-        // create index buffer
-        D3D11_BUFFER_DESC indBuffDesc = {};
-        indBuffDesc.ByteWidth = sizeof(unsigned short) * 36;
-        indBuffDesc.Usage = D3D11_USAGE_DEFAULT;
-        indBuffDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        indBuffDesc.CPUAccessFlags = 0;
-        indBuffDesc.MiscFlags = 0;
-        indBuffDesc.StructureByteStride = sizeof(unsigned short);
-
-        D3D11_SUBRESOURCE_DATA iData = {};
-        iData.pSysMem = indices;
-
-        HRESULT res2 = mDevice->CreateBuffer(&indBuffDesc, &iData, &mIndexBuffer);
-        if (FAILED(res2)) std::cout << "FAILED_TO_CREATE_INDEX_BUFFER" << std::endl;
-
-        // create constant buffer
-        D3D11_BUFFER_DESC cbDesc = {};
-        cbDesc.ByteWidth = sizeof(XMMATRIX);
-        cbDesc.Usage = D3D11_USAGE_DEFAULT;
-        cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        cbDesc.CPUAccessFlags = 0;
-        cbDesc.MiscFlags = 0;
-        cbDesc.StructureByteStride = sizeof(XMMATRIX);
-
-        HRESULT res3 = mDevice->CreateBuffer(&cbDesc, nullptr, &mConstantBuffer);
-        if (FAILED(res3)) std::cout << "FAILED_TO_CREATE_CONSTANT_BUFFER" << std::endl;
-
-        // compile shaders to bytecode
-        Microsoft::WRL::ComPtr<ID3DBlob> vsBlob;
-        Microsoft::WRL::ComPtr<ID3DBlob> psBlob;
-        ShaderCompiler compiler;
-        compiler.Compile(L"shaders/VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlob);
-        compiler.Compile(L"shaders/PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlob);
-
-        // create and bind vertex shader and pixel shader
-        HRESULT vsRes = mDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &mVertexShader);
-        if (FAILED(vsRes)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER" << std::endl;
-        HRESULT psRes = mDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &mPixelShader);
-        if (FAILED(psRes)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER" << std::endl;
-
-        // create input layout
-        D3D11_INPUT_ELEMENT_DESC layout[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-                  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,
-                    D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        };
-        HRESULT ciRes = mDevice->CreateInputLayout(layout, (UINT)std::size(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &mInputLayout);
-        if (FAILED(ciRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
-    }
-
-    void DX11Renderer::DrawCube(const double deltaTime, UINT indices, float angle)
-    {
-        XMMATRIX modelMatrix = XMMatrixRotationZ(angle) * XMMatrixRotationX(angle);
-        XMMATRIX viewMatrix = XMMatrixTranslation(0.0f, 0.0f, 2.5f); 
-        XMMATRIX projectionMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 1.0f / 0.75f, 0.1f, 10.0f);
-
-        XMMATRIX mvp = modelMatrix * viewMatrix * projectionMatrix;
-        mViewProjectionMatrix = XMMatrixTranspose(mvp);
-
-        mDeviceContext->UpdateSubresource(mConstantBuffer.Get(), 0, nullptr, &mViewProjectionMatrix, 0, 0);
-        mDeviceContext->VSSetConstantBuffers(0, 1, mConstantBuffer.GetAddressOf());
-        // set input layout and vertex buffer
-        UINT stride = sizeof(TR::Vertex3D);
-        UINT offset = 0;
-        mDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
-        mDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
-        mDeviceContext->IASetInputLayout(mInputLayout.Get());
-        // specifing primitive type
-        mDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        // set shaders
-        mDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
-        mDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
-        // drawing 
-        mDeviceContext->DrawIndexed(indices, 0, 0);
-
-        mAngle += 0.5f * deltaTime;
+        mTextureManager.Clear();
     }
 }

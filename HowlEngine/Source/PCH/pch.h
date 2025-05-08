@@ -19,6 +19,9 @@
 // math
 #include <DirectXMath.h>
 
+// texture loading
+#include <DirectXTex.h>
+
 // lib files
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "D3D12.lib")

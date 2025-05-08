@@ -27,6 +27,13 @@ namespace HEngine
 			ComPtr<IDXGISwapChain>& pSwapChain
 		);
 
+		static void SetViewPort(
+			const UINT width,
+			const UINT height,
+			ComPtr<ID3D11DeviceContext>& pDeviceContext,
+			D3D11_VIEWPORT& pViewPort
+		);
+
 		static void InitializeDepthStencilView(
 			ComPtr<ID3D11DepthStencilState>& pDepthStencilState,
 			ComPtr<ID3D11Texture2D>& pDepthStencilTexture,
@@ -34,6 +41,12 @@ namespace HEngine
 			ComPtr<ID3D11Device> pDevice,
 			const UINT width, 
 			const UINT height
+		);
+
+		static void InitializeRasterizer(
+			ComPtr<ID3D11Device>& pDevice,
+			ComPtr<ID3D11DeviceContext>& pDeviceContext,
+			ComPtr<ID3D11RasterizerState>& pRasterizer
 		);
 	};
 }
