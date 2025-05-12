@@ -69,7 +69,7 @@ namespace HEngine
 			if (FAILED(res)) std::cout << "FAILED_TO_CREATE_CONSTANT_BUFFER" << std::endl;
 		}
 
-		void Bind(ComPtr<ID3D11Buffer>& pVertexBuffer, ComPtr<ID3D11Buffer>& pIndexBuffer, ComPtr<ID3D11Buffer>& pConstantBuffer, 
+		void BindRes(ComPtr<ID3D11Buffer>& pVertexBuffer, ComPtr<ID3D11Buffer>& pIndexBuffer, ComPtr<ID3D11Buffer>& pConstantBuffer, 
 			const XMMATRIX& modelMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projMatrix, UINT vertexSize, const std::string& textureName)
 		{
 			XMMATRIX _mvp = modelMatrix * viewMatrix * projMatrix;

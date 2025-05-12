@@ -5,13 +5,13 @@
 
 namespace HEngine
 {
-	class CubeMeshT : public Binder<TR::Vertex3T>
+	class PlaneMeshT : public Binder<TR::Vertex3T>
 	{
 	public:
-		CubeMeshT(ID3D11Device& device, ID3D11DeviceContext& deviceContext, ID3D11InputLayout& inputLayout, TextureManager& textureManager)
+		PlaneMeshT(ID3D11Device& device, ID3D11DeviceContext& deviceContext, ID3D11InputLayout& inputLayout, TextureManager& textureManager)
 			: Binder(device, deviceContext, inputLayout, textureManager) {}
 
-		void Initialize(std::vector<TR::Vertex3T> _vertices, std::vector<UINT16> _indices,
+		void Initialize(float width, float height, UINT16 divisionsX, UINT16 divisionsZ,
 			XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName);
 		void Bind(XMMATRIX& viewMatrix);
 		void Draw();
@@ -20,7 +20,6 @@ namespace HEngine
 		std::vector<UINT16> indices;
 
 		std::string texture;
-
 	public:
 		XMMATRIX GetModelMartix() const;
 
@@ -29,7 +28,7 @@ namespace HEngine
 		inline XMFLOAT3& GetScale() { return mScale; };
 
 	private:
-		XMFLOAT3 mPosition = {0.0f, 0.0f, 0.0f};
+		XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };
 		XMFLOAT3 mRotation = { 0.0f, 0.0f, 0.0f };
 		XMFLOAT3 mScale = { 1.0f, 1.0f, 1.0f };
 
@@ -40,11 +39,6 @@ namespace HEngine
 		ComPtr<ID3D11Buffer> mVertexBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mConstantBuffer = nullptr;
-	};
-
-	class CubeMeshC : public Binder<TR::Vertex3C>
-	{
-	public:
 	};
 }
 

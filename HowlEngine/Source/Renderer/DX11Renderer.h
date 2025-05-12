@@ -5,6 +5,7 @@
 #include "./RenderTypes/RenderDataTypes.h"
 #include "./DirectX11/TextureManager.h"
 #include "../Mesh/CubeMesh.h"
+#include "../Mesh/PlaneMesh.h"
 
 namespace HEngine
 {
@@ -43,7 +44,7 @@ namespace HEngine
 		// viewport
 		D3D11_VIEWPORT mViewPort = {};
 		XMMATRIX mViewMatrix = XMMatrixTranslation(0.0f, 0.0f, 4.5f);
-		XMMATRIX mProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 1.0f / 0.75f, 0.1f, 10.0f);
+		XMMATRIX mProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 1.0f / 0.75f, 0.1f, 20.0f);
 
 	private:
 		// textures
@@ -55,6 +56,7 @@ namespace HEngine
 		std::unique_ptr<CubeMeshT> cube2;
 		std::unique_ptr<CubeMeshT> cube3;
 
+		std::unique_ptr<PlaneMeshT> plane1;
 		// Other
 		float mAngle = 45.0f;
 

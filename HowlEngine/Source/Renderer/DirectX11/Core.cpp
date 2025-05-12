@@ -124,7 +124,7 @@ namespace HEngine
          ZeroMemory(&rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
 
          rasterDesc.FillMode = D3D11_FILL_SOLID; // D3D11_FILL_WIREFRAME may be used
-         rasterDesc.CullMode = D3D11_CULL_NONE;
+         rasterDesc.CullMode = D3D11_CULL_NONE; // try cull back if current state is incorrect
          rasterDesc.FrontCounterClockwise = false;
          rasterDesc.DepthBias = 0;
          rasterDesc.SlopeScaledDepthBias = 0.0f;

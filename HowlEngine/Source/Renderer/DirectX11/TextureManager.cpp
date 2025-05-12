@@ -3,7 +3,7 @@
 
 namespace HEngine
 {
-	bool TextureManager::LoadTexture(const std::string& name, const std::wstring path, ID3D11Device* pDevice)
+	bool TextureManager::LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice)
 	{
 		if (mTextures.find(name) != mTextures.end()) return true;
 

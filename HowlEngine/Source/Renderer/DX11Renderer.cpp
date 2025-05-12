@@ -55,6 +55,7 @@ namespace HEngine
         mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get());
         mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get());
         mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get());
+        mTextureManager.LoadTexture("desert", L"Assets/Textures/desert.jpg", mDevice.Get());
 
         // texture sampler
         D3D11_SAMPLER_DESC sampDesc = {};
@@ -101,11 +102,15 @@ namespace HEngine
 
         cube2 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         cube2->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "brick");
-        cube2->SetPosition(1.5f, 0.0f, 0.0f);
+        cube2->GetPosition().x = 1.5f;
 
         cube3 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         cube3->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "metal");
-        cube3->SetPosition(-1.5f, 0.0f, 0.0f);
+        cube3->GetPosition().x = -1.5f;
+
+        plane1 = std::make_unique<PlaneMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
+        plane1->Initialize(6.0f, 6.0f, 1, 1, mViewMatrix, mProjMatrix, "desert");
+        plane1->GetPosition().y = -1.5f;
     }
 
     void DX11Renderer::Update(const double deltaTime)
@@ -122,17 +127,20 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
-        cube1->SetRotation(mAngle, 0.0f, mAngle);
-        cube1->BindRes(mViewMatrix);
+        cube1->GetRotation().y = mAngle;
+        cube1->Bind(mViewMatrix);
         cube1->Draw();
 
-        cube2->SetRotation(-mAngle, mAngle, 0.0f);
-        cube2->BindRes(mViewMatrix);
+        cube2->GetRotation().y = mAngle;
+        cube2->Bind(mViewMatrix);
         cube2->Draw();
 
-        cube3->SetRotation(mAngle, 0.0f, -mAngle);
-        cube3->BindRes(mViewMatrix);
+        cube3->GetRotation().y = mAngle;
+        cube3->Bind(mViewMatrix);
         cube3->Draw();
+
+        plane1->Bind(mViewMatrix);
+        plane1->Draw();
 
         mAngle += 0.5f * deltaTime;
 

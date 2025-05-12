@@ -3,7 +3,8 @@
 
 namespace HEngine
 {
-    void CubeMeshT::Initialize(std::vector<TR::Vertex3T> _vertices, std::vector<UINT16> _indices, XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName)
+    void CubeMeshT::Initialize(std::vector<TR::Vertex3T> _vertices, std::vector<UINT16> _indices,
+        XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName)
     {
         vertices = std::move(_vertices);
         indices = std::move(_indices);
@@ -16,9 +17,9 @@ namespace HEngine
         CreateConstantBuffer(mConstantBuffer);
     }
 
-    void CubeMeshT::BindRes(XMMATRIX& viewMatrix)
+    void CubeMeshT::Bind(XMMATRIX& viewMatrix)
     {
-        Bind(mVertexBuffer, mIndexBuffer, mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix, sizeof(TR::Vertex3T), texture);
+        BindRes(mVertexBuffer, mIndexBuffer, mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix, sizeof(TR::Vertex3T), texture);
     }
 
     void CubeMeshT::Draw()
