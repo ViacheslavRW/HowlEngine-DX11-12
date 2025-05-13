@@ -67,49 +67,22 @@ namespace HEngine
         mDevice->CreateSamplerState(&sampDesc, mSamplerState.GetAddressOf());
         mDeviceContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
 
-        // -- new system
-        std::vector<TR::Vertex3T> _vertices = {
-            // Front face
-            {{-0.5f, -0.5f, -0.5f}, {}, {0.0f, 1.0f}}, // bottom-left
-            {{ 0.5f, -0.5f, -0.5f}, {}, {1.0f, 1.0f}}, // bottom-right
-            {{-0.5f,  0.5f, -0.5f}, {}, {0.0f, 0.0f}}, // top-left
-            {{ 0.5f,  0.5f, -0.5f}, {}, {1.0f, 0.0f}}, // top-right
+        mCamera.SetProjMatrix(width, height);
 
-            // Back face
-            {{-0.5f, -0.5f,  0.5f}, {}, {1.0f, 1.0f}}, // bottom-right (mirrored)
-            {{ 0.5f, -0.5f,  0.5f}, {}, {0.0f, 1.0f}}, // bottom-left
-            {{-0.5f,  0.5f,  0.5f}, {}, {1.0f, 0.0f}}, // top-right
-            {{ 0.5f,  0.5f,  0.5f}, {}, {0.0f, 0.0f}}, // top-left
-        };
-
-        std::vector<UINT16> _indices = {
-            // Front face
-            0, 1, 2,  1, 3, 2,
-            // Right face
-            1, 5, 3,  5, 7, 3,
-            // Top face
-            2, 3, 6,  3, 7, 6,
-            // Back face
-            5, 4, 7,  4, 6, 7,
-            // Left face
-            4, 0, 6,  0, 2, 6,
-            // Bottom face
-            4, 5, 0,  5, 1, 0
-        };
-
+        // mesh
         cube1 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube1->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "crumpled_paper");
+        cube1->Initialize(0.5f, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "crumpled_paper");
 
         cube2 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube2->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "brick");
+        cube2->Initialize(0.5f, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "brick");
         cube2->GetPosition().x = 1.5f;
 
         cube3 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube3->Initialize(_vertices, _indices, mViewMatrix, mProjMatrix, "metal");
+        cube3->Initialize(0.5f, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "metal");
         cube3->GetPosition().x = -1.5f;
 
         plane1 = std::make_unique<PlaneMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        plane1->Initialize(6.0f, 6.0f, 1, 1, mViewMatrix, mProjMatrix, "desert");
+        plane1->Initialize(6.0f, 6.0f, 1, 1, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "desert");
         plane1->GetPosition().y = -1.5f;
     }
 
@@ -128,18 +101,19 @@ namespace HEngine
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
         cube1->GetRotation().y = mAngle;
-        cube1->Bind(mViewMatrix);
+        cube1->Bind(mCamera.GetViewMatrix());
         cube1->Draw();
 
         cube2->GetRotation().y = mAngle;
-        cube2->Bind(mViewMatrix);
+        cube2->Bind(mCamera.GetViewMatrix());
         cube2->Draw();
 
         cube3->GetRotation().y = mAngle;
-        cube3->Bind(mViewMatrix);
+        cube3->Bind(mCamera.GetViewMatrix());
         cube3->Draw();
 
-        plane1->Bind(mViewMatrix);
+        plane1->GetPosition().z = 1.0f;
+        plane1->Bind(mCamera.GetViewMatrix());
         plane1->Draw();
 
         mAngle += 0.5f * deltaTime;

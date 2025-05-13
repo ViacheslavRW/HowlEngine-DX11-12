@@ -6,6 +6,7 @@
 #include "./DirectX11/TextureManager.h"
 #include "../Mesh/CubeMesh.h"
 #include "../Mesh/PlaneMesh.h"
+#include "../Camera/Camera.h"
 
 namespace HEngine
 {
@@ -43,8 +44,8 @@ namespace HEngine
 	private:
 		// viewport
 		D3D11_VIEWPORT mViewPort = {};
-		XMMATRIX mViewMatrix = XMMatrixTranslation(0.0f, 0.0f, 4.5f);
-		XMMATRIX mProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 1.0f / 0.75f, 0.1f, 20.0f);
+		// camera
+		Camera mCamera;
 
 	private:
 		// textures

@@ -79,6 +79,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Camera\Camera.h" />
     <ClInclude Include="Source\Mesh\PlaneMesh.h" />
     <ClInclude Include="Source\Mesh\Binder.h" />
     <ClInclude Include="Source\Mesh\CubeMesh.h" />
@@ -115,6 +116,7 @@
     <ClInclude Include="Source\Renderer\DirectX11\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Camera\Camera.cpp" />
     <ClCompile Include="Source\Mesh\PlaneMesh.cpp" />
     <ClCompile Include="Source\Mesh\CubeMesh.cpp" />
     <ClCompile Include="Source\Renderer\DirectX11\Core.cpp" />

@@ -11,8 +11,7 @@ namespace HEngine
 		CubeMeshT(ID3D11Device& device, ID3D11DeviceContext& deviceContext, ID3D11InputLayout& inputLayout, TextureManager& textureManager)
 			: Binder(device, deviceContext, inputLayout, textureManager) {}
 
-		void Initialize(std::vector<TR::Vertex3T> _vertices, std::vector<UINT16> _indices,
-			XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName);
+		void Initialize(float size, XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName);
 		void Bind(XMMATRIX& viewMatrix);
 		void Draw();
 

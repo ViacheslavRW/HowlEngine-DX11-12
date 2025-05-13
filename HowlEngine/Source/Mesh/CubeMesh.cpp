@@ -3,11 +3,37 @@
 
 namespace HEngine
 {
-    void CubeMeshT::Initialize(std::vector<TR::Vertex3T> _vertices, std::vector<UINT16> _indices,
-        XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName)
+    void CubeMeshT::Initialize(float size, XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName)
     {
-        vertices = std::move(_vertices);
-        indices = std::move(_indices);
+        vertices = {
+            // Front face
+            {{-size, -size, -size}, {}, {0.0f, 1.0f}}, // bottom-left
+            {{ size, -size, -size}, {}, {1.0f, 1.0f}}, // bottom-right
+            {{-size,  size, -size}, {}, {0.0f, 0.0f}}, // top-left
+            {{ size,  size, -size}, {}, {1.0f, 0.0f}}, // top-right
+
+            // Back face
+            {{-size, -size,  size}, {}, {1.0f, 1.0f}}, // bottom-right (mirrored)
+            {{ size, -size,  size}, {}, {0.0f, 1.0f}}, // bottom-left
+            {{-size,  size,  size}, {}, {1.0f, 0.0f}}, // top-right
+            {{ size,  size,  size}, {}, {0.0f, 0.0f}}, // top-left
+        };
+
+        indices = {
+            // Front face
+            0, 1, 2,  1, 3, 2,
+            // Right face
+            1, 5, 3,  5, 7, 3,
+            // Top face
+            2, 3, 6,  3, 7, 6,
+            // Back face
+            5, 4, 7,  4, 6, 7,
+            // Left face
+            4, 0, 6,  0, 2, 6,
+            // Bottom face
+            4, 5, 0,  5, 1, 0
+        };
+
         mViewMatrix = _viewMatrix;
         mProjMatrix = _projectionMatrix;
         texture = textureName;
