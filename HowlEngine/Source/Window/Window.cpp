@@ -8,6 +8,7 @@ namespace HEngine
 	// window procedure function
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		Window* pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 		switch(uMsg)
 		{
 			case WM_NCCREATE:
@@ -15,17 +16,15 @@ namespace HEngine
 				LPCREATESTRUCT lPar = reinterpret_cast<LPCREATESTRUCT>(lParam);
 				Window* pWnd = reinterpret_cast<Window*>(lPar->lpCreateParams);
 				SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-
+				return true;
 			} break;
 			case WM_CREATE :
 			{
-				Window* pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				pWnd->OnWindowCreate(hwnd);
 				
 			} break;
 			case WM_DESTROY:
 			{
-				Window* pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				pWnd->OnWindowDestroy();
 				PostQuitMessage(0);
 			} break;

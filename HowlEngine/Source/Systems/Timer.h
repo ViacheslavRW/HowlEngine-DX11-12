@@ -13,9 +13,9 @@ namespace HEngine
 		void Reset();
 		void Tick();
 
-		double GetTotalTime() const;
+		float GetTotalTime() const;
 
-		inline double GetDeltaTime() const { return mDeltaTime; };
+		inline float GetDeltaTime() const { return mDeltaTime; };
 	private:
 		using clock = std::chrono::high_resolution_clock;
 		using timepoint = std::chrono::time_point<clock>;
@@ -26,7 +26,7 @@ namespace HEngine
 		timepoint mCurrentFrameTime;
 
 		bool mIsPaused = false;
-		double mDeltaTime = 0.0;
+		float mDeltaTime = 0.0f;
 	};
 }
 

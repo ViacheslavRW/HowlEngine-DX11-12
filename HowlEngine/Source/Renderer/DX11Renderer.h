@@ -1,6 +1,7 @@
 #pragma once
-#include "Windows.h"
+#include "../Config/EngineDLLConfig.h"
 #include "IRenderer.h"
+#include "Windows.h"
 #include "DirectX11/DebugInfoManager.h"
 #include "./RenderTypes/RenderDataTypes.h"
 #include "./DirectX11/TextureManager.h"
@@ -13,7 +14,7 @@ namespace HEngine
 	using namespace Microsoft::WRL;
 	using namespace DirectX;
 
-	class DX11Renderer : public IRenderer
+	class HE_API DX11Renderer : public IRenderer
 	{
 	public:
 		DX11Renderer() = default;
@@ -21,10 +22,9 @@ namespace HEngine
 		DX11Renderer* operator=(const DX11Renderer&) = delete;
 		~DX11Renderer() override;
 
-		void Initialize(HWND hwnd, const UINT width, const UINT height) override;
-		void Update(const double deltaTime) override;
+		void Initialize(HWND hwnd, const UINT width, const UINT height, Camera* pCamera) override;
+		void Update(const float deltaTime) override;
 		void Release() override;
-
 	private:
 		// Main Components
 		ComPtr<ID3D11Device> mDevice = nullptr;
@@ -45,7 +45,7 @@ namespace HEngine
 		// viewport
 		D3D11_VIEWPORT mViewPort = {};
 		// camera
-		Camera mCamera;
+		Camera* pCamera;
 
 	private:
 		// textures

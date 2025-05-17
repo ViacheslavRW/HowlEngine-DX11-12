@@ -13,8 +13,9 @@ namespace HEngine
         Release();
     }
 
-    void DX11Renderer::Initialize(HWND hwnd, const UINT width, const UINT height)
+    void DX11Renderer::Initialize(HWND hwnd, const UINT width, const UINT height, Camera* _camera)
     {
+        pCamera = _camera;
         Core::InitializeDeviceAndSwapChain(hwnd, width, height, mDevice, mSwapChain, mDeviceContext);
         Core::InitializeRenderTargetView(mRenderTargetView, mDevice, mSwapChain);
         Core::SetViewPort(width, height, mDeviceContext, mViewPort);
@@ -67,26 +68,25 @@ namespace HEngine
         mDevice->CreateSamplerState(&sampDesc, mSamplerState.GetAddressOf());
         mDeviceContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
 
-        mCamera.SetProjMatrix(width, height);
-
         // mesh
         cube1 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube1->Initialize(0.5f, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "crumpled_paper");
+        cube1->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "crumpled_paper");
 
         cube2 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube2->Initialize(0.5f, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "brick");
+        cube2->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "brick");
         cube2->GetPosition().x = 1.5f;
 
         cube3 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube3->Initialize(0.5f, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "metal");
+        cube3->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "metal");
         cube3->GetPosition().x = -1.5f;
 
         plane1 = std::make_unique<PlaneMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        plane1->Initialize(6.0f, 6.0f, 1, 1, mCamera.GetViewMatrix(), mCamera.GetProjMatrix(), "desert");
+        plane1->Initialize(6.0f, 6.0f, 1, 1, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "desert");
+        plane1->GetPosition().z = 1.0f;
         plane1->GetPosition().y = -1.5f;
     }
 
-    void DX11Renderer::Update(const double deltaTime)
+    void DX11Renderer::Update(const float deltaTime)
     {
 #if defined(DEBUG) || defined(_DEBUG)
         mDebugInfoManager.Set();
@@ -100,20 +100,16 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
-        cube1->GetRotation().y = mAngle;
-        cube1->Bind(mCamera.GetViewMatrix());
+        cube1->Bind(pCamera->GetViewMatrix());
         cube1->Draw();
 
-        cube2->GetRotation().y = mAngle;
-        cube2->Bind(mCamera.GetViewMatrix());
+        cube2->Bind(pCamera->GetViewMatrix());
         cube2->Draw();
 
-        cube3->GetRotation().y = mAngle;
-        cube3->Bind(mCamera.GetViewMatrix());
+        cube3->Bind(pCamera->GetViewMatrix());
         cube3->Draw();
 
-        plane1->GetPosition().z = 1.0f;
-        plane1->Bind(mCamera.GetViewMatrix());
+        plane1->Bind(pCamera->GetViewMatrix());
         plane1->Draw();
 
         mAngle += 0.5f * deltaTime;

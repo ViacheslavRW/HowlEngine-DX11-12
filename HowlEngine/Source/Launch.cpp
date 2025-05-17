@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Launch.h"
-#include "Window/Window.h"
-#include "Renderer/DX12Renderer.h"
-#include "Renderer/DX11Renderer.h"
+#include "./Window/Window.h"
+#include "./Renderer/DX12Renderer.h"
+#include "./Renderer/DX11Renderer.h"
 
 namespace HEngine
 {
@@ -10,10 +10,15 @@ namespace HEngine
 
 	void Launch::AppRun()
 	{
-		Window mainWindow(mMainWindowWidth, mMainWindowHeight, this);
+		static Window mainWindow(mMainWindowWidth, mMainWindowHeight, this);
+
+		mCamera.Initialize();
+		mCamera.SetProjMatrix(mMainWindowWidth, mMainWindowHeight);
 
 		mRenderer = SetRenderer(GraphicsAPI::DirectX11);
-		mRenderer->Initialize(WndHandle, mMainWindowWidth, mMainWindowHeight);
+		mRenderer->Initialize(WndHandle, mMainWindowWidth, mMainWindowHeight, &mCamera);
+
+		mInputManager.Initialize(&mCamera);
 
 		gTimer.Reset();
 
@@ -31,6 +36,7 @@ namespace HEngine
 			DispatchMessage(&msg);
 		}
 
+		mInputManager.Update(gTimer.GetDeltaTime());
 		mRenderer->Update(gTimer.GetDeltaTime());
 		gTimer.Tick();
 		CalculateFrameStats();
@@ -38,7 +44,6 @@ namespace HEngine
 
 	void Launch::AppExit()
 	{
-		//if(mRenderer) mRenderer->Release();
 	}
 
 	void Launch::CalculateFrameStats() const

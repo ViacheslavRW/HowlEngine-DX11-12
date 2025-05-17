@@ -47,21 +47,21 @@ namespace HEngine
 		}
 
 		mCurrentFrameTime = clock::now();
-		mDeltaTime = std::chrono::duration<double>(mCurrentFrameTime - mPrevFrameTime).count();
+		mDeltaTime = std::chrono::duration<float>(mCurrentFrameTime - mPrevFrameTime).count();
 		mPrevFrameTime = mCurrentFrameTime;
 
 		if (mDeltaTime < 0.0) mDeltaTime = 0.0;
 	}
 
-	double Timer::GetTotalTime() const
+	float Timer::GetTotalTime() const
 	{
 		if (mIsPaused)
 		{
-			return std::chrono::duration<double>(mPauseTime - mStartTime).count();
+			return std::chrono::duration<float>(mPauseTime - mStartTime).count();
 		}
 		else
 		{
-			return std::chrono::duration<double>(mCurrentFrameTime - mStartTime).count();
+			return std::chrono::duration<float>(mCurrentFrameTime - mStartTime).count();
 		}
 	}
 }

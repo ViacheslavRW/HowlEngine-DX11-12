@@ -29,8 +29,8 @@ namespace HEngine
 		DX12Renderer& operator=(const DX12Renderer&) = delete;
 		~DX12Renderer() override;
 
-		void Initialize(HWND hwnd, const UINT width, const UINT height) override;
-		void Update(const double deltaTime) override;
+		void Initialize(HWND hwnd, const UINT width, const UINT height, Camera* pCamera) override;
+		void Update(const float deltaTime) override;
 		void Release() override;
 
 	private:

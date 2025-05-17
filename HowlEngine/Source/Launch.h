@@ -1,15 +1,18 @@
 #pragma once
 #include <memory>
+#include "./Camera/Camera.h"
+#include "Windows.h"
 #include "./Config/EngineDLLConfig.h"
 #include "./Renderer/IRenderer.h"
 #include "./Renderer/RenderTypes/GraphicsAPI.h"
 #include "./Systems/Timer.h"
+#include "./Input/InputManager.h"
 
 namespace HEngine
 {
 	extern Timer gTimer;
 
-	class __declspec(dllexport) Launch
+	class HE_API Launch
 	{
 	public:
 		// Main Application Loop
@@ -23,15 +26,16 @@ namespace HEngine
 
 	public:
 		std::unique_ptr<IRenderer> mRenderer;
-
+		Camera mCamera;
+		InputManager mInputManager;
 	public:
 		HWND WndHandle = nullptr;   
-
 	private:
 		UINT mMainWindowWidth = 800;
 		UINT mMainWindowHeight = 600;
 		// time and frames
 		void CalculateFrameStats() const;
+		
 	private:
 		std::unique_ptr<IRenderer> SetRenderer(GraphicsAPI api);
 	};

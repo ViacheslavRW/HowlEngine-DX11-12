@@ -11,7 +11,7 @@ namespace HEngine
 		Release();
 	}
 
-	void DX12Renderer::Initialize(HWND hwnd, const UINT width, const UINT height)
+	void DX12Renderer::Initialize(HWND hwnd, const UINT width, const UINT height, Camera* pCamera)
 	{
 		// Setup variables
 		mWidth = width;
@@ -210,7 +210,7 @@ namespace HEngine
 			(DXCommandList*)mCommandList.GetAddressOf(), (DXCommandQueue*)mCommandQueue.GetAddressOf());
 	}
 
-	void DX12Renderer::Update(const double deltaTime)
+	void DX12Renderer::Update(const float deltaTime)
 	{
 		memcpy(mConstantBufferPassData.GetCPUMemory(), &mViewProjectionMatrix, sizeof(TR::PassData));
 

@@ -22,8 +22,10 @@ namespace HEngine
 		void SetWindowed();
 		bool isFullScreen = false;
 		bool isWindowed = true;
-	private:
+
 		Launch* mLaunchPtr = nullptr;
+	private:
+
 		UINT mLastWidth = 0;
 		UINT mLastHeight = 0;
 	};

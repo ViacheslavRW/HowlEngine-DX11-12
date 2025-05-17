@@ -3,8 +3,13 @@
 
 namespace HEngine
 {
-	Camera::Camera()
-		: position(0.0f, 0.0f, -4.5f), pitch(0.0f), yaw(0.0f), roll(0.0f) {}
+	void Camera::Initialize()
+	{
+		pitch = 0.0f;
+		yaw = 0.0f;
+		roll = 0.0f;
+		position = { 0.0f, 0.0f, -4.5f };
+	}
 
 	XMMATRIX& Camera::GetViewMatrix()
 	{
@@ -19,6 +24,6 @@ namespace HEngine
 
 	void Camera::SetProjMatrix(UINT width, UINT height)
 	{
-		mProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(width) / static_cast<float>(height), nearZ, farZ);
+		mProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 800.0f / 600.0f, nearZ, farZ);
 	}
 }
