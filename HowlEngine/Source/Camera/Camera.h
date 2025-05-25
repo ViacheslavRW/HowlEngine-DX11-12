@@ -16,34 +16,56 @@ namespace HEngine
 
 		void Initialize();
 
+		void UpdateCameraVectors();
 		XMMATRIX& GetViewMatrix();
-		inline XMMATRIX& GetProjMatrix() { return mProjMatrix; };
+		
 		void SetProjMatrix(UINT width, UINT height);
 
-		inline void SetPosition(XMFLOAT3 _position) { position = _position; };
-		inline void SetRotation(float _pitch, float _yaw, float _roll) { pitch = _pitch; yaw = _yaw; roll = _roll; };
-		// move
-		inline void MoveForward(float deltaTime) { position.z += cameraSpeed * deltaTime; };
-		inline void MoveBackward(float deltaTime) { position.z -= cameraSpeed * deltaTime; };
-		inline void MoveLeft(float deltaTime) { position.x -= cameraSpeed * deltaTime; };
-		inline void MoveRight(float deltaTime) { position.x += cameraSpeed * deltaTime; };
-		inline void MoveUp(float deltaTime) { position.y += cameraSpeed * deltaTime; };
-		inline void MoveDown(float deltaTime) { position.y -= cameraSpeed * deltaTime; };
+		inline XMMATRIX& GetProjMatrix() { return mProjMatrix; };
 
+		inline void SetPosition(XMFLOAT3 _position) { position = _position; dirtyView = true; };
+		inline void SetRotation(float _pitch, float _yaw, float _roll) { pitch = _pitch; yaw = _yaw; roll = _roll; dirtyRotation = true; dirtyView = true; };
+
+		// move
+		void MoveForward(float deltaTime);
+		void MoveBackward(float deltaTime);
+		void MoveLeft(float deltaTime);
+		void MoveRight(float deltaTime);
+		void MoveUp(float deltaTime);
+		void MoveDown(float deltaTime);
+		// rotate
+		void RotateByRawMouse(int dx, int dy);
+		void RotateLeft(float deltaTime);
+		void RotateRight(float deltaTime);
+		void RotateDown(float deltaTime);
+		void RotateUp(float deltaTime);
 	private:
 		constexpr static float nearZ = 0.1f;
 		constexpr static float farZ = 100.0f;
 		float pitch, yaw, roll;
 	
-		constexpr static float cameraSpeed = 3.9f;
+		bool dirtyRotation = true;
+		bool dirtyView = true;
+
+		constexpr static float cameraSpeed = 7.5f;
+		constexpr static float cameraRotSpeed = 2.2f;
+		constexpr static float cameraSensitivity = 0.004f;
 
 		XMFLOAT3 position;
 
-		const XMVECTOR defaultForward = XMVectorSet( 0.0f, 0.0f, 1.0f, 0.0f );
-		const XMVECTOR defaultUp = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+		XMFLOAT3 forward = { 0.0f, 0.0f, 1.0f };
+		XMFLOAT3 right = { 1.0f, 0.0f, 0.0f };
+		XMFLOAT3 up = { 0.0f, 1.0f, 0.0f };
+		XMVECTOR worldUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 		XMMATRIX mViewMatrix = {};
 		XMMATRIX mProjMatrix = {};
+
+		template <typename T>
+		inline const T& Clamp(const T& v, const T& lo, const T& hi)
+		{
+			return (v < lo) ? lo : (hi < v) ? hi : v;
+		}
 	};
 }
 

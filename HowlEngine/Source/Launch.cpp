@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Launch.h"
+#include "Windowsx.h"
 #include "./Window/Window.h"
 #include "./Renderer/DX12Renderer.h"
 #include "./Renderer/DX11Renderer.h"
@@ -34,6 +35,7 @@ namespace HEngine
 			if (msg.message == WM_QUIT) isAppRunning = false;
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+			
 		}
 
 		mInputManager.Update(gTimer.GetDeltaTime());

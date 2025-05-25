@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Keyboard.h"
+#include "Mouse.h"
 
 namespace HEngine
 {

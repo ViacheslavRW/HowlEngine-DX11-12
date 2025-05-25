@@ -24,8 +24,8 @@ namespace HEngine
 		bool isWindowed = true;
 
 		Launch* mLaunchPtr = nullptr;
+		std::vector<BYTE> rawData;
 	private:
-
 		UINT mLastWidth = 0;
 		UINT mLastHeight = 0;
 	};

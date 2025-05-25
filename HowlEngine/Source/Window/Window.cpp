@@ -23,6 +23,29 @@ namespace HEngine
 				pWnd->OnWindowCreate(hwnd);
 				
 			} break;
+			// read mouse position
+			case WM_INPUT:
+			{
+				UINT dataSize;
+				GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, NULL, &dataSize, sizeof(RAWINPUTHEADER));
+
+				pWnd->rawData.resize(dataSize);
+
+				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, pWnd->rawData.data(), &dataSize, sizeof(RAWINPUTHEADER)) == dataSize)
+				{
+					RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(pWnd->rawData.data());
+					if (raw->header.dwType == RIM_TYPEMOUSE)
+					{
+						pWnd->mLaunchPtr->mCamera.RotateByRawMouse(raw->data.mouse.lLastX, raw->data.mouse.lLastY);
+					}
+				}
+				else
+				{
+					std::cout << "INCORRECT_DATA_SIZE_OF_RID" << " size: " << dataSize << "\n";
+				}
+
+				break;
+			} 
 			case WM_DESTROY:
 			{
 				pWnd->OnWindowDestroy();
@@ -58,6 +81,14 @@ namespace HEngine
 			isWindowRunning = false;
 			return;
 		}
+		// create raw input device (mouse)
+		RAWINPUTDEVICE rid = {};
+		rid.usUsagePage = 0x01;
+		rid.usUsage = 0x02; // mouse
+		rid.dwFlags = 0;
+		rid.hwndTarget = WndHandle;
+		RegisterRawInputDevices(&rid, 1, sizeof(rid));
+		
 		//SetFullScreen();
 		ShowWindow(WndHandle, SW_SHOW);
 		UpdateWindow(WndHandle);
