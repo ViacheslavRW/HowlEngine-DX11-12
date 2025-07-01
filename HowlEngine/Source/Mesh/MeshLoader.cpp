@@ -3,10 +3,11 @@
 #include "../Renderer/RenderTypes/RenderDataTypes.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <filesystem> 
 
 namespace HEngine
 {
-	void MeshLoader::LoadMesh(Mesh* pMesh, const std::string& path)
+	void MeshLoader::LoadMesh(Mesh* pMesh, const std::string& path, const std::wstring& texturesPath, TextureManager* pTextureManager, ID3D11Device* pDevice)
 	{
 		Assimp::Importer importer;
 
@@ -22,27 +23,54 @@ namespace HEngine
 			std::cerr << "Assimp error: " << importer.GetErrorString() << std::endl;
 			return;
 		};
-		
-		ProcessNode(scene->mRootNode, scene, pMesh);
+
+		// Load textures
+		std::unordered_map<UINT, std::string> materialIndexToTextureKey;
+		for (UINT i = 0; i < scene->mNumMaterials; ++i)
+		{
+			aiMaterial* material = scene->mMaterials[i];
+			aiString texturePath;
+
+			if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+			{
+				std::filesystem::path fullPath = texturePath.C_Str();
+				std::string filenameOnly = fullPath.filename().string();
+
+				std::string textureKey = filenameOnly;
+				std::wstring textureFullPath = L"Assets/Textures" + texturesPath + std::wstring(filenameOnly.begin(), filenameOnly.end());
+
+				pTextureManager->LoadTexture(textureKey, textureFullPath, pDevice, TextureFormat::TGA);
+
+				materialIndexToTextureKey[i] = textureKey;
+			}
+		}
+
+		ProcessNode(scene->mRootNode, scene, pMesh, materialIndexToTextureKey);
 	}
 
-	void MeshLoader::ProcessNode(aiNode* node, const aiScene* scene, Mesh* pMesh)
+	void MeshLoader::ProcessNode(aiNode* node, const aiScene* scene, Mesh* pMesh,
+		const std::unordered_map<UINT, std::string>& materialIndexToTextureKey)
 	{
 		for (UINT i = 0; i < node->mNumMeshes; ++i)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			ProcessMesh(mesh, scene, pMesh);
+			SubMesh subMesh;
+			ProcessMesh(mesh, scene, &subMesh, materialIndexToTextureKey);
+			pMesh->subMeshes.push_back(std::move(subMesh));
 		}
 
 		for (UINT i = 0; i < node->mNumChildren; ++i)
 		{
-			ProcessNode(node->mChildren[i], scene, pMesh);
+			ProcessNode(node->mChildren[i], scene, pMesh, materialIndexToTextureKey);
 		}
 	}
 
-	void MeshLoader::ProcessMesh(aiMesh* mesh, const aiScene* scene, Mesh* pMesh)
+	void MeshLoader::ProcessMesh(aiMesh* mesh, const aiScene* scene, SubMesh* subMesh, 
+		const std::unordered_map<UINT, std::string>& materialIndexToTextureKey)
 	{
-		UINT vertexOffset = static_cast<UINT>(pMesh->vertices.size());
+		UINT materialIndex = mesh->mMaterialIndex;
+		if (materialIndexToTextureKey.find(materialIndex) != materialIndexToTextureKey.end())
+			subMesh->texture = materialIndexToTextureKey.at(materialIndex);
 
 		for (UINT i = 0; i < mesh->mNumVertices; ++i)
 		{
@@ -75,7 +103,7 @@ namespace HEngine
 			}
 			else vertex.textureCoord = { 0.0f, 0.0f };
 
-			pMesh->vertices.push_back(vertex);
+			subMesh->vertices.push_back(vertex);
 		}
 
 		for (UINT i = 0; i < mesh->mNumFaces; ++i)
@@ -83,7 +111,7 @@ namespace HEngine
 			const aiFace& face = mesh->mFaces[i];
 			for (UINT j = 0; j < face.mNumIndices; ++j)
 			{
-				pMesh->indices.push_back(face.mIndices[j] + vertexOffset);
+				subMesh->indices.push_back(face.mIndices[j]);
 			}
 		}
 	}

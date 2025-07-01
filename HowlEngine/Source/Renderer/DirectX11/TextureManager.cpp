@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "TextureManager.h"
+#include "DirectXTex.h"
 
 namespace HEngine
 {
-	bool TextureManager::LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice)
+	bool TextureManager::LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format)
 	{
 		if (mTextures.find(name) != mTextures.end()) return true;
 
 		std::unique_ptr<Texture> texture = std::make_unique<Texture>();
-		if (!texture->LoadFromFile(path, pDevice)) return false;
+		if (!texture->LoadFromFile(path, pDevice, format)) return false;
 
 		mTextures[name] = std::move(texture);
 		return true;

@@ -5,6 +5,17 @@
 
 namespace HEngine
 {
+	struct SubMesh
+	{
+		std::vector<TR::Vertex3T> vertices;
+		std::vector<UINT32> indices;
+		std::string texture = "no_texture";
+
+		ComPtr<ID3D11Buffer> mVertexBuffer = nullptr;
+		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;
+		ComPtr<ID3D11Buffer> mConstantBuffer = nullptr;
+	};
+
 	class Mesh : public Binder<TR::Vertex3T>
 	{
 	public:
@@ -14,11 +25,9 @@ namespace HEngine
 		void Initialize(XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix);
 		void CreateBuffers();
 		void Bind(XMMATRIX& viewMatrix);
-		void Draw();
+		void Draw(XMMATRIX& viewMatrix);
 
-		std::vector<TR::Vertex3T> vertices;
-		std::vector<UINT32> indices;
-		std::string texture = "no_texture";
+		std::vector<SubMesh> subMeshes;
 	public:
 		XMMATRIX GetModelMartix() const;
 
@@ -33,11 +42,6 @@ namespace HEngine
 
 		XMMATRIX mViewMatrix = {};
 		XMMATRIX mProjMatrix = {};
-
-	protected:
-		ComPtr<ID3D11Buffer> mVertexBuffer = nullptr;
-		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;
-		ComPtr<ID3D11Buffer> mConstantBuffer = nullptr;
 	};
 }
 

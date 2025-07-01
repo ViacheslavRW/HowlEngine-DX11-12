@@ -13,7 +13,7 @@ namespace HEngine
 		TextureManager(const TextureManager&) = delete;
 		TextureManager& operator=(const TextureManager&) = delete;
 
-		bool LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice);
+		bool LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format);
 		ComPtr<ID3D11ShaderResourceView> GetTextureSRV(const std::string& name);
 		void Clear();
 

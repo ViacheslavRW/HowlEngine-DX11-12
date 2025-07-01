@@ -53,11 +53,11 @@ namespace HEngine
         if (FAILED(ciRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
         
         // load textures
-        mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get());
-        mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get());
-        mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get());
-        mTextureManager.LoadTexture("desert", L"Assets/Textures/desert.jpg", mDevice.Get());
-        mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get());
+        mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get(), TextureFormat::JPG);
+        mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get(), TextureFormat::JPG);
+        mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get(), TextureFormat::JPG);
+        mTextureManager.LoadTexture("desert", L"Assets/Textures/desert.jpg", mDevice.Get(), TextureFormat::JPG);
+        mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get(), TextureFormat::PNG);
 
         // texture sampler
         D3D11_SAMPLER_DESC sampDesc = {};
@@ -72,7 +72,7 @@ namespace HEngine
         // load external mesh
         mesh1 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         mesh1->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh1.get(), "Models/Monitor.obj");
+        mMeshLoader.LoadMesh(mesh1.get(), "Models/Monitor.obj", L"", &mTextureManager, mDevice.Get());
         mesh1->CreateBuffers();
         mesh1->GetScale() = { 0.3f, 0.3f, 0.3f };
         mesh1->GetPosition().x = 1.8f;
@@ -80,7 +80,7 @@ namespace HEngine
 
         mesh2 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         mesh2->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16.obj");
+        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16.obj", L"/Eve_16/", &mTextureManager, mDevice.Get());
         mesh2->CreateBuffers();
         mesh2->GetScale() = { 0.2f, 0.2f, 0.2f };
         mesh2->GetPosition().y = -1.5f;
@@ -111,11 +111,8 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
-        mesh1->Bind(pCamera->GetViewMatrix());
-        mesh1->Draw();
-
-        mesh2->Bind(pCamera->GetViewMatrix());
-        mesh2->Draw();
+        mesh1->Draw(pCamera->GetViewMatrix());
+        mesh2->Draw(pCamera->GetViewMatrix());
 
         cube1->Bind(pCamera->GetViewMatrix());
         cube1->Draw();

@@ -11,19 +11,21 @@ namespace HEngine
 
 	void Mesh::CreateBuffers()
 	{
-		CreateVertexBuffer(vertices, mVertexBuffer);
-		CreateIndexBuffer(indices, mIndexBuffer);
-		CreateConstantBuffer(mConstantBuffer);
+        for (auto& subMesh : subMeshes)
+        {
+            CreateVertexBuffer(subMesh.vertices, subMesh.mVertexBuffer);
+            CreateIndexBuffer(subMesh.indices, subMesh.mIndexBuffer);
+            CreateConstantBuffer(subMesh.mConstantBuffer);
+        }
 	}
 
-    void Mesh::Bind(XMMATRIX& viewMatrix)
+    void Mesh::Draw(XMMATRIX& viewMatrix)
     {
-        BindRes(mVertexBuffer, mIndexBuffer, mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix, sizeof(TR::Vertex3T), texture);
-    }
-
-    void Mesh::Draw()
-    {
-        Binder::DrawMesh(indices.size());
+        for (auto& subMesh : subMeshes)
+        {
+            BindRes(subMesh.mVertexBuffer, subMesh.mIndexBuffer, subMesh.mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix, sizeof(TR::Vertex3T), subMesh.texture);
+            Binder::DrawMesh(subMesh.indices.size());
+        }
     }
 
     XMMATRIX Mesh::GetModelMartix() const
