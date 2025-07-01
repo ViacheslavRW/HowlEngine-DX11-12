@@ -5,6 +5,7 @@ SamplerState sampleType : register(s0);
 struct PS_INPUT
 {
     float4 position : SV_POSITION;
+    float3 normal : NORMAL;
     float2 texCoord : TEXCOORD;
 };
 

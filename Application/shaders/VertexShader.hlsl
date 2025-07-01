@@ -9,6 +9,7 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 position : SV_POSITION;
+    float3 normal : NORMAL;
     float2 texCoord : TEXCOORD0;
 };
 
@@ -23,6 +24,7 @@ VS_OUTPUT main(VS_INPUT input)
     
     output.position = float4(input.position, 1.0f);
     output.position = mul(output.position, worldViewProjmatrix);
+    output.normal = input.normal;
     output.texCoord = input.texCoord;
     
     return output;

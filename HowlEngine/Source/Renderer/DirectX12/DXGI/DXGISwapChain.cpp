@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "DXGISwapChain.h"
 
-
 namespace HEngine
 {
 	DXGISwapChain::~DXGISwapChain()

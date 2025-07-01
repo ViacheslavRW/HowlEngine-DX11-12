@@ -16,7 +16,7 @@ namespace HEngine
 		void Draw();
 
 		std::vector<TR::Vertex3T> vertices;
-		std::vector<UINT16> indices;
+		std::vector<UINT32> indices;
 
 		std::string texture;
 
@@ -44,6 +44,12 @@ namespace HEngine
 	class CubeMeshC : public Binder<TR::Vertex3C>
 	{
 	public:
+	};
+
+	class CubeMeshM : public Binder<TR::Vertex3M>
+	{
+	public:
+
 	};
 }
 

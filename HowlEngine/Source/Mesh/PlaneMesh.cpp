@@ -31,7 +31,7 @@ namespace HEngine
 				TR::Vertex3T v = {};
 				v.position = { px, 0.0f, pz };
 				v.normal = { 0.0f, 0.0f, 0.0f };
-				v.texture = { static_cast<float>(x) / divisionsX, static_cast<float>(z) / divisionsZ };
+				v.textureCoord = { static_cast<float>(x) / divisionsX, static_cast<float>(z) / divisionsZ };
 
 				vertices.push_back(v);
 			}

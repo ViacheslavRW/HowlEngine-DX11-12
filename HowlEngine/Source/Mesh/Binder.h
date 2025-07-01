@@ -38,15 +38,15 @@ namespace HEngine
 			if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_BUFFER" << std::endl;
 		}
 
-		void CreateIndexBuffer(const std::vector<UINT16>& indices, ComPtr<ID3D11Buffer>& pIndexBuffer)
+		void CreateIndexBuffer(const std::vector<UINT32>& indices, ComPtr<ID3D11Buffer>& pIndexBuffer)
 		{
 			D3D11_BUFFER_DESC indBuffDesc = {};
-			indBuffDesc.ByteWidth = static_cast<UINT>(sizeof(UINT16) * indices.size());
+			indBuffDesc.ByteWidth = static_cast<UINT>(sizeof(UINT32) * indices.size());
 			indBuffDesc.Usage = D3D11_USAGE_DEFAULT;
 			indBuffDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			indBuffDesc.CPUAccessFlags = 0;
 			indBuffDesc.MiscFlags = 0;
-			indBuffDesc.StructureByteStride = sizeof(UINT16);
+			indBuffDesc.StructureByteStride = sizeof(UINT32);
 
 			D3D11_SUBRESOURCE_DATA iData = {};
 			iData.pSysMem = indices.data();
@@ -80,7 +80,7 @@ namespace HEngine
 			UINT stride = vertexSize;
 			UINT offset = 0;
 			mDeviceContext.IASetVertexBuffers(0, 1, pVertexBuffer.GetAddressOf(), &stride, &offset);
-			mDeviceContext.IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+			mDeviceContext.IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 			mDeviceContext.IASetInputLayout(&mInputLayout);
 
 			mDeviceContext.PSSetShaderResources(0, 1, mTextureManager.GetTextureSRV(textureName).GetAddressOf());

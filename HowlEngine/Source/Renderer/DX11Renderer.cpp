@@ -57,6 +57,7 @@ namespace HEngine
         mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get());
         mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get());
         mTextureManager.LoadTexture("desert", L"Assets/Textures/desert.jpg", mDevice.Get());
+        mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get());
 
         // texture sampler
         D3D11_SAMPLER_DESC sampDesc = {};
@@ -68,17 +69,27 @@ namespace HEngine
         mDevice->CreateSamplerState(&sampDesc, mSamplerState.GetAddressOf());
         mDeviceContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
 
-        // mesh
+        // load external mesh
+        mesh1 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
+        mesh1->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
+        mMeshLoader.LoadMesh(mesh1.get(), "Models/Monitor.obj");
+        mesh1->CreateBuffers();
+        mesh1->GetScale() = { 0.3f, 0.3f, 0.3f };
+        mesh1->GetPosition().x = 1.8f;
+        mesh1->GetPosition().y = -1.0f;
+
+        mesh2 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
+        mesh2->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
+        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16.obj");
+        mesh2->CreateBuffers();
+        mesh2->GetScale() = { 0.2f, 0.2f, 0.2f };
+        mesh2->GetPosition().y = -1.5f;
+        mesh2->GetRotation().y = 1.5f;
+        
+        // create mesh
         cube1 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube1->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "crumpled_paper");
-
-        cube2 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube2->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "brick");
-        cube2->GetPosition().x = 1.5f;
-
-        cube3 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube3->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "metal");
-        cube3->GetPosition().x = -1.5f;
+        cube1->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "metal");
+        cube1->GetPosition().x = -1.5f;
 
         plane1 = std::make_unique<PlaneMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         plane1->Initialize(6.0f, 6.0f, 1, 1, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "desert");
@@ -100,14 +111,14 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
+        mesh1->Bind(pCamera->GetViewMatrix());
+        mesh1->Draw();
+
+        mesh2->Bind(pCamera->GetViewMatrix());
+        mesh2->Draw();
+
         cube1->Bind(pCamera->GetViewMatrix());
         cube1->Draw();
-
-        cube2->Bind(pCamera->GetViewMatrix());
-        cube2->Draw();
-
-        cube3->Bind(pCamera->GetViewMatrix());
-        cube3->Draw();
 
         plane1->Bind(pCamera->GetViewMatrix());
         plane1->Draw();

@@ -5,6 +5,7 @@ namespace HEngine
 {
 	namespace TR
 	{
+		// --- DX12 ---
 		struct Vertex
 		{
 			DirectX::XMFLOAT3 position = { 0.0f, 0.0f, 0.0f };
@@ -22,6 +23,7 @@ namespace HEngine
 			DirectX::XMMATRIX viewProjMatrix = DirectX::XMMatrixIdentity();
 		};
 
+		// --- Vertices ---
 		struct Vertex3C
 		{
 			DirectX::XMFLOAT3 position;
@@ -32,18 +34,20 @@ namespace HEngine
 		{
 			DirectX::XMFLOAT3 position;
 			DirectX::XMFLOAT3 normal;
-			DirectX::XMFLOAT2 texture;
+			DirectX::XMFLOAT2 textureCoord;
 		};
 
 		struct Vertex3M
 		{
 			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT3 material;
+			DirectX::XMFLOAT3 normal;
 		};
 
-		struct TransformBuffer
+		// --- Material ---
+
+		struct Material
 		{
-			DirectX::XMMATRIX worldViewProjmatrix;
+			DirectX::XMFLOAT3 albedo = { 0.8f, 0.0f, 0.0f };
 		};
 	}
 }

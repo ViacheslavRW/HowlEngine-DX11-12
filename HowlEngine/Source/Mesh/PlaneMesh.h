@@ -17,7 +17,7 @@ namespace HEngine
 		void Draw();
 
 		std::vector<TR::Vertex3T> vertices;
-		std::vector<UINT16> indices;
+		std::vector<UINT32> indices;
 
 		std::string texture;
 	public:

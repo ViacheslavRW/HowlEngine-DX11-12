@@ -31,8 +31,8 @@ namespace HEngine
 	public:
 		HWND WndHandle = nullptr;   
 	private:
-		UINT mMainWindowWidth = 800;
-		UINT mMainWindowHeight = 600;
+		UINT mMainWindowWidth = 1280;
+		UINT mMainWindowHeight = 720;
 		// time and frames
 		void CalculateFrameStats() const;
 		

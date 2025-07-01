@@ -7,6 +7,8 @@
 #include "./DirectX11/TextureManager.h"
 #include "../Mesh/CubeMesh.h"
 #include "../Mesh/PlaneMesh.h"
+#include "../Mesh/Mesh.h"
+#include "../Mesh/MeshLoader.h"
 #include "../Camera/Camera.h"
 
 namespace HEngine
@@ -53,9 +55,11 @@ namespace HEngine
 		TextureManager mTextureManager = {};
 	private:
 		// Mesh
+		MeshLoader mMeshLoader = {};
+
+		std::unique_ptr<Mesh> mesh1;
+		std::unique_ptr<Mesh> mesh2;
 		std::unique_ptr<CubeMeshT> cube1;
-		std::unique_ptr<CubeMeshT> cube2;
-		std::unique_ptr<CubeMeshT> cube3;
 
 		std::unique_ptr<PlaneMeshT> plane1;
 		// Other
