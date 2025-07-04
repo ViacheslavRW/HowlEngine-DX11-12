@@ -51,6 +51,9 @@ namespace HEngine
         };
         HRESULT ciRes = mDevice->CreateInputLayout(layout, (UINT)std::size(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &mInputLayout);
         if (FAILED(ciRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
+
+        // create light buffers
+        mLightHelper.CreateDirectionalLightBuffer(mDevice, mDirectionalLightBuffer);
         
         // load textures
         mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get(), TextureFormat::JPG);
@@ -80,7 +83,7 @@ namespace HEngine
 
         mesh2 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         mesh2->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16.obj", L"/Eve_16/", &mTextureManager, mDevice.Get());
+        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16_2.obj", L"/Eve_16/", &mTextureManager, mDevice.Get());
         mesh2->CreateBuffers();
         mesh2->GetScale() = { 0.2f, 0.2f, 0.2f };
         mesh2->GetPosition().y = -1.5f;
@@ -111,6 +114,9 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
+        mLightHelper.UpdateDirectionalLightBuffer(*mDeviceContext.Get(), mDirectionalLightBuffer);
+
+        // drawing world objects
         mesh1->Draw(pCamera->GetViewMatrix());
         mesh2->Draw(pCamera->GetViewMatrix());
 
@@ -120,8 +126,7 @@ namespace HEngine
         plane1->Bind(pCamera->GetViewMatrix());
         plane1->Draw();
 
-        mAngle += 0.5f * deltaTime;
-
+        // present frames
         HRESULT scRes = mSwapChain->Present( 1, 0 );
         if (FAILED(scRes))
         {
@@ -147,6 +152,7 @@ namespace HEngine
         if (mSwapChain) mSwapChain = nullptr;
         if (mDevice) mDevice = nullptr;
         if (mRenderTargetView) mRenderTargetView = nullptr;
+
         mTextureManager.Clear();
     }
 }

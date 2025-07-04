@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Graphics\LightHelper.h" />
     <ClInclude Include="Source\Mesh\MeshLoader.h" />
     <ClInclude Include="Source\Mesh\Mesh.h" />
     <ClInclude Include="Source\Input\Mouse.h" />
@@ -134,6 +135,7 @@
     <ClInclude Include="Source\Renderer\DirectX11\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Graphics\LightHelper.cpp" />
     <ClCompile Include="Source\Mesh\MeshLoader.cpp" />
     <ClCompile Include="Source\Mesh\Mesh.cpp" />
     <ClCompile Include="Source\Input\Mouse.cpp" />

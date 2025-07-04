@@ -19,6 +19,8 @@ namespace HEngine
 	private:
 		void ProcessNode(aiNode* node, const aiScene* scene, Mesh* pMesh, const std::unordered_map<UINT, std::string>& materialIndexToTextureKey);
 		void ProcessMesh(aiMesh* mesh, const aiScene* scene, SubMesh* subMesh, const std::unordered_map<UINT, std::string>& materialIndexToTextureKey);
+
+		TextureFormat DetectTextureFormat(const std::wstring& filename);
 	};
 }
 

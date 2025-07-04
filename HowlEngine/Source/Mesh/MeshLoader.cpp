@@ -34,12 +34,12 @@ namespace HEngine
 			if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
 			{
 				std::filesystem::path fullPath = texturePath.C_Str();
-				std::string filenameOnly = fullPath.filename().string();
+				std::string textureKey = fullPath.filename().string();
 
-				std::string textureKey = filenameOnly;
-				std::wstring textureFullPath = L"Assets/Textures" + texturesPath + std::wstring(filenameOnly.begin(), filenameOnly.end());
+				std::wstring textureFullPath = L"Assets/Textures" + texturesPath + std::wstring(textureKey.begin(), textureKey.end());
 
-				pTextureManager->LoadTexture(textureKey, textureFullPath, pDevice, TextureFormat::TGA);
+				TextureFormat textureFormat = DetectTextureFormat(textureFullPath);
+				pTextureManager->LoadTexture(textureKey, textureFullPath, pDevice, textureFormat);
 
 				materialIndexToTextureKey[i] = textureKey;
 			}
@@ -114,5 +114,17 @@ namespace HEngine
 				subMesh->indices.push_back(face.mIndices[j]);
 			}
 		}
+	}
+
+	TextureFormat MeshLoader::DetectTextureFormat(const std::wstring& filename)
+	{
+		std::wstring ext = std::filesystem::path(filename).extension().wstring();
+		std::transform(ext.begin(), ext.end(), ext.begin(), ::towlower);
+
+		if (ext == L".tga") return TextureFormat::TGA;
+		if (ext == L".png") return TextureFormat::PNG;
+		if (ext == L".jpg" || ext == L".jpeg") return TextureFormat::JPG;
+
+		return TextureFormat::PNG;
 	}
 }

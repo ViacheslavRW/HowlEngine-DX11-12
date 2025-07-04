@@ -10,6 +10,7 @@
 #include "../Mesh/Mesh.h"
 #include "../Mesh/MeshLoader.h"
 #include "../Camera/Camera.h"
+#include "../Graphics/LightHelper.h"
 
 namespace HEngine
 {
@@ -43,6 +44,9 @@ namespace HEngine
 		// shaders
 		ComPtr<ID3D11VertexShader> mVertexShader;
 		ComPtr<ID3D11PixelShader> mPixelShader;
+		// light
+		LightHelper mLightHelper;
+		ComPtr<ID3D11Buffer> mDirectionalLightBuffer = nullptr;
 	private:
 		// viewport
 		D3D11_VIEWPORT mViewPort = {};
@@ -59,11 +63,10 @@ namespace HEngine
 
 		std::unique_ptr<Mesh> mesh1;
 		std::unique_ptr<Mesh> mesh2;
+
 		std::unique_ptr<CubeMeshT> cube1;
 
 		std::unique_ptr<PlaneMeshT> plane1;
-		// Other
-		float mAngle = 45.0f;
 
 	private:
 		// Debug
