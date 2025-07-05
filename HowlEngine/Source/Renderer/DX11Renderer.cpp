@@ -105,7 +105,7 @@ namespace HEngine
 #if defined(DEBUG) || defined(_DEBUG)
         mDebugInfoManager.Set();
 #endif
-        // specifing primitive type
+
         mDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         mDeviceContext->ClearRenderTargetView(mRenderTargetView.Get(), CLEAR_BUFFER_COLOR);
@@ -114,7 +114,13 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
-        mLightHelper.UpdateDirectionalLightBuffer(*mDeviceContext.Get(), mDirectionalLightBuffer);
+        mLightHelper.SetDirectionalLightColor().x += 0.2f * deltaTime;
+        if (mLightHelper.SetDirectionalLightColor().x >= 1.0f) mLightHelper.SetDirectionalLightColor().x = -1.0f;
+        mLightHelper.SetDirectionalLightColor().y -= 0.25f * deltaTime;
+        if (mLightHelper.SetDirectionalLightColor().y <= -1.0f) mLightHelper.SetDirectionalLightColor().y = 1.0f;
+        mLightHelper.SetDirectionalLightColor().z += 0.35f * deltaTime;
+        if (mLightHelper.SetDirectionalLightColor().z >= 1.0f) mLightHelper.SetDirectionalLightColor().z = -1.0f;
+        mLightHelper.UpdateDirectionalLightBuffer(*mDeviceContext.Get(), mDirectionalLightBuffer, mLightHelper.GetDirectionalLightParams());
 
         // drawing world objects
         mesh1->Draw(pCamera->GetViewMatrix());
