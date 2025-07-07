@@ -24,12 +24,11 @@ namespace HEngine
 		}
 		void Initialize(XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix);
 		void CreateBuffers();
-		void Bind(XMMATRIX& viewMatrix);
 		void Draw(XMMATRIX& viewMatrix);
 
 		std::vector<SubMesh> subMeshes;
 	public:
-		XMMATRIX GetModelMartix() const;
+		XMMATRIX GetModelMartix();
 
 		inline XMFLOAT3& GetPosition() { return mPosition; };
 		inline XMFLOAT3& GetRotation() { return mRotation; };
@@ -42,6 +41,9 @@ namespace HEngine
 
 		XMMATRIX mViewMatrix = {};
 		XMMATRIX mProjMatrix = {};
+		XMMATRIX mModelMatrix = {};
+
+		bool mDirtyTransform = true;
 	};
 }
 

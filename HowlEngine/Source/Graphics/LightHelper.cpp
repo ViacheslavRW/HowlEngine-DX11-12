@@ -3,7 +3,7 @@
 
 namespace HEngine
 {
-	void LightHelper::CreateDirectionalLightBuffer(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11Buffer>& pLightBuffer)
+	void LightHelper::CreateDirectionalLightBuffer(ComPtr<ID3D11Device>& pDevice)
 	{
 		D3D11_BUFFER_DESC lightBufferDesc = {};
 		lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -12,20 +12,29 @@ namespace HEngine
 		lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		lightBufferDesc.MiscFlags = NULL;
 
-		HRESULT hr = pDevice->CreateBuffer(&lightBufferDesc, nullptr, pLightBuffer.GetAddressOf());
-		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_LIGHT_BUFFER" << std::endl;
-
-		// set default params
-		directionalLightParams.lightDirection = { -0.5f, -1.0f, 0.5f, 0.0f };
-		directionalLightParams.lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		directionalLightParams.lightAmbient = { 0.7f, 0.7f, 0.7f, 1.0f };
-		directionalLightParams.lightDiffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+		HRESULT hr = pDevice->CreateBuffer(&lightBufferDesc, nullptr, mDirectionalLightBuffer.GetAddressOf());
+		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_DIRECTIONAL_LIGHT_BUFFER" << std::endl;
 	}
 
-	void LightHelper::UpdateDirectionalLightBuffer(ID3D11DeviceContext& pDeviceContext, ComPtr<ID3D11Buffer>& pLightBuffer, DirectionalLight& dirLightParams)
+	void LightHelper::CreatePointLightBuffer(ComPtr<ID3D11Device>& pDevice)
 	{
+		D3D11_BUFFER_DESC lightBufferDesc = {};
+		lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		lightBufferDesc.ByteWidth = sizeof(PointLightBuffer);
+		lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		lightBufferDesc.MiscFlags = NULL;
+
+		HRESULT hr = pDevice->CreateBuffer(&lightBufferDesc, nullptr, mPointLightBuffer.GetAddressOf());
+		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_POINT_LIGHT_BUFFER" << std::endl;
+	}
+
+	void LightHelper::UpdateDirectionalLightBuffer(ID3D11DeviceContext& pDeviceContext)
+	{
+		if (!mDirtyDirectionalLight) return;
+
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		HRESULT hr = pDeviceContext.Map(pLightBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		HRESULT hr = pDeviceContext.Map(mDirectionalLightBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 		if (SUCCEEDED(hr))
 		{
@@ -36,8 +45,82 @@ namespace HEngine
 			lightData->lightAmbient = directionalLightParams.lightAmbient;
 			lightData->lightDiffuse = directionalLightParams.lightDiffuse;
 
-			pDeviceContext.Unmap(pLightBuffer.Get(), 0);
-			pDeviceContext.PSSetConstantBuffers(1, 1, pLightBuffer.GetAddressOf());
+			pDeviceContext.Unmap(mDirectionalLightBuffer.Get(), 0);
+			pDeviceContext.PSSetConstantBuffers(1, 1, mDirectionalLightBuffer.GetAddressOf());
+
+			mDirtyDirectionalLight = false;
+		}
+	}
+
+	void LightHelper::UpdatePointLightBuffer(ID3D11DeviceContext& pDeviceContext)
+	{
+		if (!mDirtyPointLight) return;
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = pDeviceContext.Map(mPointLightBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+		if (SUCCEEDED(hr))
+		{
+			memcpy(mappedResource.pData, pointLightParams.data(), sizeof(PointLight) * MAX_POINT_LIGHTS);
+
+			pDeviceContext.Unmap(mPointLightBuffer.Get(), 0);
+			pDeviceContext.PSSetConstantBuffers(2, 1, mPointLightBuffer.GetAddressOf());
+
+			mDirtyPointLight = false;
+		}
+	}
+
+	void LightHelper::SetPointLightPosition(const USHORT& index, const XMFLOAT4& position)
+	{
+		if (index < MAX_POINT_LIGHTS)
+		{
+			mDirtyPointLight = true;
+			pointLightParams[index].lightPosition = position;
+		}
+	}
+
+	void LightHelper::SetPointLightColor(const USHORT& index, const XMFLOAT4& color)
+	{
+		if (index < MAX_POINT_LIGHTS)
+		{
+			mDirtyPointLight = true;
+			pointLightParams[index].lightColor = color;
+		}
+	}
+
+	void LightHelper::SetPointLightAmbient(const USHORT& index, const XMFLOAT4& ambient)
+	{
+		if (index < MAX_POINT_LIGHTS)
+		{
+			mDirtyPointLight = true;
+			pointLightParams[index].lightAmbient = ambient;
+		}
+	}
+
+	void LightHelper::SetPointLightDiffuse(const USHORT& index, const XMFLOAT4& diffuse)
+	{
+		if (index < MAX_POINT_LIGHTS)
+		{
+			mDirtyPointLight = true;
+			pointLightParams[index].lightDiffuse = diffuse;
+		}
+	}
+
+	void LightHelper::SetPointLightAttenuation(const USHORT& index, const XMFLOAT3& attenuation)
+	{
+		if (index < MAX_POINT_LIGHTS)
+		{
+			mDirtyPointLight = true;
+			pointLightParams[index].lightAttenuation = attenuation;
+		}
+	}
+
+	void LightHelper::SetPointLightRange(const USHORT& index, const float& range)
+	{
+		if (index < MAX_POINT_LIGHTS)
+		{
+			mDirtyPointLight = true;
+			pointLightParams[index].lightRange = range;
 		}
 	}
 }

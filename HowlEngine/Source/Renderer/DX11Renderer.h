@@ -46,7 +46,6 @@ namespace HEngine
 		ComPtr<ID3D11PixelShader> mPixelShader;
 		// light
 		LightHelper mLightHelper;
-		ComPtr<ID3D11Buffer> mDirectionalLightBuffer = nullptr;
 	private:
 		// viewport
 		D3D11_VIEWPORT mViewPort = {};

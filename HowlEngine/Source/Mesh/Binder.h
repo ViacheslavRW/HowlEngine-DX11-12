@@ -59,22 +59,30 @@ namespace HEngine
 		{
 			D3D11_BUFFER_DESC cbDesc = {};
 			cbDesc.ByteWidth = sizeof(XMMATRIX);
-			cbDesc.Usage = D3D11_USAGE_DEFAULT;
+			cbDesc.Usage = D3D11_USAGE_DYNAMIC;
 			cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			cbDesc.CPUAccessFlags = 0;
+			cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			cbDesc.MiscFlags = 0;
-			cbDesc.StructureByteStride = sizeof(XMMATRIX);
+			//cbDesc.StructureByteStride = sizeof(XMMATRIX);
 
 			HRESULT res = mDevice.CreateBuffer(&cbDesc, nullptr, pConstantBuffer.GetAddressOf());
 			if (FAILED(res)) std::cout << "FAILED_TO_CREATE_CONSTANT_BUFFER" << std::endl;
 		}
 
 		void BindRes(ComPtr<ID3D11Buffer>& pVertexBuffer, ComPtr<ID3D11Buffer>& pIndexBuffer, ComPtr<ID3D11Buffer>& pConstantBuffer, 
-			const XMMATRIX& modelMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projMatrix, UINT vertexSize, const std::string& textureName)
+			const XMMATRIX& modelMatrix, const XMMATRIX& viewMatrix, const XMMATRIX& projMatrix, const UINT& vertexSize,
+			const std::string& textureName)
 		{
-			XMMATRIX _mvp = modelMatrix * viewMatrix * projMatrix;
-			XMMATRIX m = XMMatrixTranspose(_mvp);
-			mDeviceContext.UpdateSubresource(pConstantBuffer.Get(), 0, nullptr, &m, 0, 0);
+			XMMATRIX mvp = XMMatrixTranspose(modelMatrix * viewMatrix * projMatrix);
+
+			D3D11_MAPPED_SUBRESOURCE mappedResource = {};
+			HRESULT hr = mDeviceContext.Map(pConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+			if (SUCCEEDED(hr))
+			{
+				std::memcpy(mappedResource.pData, &mvp, sizeof(XMMATRIX));
+				mDeviceContext.Unmap(pConstantBuffer.Get(), 0);
+			}
+
 			mDeviceContext.VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
 
 			UINT stride = vertexSize;

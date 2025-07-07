@@ -53,11 +53,17 @@ namespace HEngine
         if (FAILED(ciRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
 
         // create light buffers
-        mLightHelper.CreateDirectionalLightBuffer(mDevice, mDirectionalLightBuffer);
-        
+        mLightHelper.CreateDirectionalLightBuffer(mDevice);
+        mLightHelper.CreatePointLightBuffer(mDevice);
+
+        mLightHelper.SetPointLightColor(0, { 1.0f, 0.0f, 0.0f, 1.0f });
+        mLightHelper.SetPointLightPosition(0, { -1.0f, 1.0f, 1.0f, 1.0f });
+        mLightHelper.SetPointLightPosition(1, { 1.0f, 0.0f, -1.0f, 1.0f });
+        mLightHelper.SetPointLightColor(1, { 0.0f, 0.0f, 1.0f, 1.0f });
+
         // load textures
-        mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get(), TextureFormat::JPG);
-        mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get(), TextureFormat::JPG);
+        //mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get(), TextureFormat::JPG);
+        //mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get(), TextureFormat::JPG);
         mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get(), TextureFormat::JPG);
         mTextureManager.LoadTexture("desert", L"Assets/Textures/desert.jpg", mDevice.Get(), TextureFormat::JPG);
         mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get(), TextureFormat::PNG);
@@ -114,26 +120,19 @@ namespace HEngine
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
 
-        mLightHelper.SetDirectionalLightColor().x += 0.2f * deltaTime;
-        if (mLightHelper.SetDirectionalLightColor().x >= 1.0f) mLightHelper.SetDirectionalLightColor().x = -1.0f;
-        mLightHelper.SetDirectionalLightColor().y -= 0.25f * deltaTime;
-        if (mLightHelper.SetDirectionalLightColor().y <= -1.0f) mLightHelper.SetDirectionalLightColor().y = 1.0f;
-        mLightHelper.SetDirectionalLightColor().z += 0.35f * deltaTime;
-        if (mLightHelper.SetDirectionalLightColor().z >= 1.0f) mLightHelper.SetDirectionalLightColor().z = -1.0f;
-        mLightHelper.UpdateDirectionalLightBuffer(*mDeviceContext.Get(), mDirectionalLightBuffer, mLightHelper.GetDirectionalLightParams());
-
+        mLightHelper.UpdateDirectionalLightBuffer(*mDeviceContext.Get());
+        mLightHelper.UpdatePointLightBuffer(*mDeviceContext.Get());
+        
         // drawing world objects
         mesh1->Draw(pCamera->GetViewMatrix());
         mesh2->Draw(pCamera->GetViewMatrix());
 
-        cube1->Bind(pCamera->GetViewMatrix());
-        cube1->Draw();
+        cube1->Draw(pCamera->GetViewMatrix());
 
-        plane1->Bind(pCamera->GetViewMatrix());
-        plane1->Draw();
+        plane1->Draw(pCamera->GetViewMatrix());
 
         // present frames
-        HRESULT scRes = mSwapChain->Present( 1, 0 );
+        HRESULT scRes = mSwapChain->Present( 0, 0 );
         if (FAILED(scRes))
         {
             std::cout << "SWAP_CHAIN_ERROR" << std::endl;

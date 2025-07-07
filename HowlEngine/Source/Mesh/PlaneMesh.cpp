@@ -66,22 +66,24 @@ namespace HEngine
 		CreateConstantBuffer(mConstantBuffer);
 	}
 
-	void PlaneMeshT::Bind(XMMATRIX& viewMatrix)
+	void PlaneMeshT::Draw(XMMATRIX& viewMatrix)
 	{
-		BindRes(mVertexBuffer, mIndexBuffer, mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix, sizeof(TR::Vertex3T), texture);
-	}
-
-	void PlaneMeshT::Draw()
-	{
+		BindRes(mVertexBuffer, mIndexBuffer, mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix,
+			sizeof(TR::Vertex3T), texture);
 		Binder::DrawMesh(indices.size());
 	}
 
-	XMMATRIX PlaneMeshT::GetModelMartix() const
+	XMMATRIX PlaneMeshT::GetModelMartix()
 	{
-		XMMATRIX scale = XMMatrixScaling(mScale.x, mScale.y, mScale.z);
-		XMMATRIX rotation = XMMatrixRotationRollPitchYaw(mRotation.x, mRotation.y, mRotation.z);
-		XMMATRIX position = XMMatrixTranslation(mPosition.x, mPosition.y, mPosition.z);
+		if (mDirtyTransform)
+		{
+			XMMATRIX scale = XMMatrixScaling(mScale.x, mScale.y, mScale.z);
+			XMMATRIX rotation = XMMatrixRotationRollPitchYaw(mRotation.x, mRotation.y, mRotation.z);
+			XMMATRIX position = XMMatrixTranslation(mPosition.x, mPosition.y, mPosition.z);
 
-		return scale * rotation * position;
+			mModelMatrix = scale * rotation * position;
+			mDirtyTransform = false;
+		}
+		return mModelMatrix;
 	}
 }

@@ -15,7 +15,7 @@ struct VS_OUTPUT
 
 cbuffer constBuffer : register(b0)
 {
-    matrix worldViewProjmatrix;
+    matrix worldViewProjMatrix;
 };
 
 VS_OUTPUT main(VS_INPUT input) 
@@ -23,7 +23,7 @@ VS_OUTPUT main(VS_INPUT input)
     VS_OUTPUT output;
     
     output.position = float4(input.position, 1.0f);
-    output.position = mul(output.position, worldViewProjmatrix);
+    output.position = mul(output.position, worldViewProjMatrix);
     output.normal = input.normal;
     output.texCoord = input.texCoord;
     

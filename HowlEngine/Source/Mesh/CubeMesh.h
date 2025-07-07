@@ -12,8 +12,7 @@ namespace HEngine
 			: Binder(device, deviceContext, inputLayout, textureManager) {}
 
 		void Initialize(float size, XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix, std::string textureName);
-		void Bind(XMMATRIX& viewMatrix);
-		void Draw();
+		void Draw(XMMATRIX& viewMatrix);
 
 		std::vector<TR::Vertex3T> vertices;
 		std::vector<UINT32> indices;
@@ -21,7 +20,7 @@ namespace HEngine
 		std::string texture;
 
 	public:
-		XMMATRIX GetModelMartix() const;
+		XMMATRIX GetModelMartix();
 
 		inline XMFLOAT3& GetPosition() { return mPosition; };
 		inline XMFLOAT3& GetRotation() { return mRotation; };
@@ -34,7 +33,9 @@ namespace HEngine
 
 		XMMATRIX mViewMatrix = {};
 		XMMATRIX mProjMatrix = {};
+		XMMATRIX mModelMatrix = {};
 
+		bool mDirtyTransform = true;
 	protected:
 		ComPtr<ID3D11Buffer> mVertexBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;

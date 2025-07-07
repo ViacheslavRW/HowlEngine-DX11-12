@@ -23,17 +23,23 @@ namespace HEngine
     {
         for (auto& subMesh : subMeshes)
         {
-            BindRes(subMesh.mVertexBuffer, subMesh.mIndexBuffer, subMesh.mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix, sizeof(TR::Vertex3T), subMesh.texture);
+            BindRes(subMesh.mVertexBuffer, subMesh.mIndexBuffer, subMesh.mConstantBuffer, GetModelMartix(), viewMatrix, mProjMatrix,
+                sizeof(TR::Vertex3T), subMesh.texture);
             Binder::DrawMesh(subMesh.indices.size());
         }
     }
 
-    XMMATRIX Mesh::GetModelMartix() const
+    XMMATRIX Mesh::GetModelMartix()
     {
-        XMMATRIX scale = XMMatrixScaling(mScale.x, mScale.y, mScale.z);
-        XMMATRIX rotation = XMMatrixRotationRollPitchYaw(mRotation.x, mRotation.y, mRotation.z);
-        XMMATRIX position = XMMatrixTranslation(mPosition.x, mPosition.y, mPosition.z);
+        if (mDirtyTransform)
+        {
+            XMMATRIX scale = XMMatrixScaling(mScale.x, mScale.y, mScale.z);
+            XMMATRIX rotation = XMMatrixRotationRollPitchYaw(mRotation.x, mRotation.y, mRotation.z);
+            XMMATRIX position = XMMatrixTranslation(mPosition.x, mPosition.y, mPosition.z);
 
-        return scale * rotation * position;
+            mModelMatrix = scale * rotation * position;
+            mDirtyTransform = false;
+        }
+        return mModelMatrix;
     }
 }
