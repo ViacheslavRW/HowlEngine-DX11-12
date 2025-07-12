@@ -38,6 +38,9 @@ namespace HEngine
 		if (keyboard.isKeyDown('E')) pCamera->RotateRight(deltaTime);
 		if (keyboard.isKeyDown('Z')) pCamera->RotateUp(deltaTime);
 		if (keyboard.isKeyDown('X')) pCamera->RotateDown(deltaTime);
+		// Toggle
+		if (keyboard.isKeyReleased('C')) pCamera->SetRotationEnabled(false);
+		if (keyboard.isKeyReleased('V')) pCamera->SetRotationEnabled(true);
 	}
 
 	void GameInputMode::HandleInput(Keyboard& keyboard, Mouse& mouse, Camera* pCamera, float& deltaTime)

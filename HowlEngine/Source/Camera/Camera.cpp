@@ -110,6 +110,7 @@ namespace HEngine
 
 	void Camera::RotateByRawMouse(int dx, int dy)
 	{
+		if (!isRotationEnabled) return;
 		yaw += dx * cameraSensitivity;
 		pitch += dy * cameraSensitivity;
 		pitch = Clamp(pitch, -XM_PIDIV2 + 0.01f, XM_PIDIV2 - 0.01f);
@@ -120,6 +121,7 @@ namespace HEngine
 
 	void Camera::RotateLeft(float deltaTime)
 	{
+		if (!isRotationEnabled) return;
 		yaw -= cameraRotSpeed * deltaTime;
 		dirtyView = true;
 		dirtyRotation = true;
@@ -127,6 +129,7 @@ namespace HEngine
 
 	void Camera::RotateRight(float deltaTime)
 	{
+		if (!isRotationEnabled) return;
 		yaw += cameraRotSpeed * deltaTime;
 		dirtyView = true;
 		dirtyRotation = true;
@@ -134,6 +137,7 @@ namespace HEngine
 
 	void Camera::RotateDown(float deltaTime)
 	{
+		if (!isRotationEnabled) return;
 		pitch += cameraRotSpeed * deltaTime;
 		pitch = Clamp(pitch, -XM_PIDIV2 + 0.01f, XM_PIDIV2 - 0.01f);
 		dirtyView = true;
@@ -142,6 +146,7 @@ namespace HEngine
 
 	void Camera::RotateUp(float deltaTime)
 	{
+		if (!isRotationEnabled) return;
 		pitch -= cameraRotSpeed * deltaTime;
 		pitch = Clamp(pitch, -XM_PIDIV2 + 0.01f, XM_PIDIV2 - 0.01f);
 		dirtyView = true;

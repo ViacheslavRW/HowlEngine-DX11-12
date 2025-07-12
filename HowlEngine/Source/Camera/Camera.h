@@ -26,6 +26,8 @@ namespace HEngine
 		inline void SetPosition(XMFLOAT3 _position) { position = _position; dirtyView = true; };
 		inline void SetRotation(float _pitch, float _yaw, float _roll) { pitch = _pitch; yaw = _yaw; roll = _roll; dirtyRotation = true; dirtyView = true; };
 
+		inline void SetRotationEnabled(bool isEnagle) { isRotationEnabled = isEnagle; };
+		inline bool GetRotationEnabled() const { return isRotationEnabled; };
 		// move
 		void MoveForward(float deltaTime);
 		void MoveBackward(float deltaTime);
@@ -46,6 +48,8 @@ namespace HEngine
 	
 		bool dirtyRotation = true;
 		bool dirtyView = true;
+
+		bool isRotationEnabled = true;
 
 		constexpr static float cameraSpeed = 7.5f;
 		constexpr static float cameraRotSpeed = 2.2f;

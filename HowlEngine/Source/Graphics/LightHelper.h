@@ -21,7 +21,7 @@ namespace HEngine
 		XMFLOAT4 lightAmbient = { 0.7f, 0.7f, 0.7f, 1.0f };
 		XMFLOAT4 lightDiffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
 		XMFLOAT3 lightAttenuation = { 1.0f, 0.0f, 0.5f };
-		float lightRange = 10.0f;
+		float lightRange = 5.0f;
 	};
 
 	struct PointLightBuffer
@@ -42,6 +42,7 @@ namespace HEngine
 		void UpdateDirectionalLightBuffer(ID3D11DeviceContext& pDeviceContext);
 		void UpdatePointLightBuffer(ID3D11DeviceContext& pDeviceContext);
 
+		void Release();
 	public:
 		// dir light
 		inline XMFLOAT4& SetDirectionalLightDirection() { mDirtyDirectionalLight = true; return directionalLightParams.lightDirection; };
@@ -58,16 +59,15 @@ namespace HEngine
 		void SetPointLightRange(const USHORT& index, const float& range);
 		inline PointLight& GetPointLightParams(const USHORT& index) { return pointLightParams[index]; };
 
+	public:
+		bool mDirtyDirectionalLight = true;
+		bool mDirtyPointLight = true;
 	private:
 		ComPtr<ID3D11Buffer> mDirectionalLightBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mPointLightBuffer = nullptr;
 	private:
 		DirectionalLight directionalLightParams;
 		std::array<PointLight, MAX_POINT_LIGHTS> pointLightParams = {};
-
-	private:
-		bool mDirtyDirectionalLight = true;
-		bool mDirtyPointLight = true;
 	};
 }
 

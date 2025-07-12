@@ -70,6 +70,12 @@ namespace HEngine
 		}
 	}
 
+	void LightHelper::Release()
+	{
+		mDirectionalLightBuffer.Reset();
+		mPointLightBuffer.Reset();
+	}
+
 	void LightHelper::SetPointLightPosition(const USHORT& index, const XMFLOAT4& position)
 	{
 		if (index < MAX_POINT_LIGHTS)

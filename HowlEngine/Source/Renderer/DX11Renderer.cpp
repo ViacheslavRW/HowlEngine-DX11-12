@@ -5,6 +5,9 @@
 #include "./DirectX11/Core.h"
 #include "../Mesh/Binder.h"
 
+#include "../Editor/ImGui/imgui.h"
+#include "../Editor/ImGui/imgui_impl_win32.h"
+#include "../Editor/ImGui/imgui_impl_dx11.h"
 
 namespace HEngine
 {
@@ -21,6 +24,13 @@ namespace HEngine
         Core::SetViewPort(width, height, mDeviceContext, mViewPort);
         Core::InitializeDepthStencilView(mDepthStencilState, mDepthStencilTexture, mDepthStencilView, mDevice, width, height);
         Core::InitializeRasterizer(mDevice, mDeviceContext, mRasterizer);
+
+        // init imgui
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui_ImplWin32_Init(hwnd);
+        ImGui_ImplDX11_Init(mDevice.Get(), mDeviceContext.Get());
 
         // compile shaders to bytecode
         Microsoft::WRL::ComPtr<ID3DBlob> vsBlob;
@@ -57,8 +67,8 @@ namespace HEngine
         mLightHelper.CreatePointLightBuffer(mDevice);
 
         mLightHelper.SetPointLightColor(0, { 1.0f, 0.0f, 0.0f, 1.0f });
-        mLightHelper.SetPointLightPosition(0, { -1.0f, 1.0f, 1.0f, 1.0f });
-        mLightHelper.SetPointLightPosition(1, { 1.0f, 0.0f, -1.0f, 1.0f });
+        mLightHelper.SetPointLightPosition(0, { -1.0f, 0.0f, 0.0f, 1.0f });
+        mLightHelper.SetPointLightPosition(1, { 1.0f, 0.5f, -0.3f, 1.0f });
         mLightHelper.SetPointLightColor(1, { 0.0f, 0.0f, 1.0f, 1.0f });
 
         // load textures
@@ -131,8 +141,35 @@ namespace HEngine
 
         plane1->Draw(pCamera->GetViewMatrix());
 
+        // draw ui
+        ImGui_ImplDX11_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+
+        if(ImGui::Begin("Point Light 1"))
+        ImGui::SliderFloat4("Position", &mLightHelper.GetPointLightParams(0).lightPosition.x, -10.0f, 10.0f);
+        ImGui::ColorEdit4("Color", &mLightHelper.GetPointLightParams(0).lightColor.x);
+        ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(0).lightAmbient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(0).lightDiffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Attenuation", &mLightHelper.GetPointLightParams(0).lightAttenuation.x, 0.0f, 1.0f);
+        ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(0).lightRange, 0.0f, 10.0f);
+        ImGui::End();
+
+        ImGui::Begin("Point Light 2");
+        ImGui::SliderFloat4("Position", &mLightHelper.GetPointLightParams(1).lightPosition.x, -10.0f, 10.0f);
+        ImGui::ColorEdit4("Color", &mLightHelper.GetPointLightParams(1).lightColor.x);
+        ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(1).lightAmbient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(1).lightDiffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Attenuation", &mLightHelper.GetPointLightParams(1).lightAttenuation.x, 0.0f, 1.0f);
+        ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(1).lightRange, 0.0f, 10.0f);
+        ImGui::End();
+
+        mLightHelper.mDirtyPointLight = true;
+        ImGui::Render();
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
         // present frames
-        HRESULT scRes = mSwapChain->Present( 0, 0 );
+        HRESULT scRes = mSwapChain->Present( 1, 0 );
         if (FAILED(scRes))
         {
             std::cout << "SWAP_CHAIN_ERROR" << std::endl;
@@ -153,11 +190,21 @@ namespace HEngine
 
     void DX11Renderer::Release()
     {
-        if (mDeviceContext) mDeviceContext = nullptr;
-        if (mSwapChain) mSwapChain = nullptr;
-        if (mDevice) mDevice = nullptr;
-        if (mRenderTargetView) mRenderTargetView = nullptr;
+        mVertexShader.Reset();
+        mPixelShader.Reset();
+        mInputLayout.Reset();
+        mRenderTargetView.Reset();
+        mDepthStencilView.Reset();
+        mDepthStencilState.Reset();
+        mSwapChain.Reset();
+        mDeviceContext.Reset();
+        mDevice.Reset();
 
         mTextureManager.Clear();
+        mLightHelper.Release();
+
+        ImGui_ImplDX11_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
     }
 }

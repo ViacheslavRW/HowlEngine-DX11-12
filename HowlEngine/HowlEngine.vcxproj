@@ -57,7 +57,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;NOMINMAX;HOWLENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionsDir)Source\PCH; $(SolutionsDir)Vendor; </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -92,6 +92,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Editor\ImGui\imconfig.h" />
+    <ClInclude Include="Source\Editor\ImGui\imgui.h" />
+    <ClInclude Include="Source\Editor\ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="Source\Editor\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="Source\Editor\ImGui\imgui_internal.h" />
+    <ClInclude Include="Source\Editor\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="Source\Editor\ImGui\imstb_textedit.h" />
+    <ClInclude Include="Source\Editor\ImGui\imstb_truetype.h" />
     <ClInclude Include="Source\Graphics\LightHelper.h" />
     <ClInclude Include="Source\Mesh\MeshLoader.h" />
     <ClInclude Include="Source\Mesh\Mesh.h" />
@@ -135,6 +143,24 @@
     <ClInclude Include="Source\Renderer\DirectX11\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Editor\ImGui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\ImGui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\ImGui\imgui_impl_dx11.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\ImGui\imgui_impl_win32.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\ImGui\imgui_tables.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\ImGui\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\Graphics\LightHelper.cpp" />
     <ClCompile Include="Source\Mesh\MeshLoader.cpp" />
     <ClCompile Include="Source\Mesh\Mesh.cpp" />
@@ -163,7 +189,9 @@
     <ClCompile Include="Source\Renderer\ShaderCompiler.cpp" />
     <ClCompile Include="Source\Renderer\DirectX11\DebugInfoManager.cpp" />
     <ClCompile Include="Source\Renderer\DX11Renderer.cpp" />
-    <ClCompile Include="Source\Launch.cpp" />
+    <ClCompile Include="Source\Launch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\PCH\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

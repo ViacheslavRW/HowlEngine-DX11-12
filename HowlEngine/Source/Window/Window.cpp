@@ -2,12 +2,16 @@
 #include "Window.h"
 #include "../Launch.h"
 #include "../Renderer/DirectX12/Debug/DXGIDebug.h"
+#include "../Editor/ImGui/imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace HEngine
 {
 	// window procedure function
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam)) return true;
 		Window* pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 		switch(uMsg)
 		{
