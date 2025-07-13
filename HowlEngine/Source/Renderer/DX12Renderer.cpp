@@ -210,7 +210,7 @@ namespace HEngine
 			(DXCommandList*)mCommandList.GetAddressOf(), (DXCommandQueue*)mCommandQueue.GetAddressOf());
 	}
 
-	void DX12Renderer::Update(const float deltaTime)
+	void DX12Renderer::Update(const float& deltaTime)
 	{
 		memcpy(mConstantBufferPassData.GetCPUMemory(), &mViewProjectionMatrix, sizeof(TR::PassData));
 

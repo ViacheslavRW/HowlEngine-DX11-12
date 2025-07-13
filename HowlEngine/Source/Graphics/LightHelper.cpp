@@ -76,7 +76,7 @@ namespace HEngine
 		mPointLightBuffer.Reset();
 	}
 
-	void LightHelper::SetPointLightPosition(const USHORT& index, const XMFLOAT4& position)
+	void LightHelper::SetPointLightPosition(const USHORT& index, const XMFLOAT3& position)
 	{
 		if (index < MAX_POINT_LIGHTS)
 		{
@@ -127,6 +127,18 @@ namespace HEngine
 		{
 			mDirtyPointLight = true;
 			pointLightParams[index].lightRange = range;
+		}
+	}
+
+	void LightHelper::SetPointLightActive(const USHORT& index, const bool& isActive)
+	{
+		if (index < MAX_POINT_LIGHTS)
+		{
+			if (isActive)
+			{
+				pointLightParams[index].active = 1;
+			}
+			else pointLightParams[index].active = 0;
 		}
 	}
 }

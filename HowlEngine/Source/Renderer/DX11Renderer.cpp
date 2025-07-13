@@ -67,8 +67,8 @@ namespace HEngine
         mLightHelper.CreatePointLightBuffer(mDevice);
 
         mLightHelper.SetPointLightColor(0, { 1.0f, 0.0f, 0.0f, 1.0f });
-        mLightHelper.SetPointLightPosition(0, { -1.0f, 0.0f, 0.0f, 1.0f });
-        mLightHelper.SetPointLightPosition(1, { 1.0f, 0.5f, -0.3f, 1.0f });
+        mLightHelper.SetPointLightPosition(0, { -1.0f, 0.0f, 0.0f });
+        mLightHelper.SetPointLightPosition(1, { 1.0f, 0.5f, -0.3f });
         mLightHelper.SetPointLightColor(1, { 0.0f, 0.0f, 1.0f, 1.0f });
 
         // load textures
@@ -116,7 +116,7 @@ namespace HEngine
         plane1->GetPosition().y = -1.5f;
     }
 
-    void DX11Renderer::Update(const float deltaTime)
+    void DX11Renderer::Update(const float& deltaTime)
     {
 #if defined(DEBUG) || defined(_DEBUG)
         mDebugInfoManager.Set();
@@ -147,7 +147,7 @@ namespace HEngine
         ImGui::NewFrame();
 
         if(ImGui::Begin("Point Light 1"))
-        ImGui::SliderFloat4("Position", &mLightHelper.GetPointLightParams(0).lightPosition.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(0).lightPosition.x, -10.0f, 10.0f);
         ImGui::ColorEdit4("Color", &mLightHelper.GetPointLightParams(0).lightColor.x);
         ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(0).lightAmbient.x, 0.0f, 1.0f);
         ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(0).lightDiffuse.x, 0.0f, 1.0f);
@@ -156,7 +156,7 @@ namespace HEngine
         ImGui::End();
 
         ImGui::Begin("Point Light 2");
-        ImGui::SliderFloat4("Position", &mLightHelper.GetPointLightParams(1).lightPosition.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(1).lightPosition.x, -10.0f, 10.0f);
         ImGui::ColorEdit4("Color", &mLightHelper.GetPointLightParams(1).lightColor.x);
         ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(1).lightAmbient.x, 0.0f, 1.0f);
         ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(1).lightDiffuse.x, 0.0f, 1.0f);

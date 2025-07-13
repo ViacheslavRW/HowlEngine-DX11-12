@@ -26,7 +26,7 @@ namespace HEngine
 		~DX11Renderer() override;
 
 		void Initialize(HWND hwnd, const UINT width, const UINT height, Camera* pCamera) override;
-		void Update(const float deltaTime) override;
+		void Update(const float& deltaTime) override;
 		void Release() override;
 	private:
 		// Main Components

@@ -12,7 +12,8 @@ cbuffer DirectionalLightBuffer : register(b1)
 
 struct PointLight
 {
-    float4 lightPosition;
+    float3 lightPosition;
+    uint active;
     float4 lightColor;
     float4 lightAmbient;
     float4 lightDiffuse;
@@ -52,6 +53,8 @@ float4 CalculatePointLight(float3 normal)
     {
         PointLight light = pointLights[i];
 
+        if (light.active == 0) continue;
+        
         float3 toLight = light.lightPosition.xyz;
         float dist = length(toLight);
         float3 dir = normalize(toLight);

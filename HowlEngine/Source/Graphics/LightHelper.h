@@ -16,7 +16,8 @@ namespace HEngine
 
 	struct PointLight
 	{
-		XMFLOAT4 lightPosition = { 0.0f, 0.0f, 0.0f, 0.0f };
+		XMFLOAT3 lightPosition = { 0.0f, 0.0f, 0.0f };
+		UINT active = 1; // bool may be unpredictable in HLSL
 		XMFLOAT4 lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		XMFLOAT4 lightAmbient = { 0.7f, 0.7f, 0.7f, 1.0f };
 		XMFLOAT4 lightDiffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
@@ -51,12 +52,13 @@ namespace HEngine
 		inline XMFLOAT4& SetDirectionalLightDiffuse() { mDirtyDirectionalLight = true; return directionalLightParams.lightDiffuse; };
 		inline DirectionalLight& GetDirectionalLightParams() { return directionalLightParams; }
 		// point light
-		void SetPointLightPosition(const USHORT& index, const XMFLOAT4& position);
+		void SetPointLightPosition(const USHORT& index, const XMFLOAT3& position);
 		void SetPointLightColor(const USHORT& index, const XMFLOAT4& color);
 		void SetPointLightAmbient(const USHORT& index, const XMFLOAT4& ambient);
 		void SetPointLightDiffuse(const USHORT& index, const XMFLOAT4& diffuse);
 		void SetPointLightAttenuation(const USHORT& index, const XMFLOAT3& attenuation);
 		void SetPointLightRange(const USHORT& index, const float& range);
+		void SetPointLightActive(const USHORT& index, const bool& isActive);
 		inline PointLight& GetPointLightParams(const USHORT& index) { return pointLightParams[index]; };
 
 	public:
