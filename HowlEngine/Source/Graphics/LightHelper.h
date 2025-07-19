@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include "../Mesh/Mesh.h"
 
 namespace HEngine
 {
@@ -60,6 +61,8 @@ namespace HEngine
 		void SetPointLightRange(const USHORT& index, const float& range);
 		void SetPointLightActive(const USHORT& index, const bool& isActive);
 		inline PointLight& GetPointLightParams(const USHORT& index) { return pointLightParams[index]; };
+		inline void SetPointLightSource(const USHORT& index, Mesh& pMesh) { pointLightSources[index] = &pMesh; };
+		inline void RemovePointLightSource(const USHORT& index) { pointLightSources[index] = nullptr; };
 
 	public:
 		bool mDirtyDirectionalLight = true;
@@ -70,6 +73,7 @@ namespace HEngine
 	private:
 		DirectionalLight directionalLightParams;
 		std::array<PointLight, MAX_POINT_LIGHTS> pointLightParams = {};
+		std::array<Mesh*, MAX_POINT_LIGHTS> pointLightSources = {};
 	};
 }
 

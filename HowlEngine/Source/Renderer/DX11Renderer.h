@@ -4,6 +4,7 @@
 #include "Windows.h"
 #include "DirectX11/DebugInfoManager.h"
 #include "./RenderTypes/RenderDataTypes.h"
+#include "../Systems/ShaderCompiler.h"
 #include "./DirectX11/TextureManager.h"
 #include "../Mesh/CubeMesh.h"
 #include "../Mesh/PlaneMesh.h"
@@ -36,14 +37,17 @@ namespace HEngine
 		ComPtr<ID3D11RenderTargetView> mRenderTargetView = nullptr;
 		// depth stencil
 		ComPtr<ID3D11DepthStencilState> mDepthStencilState = nullptr;
+		ComPtr<ID3D11DepthStencilState> mDepthStencilStateTransparent = nullptr;
 		ComPtr<ID3D11Texture2D> mDepthStencilTexture = nullptr;
 		ComPtr<ID3D11DepthStencilView> mDepthStencilView = nullptr;
 		ComPtr<ID3D11RasterizerState> mRasterizer = nullptr;
 		// input layout
 		ComPtr<ID3D11InputLayout> mInputLayout = nullptr;
+		ComPtr<ID3D11InputLayout> mInputLayoutGlass = nullptr;
 		// shaders
-		ComPtr<ID3D11VertexShader> mVertexShader;
-		ComPtr<ID3D11PixelShader> mPixelShader;
+		ShaderCompiler mShaderCompiler;
+		// blend
+		ComPtr<ID3D11BlendState> mBlendState;
 		// light
 		LightHelper mLightHelper;
 	private:
@@ -62,16 +66,18 @@ namespace HEngine
 
 		std::unique_ptr<Mesh> mesh1;
 		std::unique_ptr<Mesh> mesh2;
+		std::unique_ptr<Mesh> mesh3;
+		std::unique_ptr<Mesh> mesh4;
 
 		std::unique_ptr<CubeMeshT> cube1;
 
 		std::unique_ptr<PlaneMeshT> plane1;
-
 	private:
 		// Debug
 #if defined(DEBUG) || defined(_DEBUG)
 		DebugInfoManager mDebugInfoManager;
 #endif
+		HRESULT hRes;
 	};
 }
 

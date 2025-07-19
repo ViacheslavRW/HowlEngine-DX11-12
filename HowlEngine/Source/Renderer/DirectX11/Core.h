@@ -4,6 +4,12 @@ namespace HEngine
 {
 	using namespace Microsoft::WRL;
 
+	enum class InputLayoutType
+	{
+		Universal,
+		Glass
+	};
+
 	class Core
 	{
 	public:
@@ -43,10 +49,33 @@ namespace HEngine
 			const UINT height
 		);
 
+		static void InitializeDepthStencilViewTransparent(
+			ComPtr<ID3D11DepthStencilState>& pDepthStencilState,
+			ComPtr<ID3D11Device> pDevice
+		);
+
 		static void InitializeRasterizer(
 			ComPtr<ID3D11Device>& pDevice,
 			ComPtr<ID3D11DeviceContext>& pDeviceContext,
 			ComPtr<ID3D11RasterizerState>& pRasterizer
+		);
+
+		static void InitializeInputLayout(
+			InputLayoutType type,
+			ComPtr<ID3DBlob>& pBlob,
+			ComPtr<ID3D11InputLayout>& pInputLayout,
+			ComPtr<ID3D11Device>& pDevice
+		);
+
+		static void InitializeBlendState(
+			ComPtr<ID3D11Device>& pDevice,
+			ComPtr<ID3D11BlendState>& pBlendState
+		);
+
+		static void InitializeTextureSampler(
+			ComPtr<ID3D11Device>& pDevice,
+			ComPtr<ID3D11DeviceContext>& pDeviceContext,
+			ComPtr<ID3D11SamplerState>& pSampleState
 		);
 	};
 }

@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "DX11Renderer.h"
 #include "../Config/EngineGlobalSettings.h"
-#include "ShaderCompiler.h"
 #include "./DirectX11/Core.h"
 #include "../Mesh/Binder.h"
 
@@ -23,6 +22,7 @@ namespace HEngine
         Core::InitializeRenderTargetView(mRenderTargetView, mDevice, mSwapChain);
         Core::SetViewPort(width, height, mDeviceContext, mViewPort);
         Core::InitializeDepthStencilView(mDepthStencilState, mDepthStencilTexture, mDepthStencilView, mDevice, width, height);
+        Core::InitializeDepthStencilViewTransparent(mDepthStencilStateTransparent, mDevice);
         Core::InitializeRasterizer(mDevice, mDeviceContext, mRasterizer);
 
         // init imgui
@@ -32,61 +32,33 @@ namespace HEngine
         ImGui_ImplWin32_Init(hwnd);
         ImGui_ImplDX11_Init(mDevice.Get(), mDeviceContext.Get());
 
-        // compile shaders to bytecode
-        Microsoft::WRL::ComPtr<ID3DBlob> vsBlob;
-        Microsoft::WRL::ComPtr<ID3DBlob> psBlob;
-        ShaderCompiler compiler;
-        compiler.Compile(L"shaders/VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlob);
-        compiler.Compile(L"shaders/PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlob);
-
-        // create and bind vertex shader and pixel shader
-        HRESULT vsRes = mDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &mVertexShader);
-        if (FAILED(vsRes)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER" << std::endl;
-        HRESULT psRes = mDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &mPixelShader);
-        if (FAILED(psRes)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER" << std::endl;
-
-        // set compiled shaders
-        mDeviceContext->VSSetShader(mVertexShader.Get(), nullptr, 0);
-        mDeviceContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
+        // compile shaders
+        mShaderCompiler.CompileAll();
+        mShaderCompiler.CreateAll(mDevice);
 
         // create input layout
-        D3D11_INPUT_ELEMENT_DESC layout[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
-                  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
-                    D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
-            D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        };
-        HRESULT ciRes = mDevice->CreateInputLayout(layout, (UINT)std::size(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &mInputLayout);
-        if (FAILED(ciRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
+        Core::InitializeInputLayout(InputLayoutType::Universal, mShaderCompiler.vsBlobUniversal, mInputLayout, mDevice);
+        Core::InitializeInputLayout(InputLayoutType::Glass, mShaderCompiler.vsBlobGlass, mInputLayoutGlass, mDevice);
+        // blend state
+        Core::InitializeBlendState(mDevice, mBlendState);
 
         // create light buffers
         mLightHelper.CreateDirectionalLightBuffer(mDevice);
         mLightHelper.CreatePointLightBuffer(mDevice);
 
-        mLightHelper.SetPointLightColor(0, { 1.0f, 0.0f, 0.0f, 1.0f });
-        mLightHelper.SetPointLightPosition(0, { -1.0f, 0.0f, 0.0f });
+        mLightHelper.SetPointLightPosition(0, { -1.8f, -0.2f, 0.0f });
+        
         mLightHelper.SetPointLightPosition(1, { 1.0f, 0.5f, -0.3f });
         mLightHelper.SetPointLightColor(1, { 0.0f, 0.0f, 1.0f, 1.0f });
 
         // load textures
-        //mTextureManager.LoadTexture("crumpled_paper", L"Assets/Textures/crumpled_paper.jpg", mDevice.Get(), TextureFormat::JPG);
-        //mTextureManager.LoadTexture("brick", L"Assets/Textures/brick.jpg", mDevice.Get(), TextureFormat::JPG);
-        mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get(), TextureFormat::JPG);
+        //mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get(), TextureFormat::JPG);
         mTextureManager.LoadTexture("desert", L"Assets/Textures/desert.jpg", mDevice.Get(), TextureFormat::JPG);
+        //mTextureManager.LoadTexture("white", L"Assets/Textures/white.jpg", mDevice.Get(), TextureFormat::JPG);
         mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get(), TextureFormat::PNG);
 
         // texture sampler
-        D3D11_SAMPLER_DESC sampDesc = {};
-        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP ;
-        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-
-        mDevice->CreateSamplerState(&sampDesc, mSamplerState.GetAddressOf());
-        mDeviceContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
+        Core::InitializeTextureSampler(mDevice, mDeviceContext, mSamplerState);
 
         // load external mesh
         mesh1 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
@@ -99,17 +71,30 @@ namespace HEngine
 
         mesh2 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         mesh2->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16_2.obj", L"/Eve_16/", &mTextureManager, mDevice.Get());
+        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16_2.obj", L"Eve_16/", &mTextureManager, mDevice.Get());
         mesh2->CreateBuffers();
         mesh2->GetScale() = { 0.2f, 0.2f, 0.2f };
         mesh2->GetPosition().y = -1.5f;
         mesh2->GetRotation().y = 1.5f;
         
-        // create mesh
-        cube1 = std::make_unique<CubeMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        cube1->Initialize(0.5f, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "metal");
-        cube1->GetPosition().x = -1.5f;
+        mesh3 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayoutGlass.Get(), mTextureManager);
+        mesh3->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
+        mMeshLoader.LoadMesh(mesh3.get(), "Models/Light/LightBulb1Glass.obj", L"", &mTextureManager, mDevice.Get());
+        mesh3->CreateBuffers();
+        mesh3->GetPosition().x = -1.8f;
+        mesh3->GetPosition().y = -0.2f;
 
+        mesh4 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
+        mesh4->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
+        mMeshLoader.LoadMesh(mesh4.get(), "Models/Light/LightBulb1Bottom.obj", L"", &mTextureManager, mDevice.Get());
+        mesh4->CreateBuffers();
+        mesh4->GetPosition().x = -1.8f;
+        mesh4->GetPosition().y = -0.2f;
+
+        // link meshes
+        mLightHelper.SetPointLightSource(0, *mesh3);
+        mesh3->childMesh = mesh4.get();
+        // create mesh
         plane1 = std::make_unique<PlaneMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
         plane1->Initialize(6.0f, 6.0f, 1, 1, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "desert");
         plane1->GetPosition().z = 1.0f;
@@ -133,21 +118,29 @@ namespace HEngine
         mLightHelper.UpdateDirectionalLightBuffer(*mDeviceContext.Get());
         mLightHelper.UpdatePointLightBuffer(*mDeviceContext.Get());
         
-        // drawing world objects
+        // render world objects
+        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::UNIVERSAL);
         mesh1->Draw(pCamera->GetViewMatrix());
         mesh2->Draw(pCamera->GetViewMatrix());
-
-        cube1->Draw(pCamera->GetViewMatrix());
-
+        mesh4->Draw(pCamera->GetViewMatrix());
         plane1->Draw(pCamera->GetViewMatrix());
+
+        // render glass objects
+        float blendFactor[4] = { 0, 0, 0, 0 };
+        mDeviceContext->OMSetBlendState(mBlendState.Get(), blendFactor, 0xffffffff);
+        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::GLASS);
+        mesh3->Draw(pCamera->GetViewMatrix());
 
         // draw ui
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        if(ImGui::Begin("Point Light 1"))
-        ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(0).lightPosition.x, -10.0f, 10.0f);
+        ImGui::Begin("Point Light 1");
+        if (ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(0).lightPosition.x, -10.0f, 10.0f))
+        {
+            mLightHelper.SetPointLightPosition(0, mLightHelper.GetPointLightParams(0).lightPosition);
+        }
         ImGui::ColorEdit4("Color", &mLightHelper.GetPointLightParams(0).lightColor.x);
         ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(0).lightAmbient.x, 0.0f, 1.0f);
         ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(0).lightDiffuse.x, 0.0f, 1.0f);
@@ -169,14 +162,14 @@ namespace HEngine
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
         // present frames
-        HRESULT scRes = mSwapChain->Present( 1, 0 );
-        if (FAILED(scRes))
+        hRes = mSwapChain->Present( 1, 0 );
+        if (FAILED(hRes))
         {
             std::cout << "SWAP_CHAIN_ERROR" << std::endl;
-            if (scRes == DXGI_ERROR_DEVICE_REMOVED)
+            if (hRes == DXGI_ERROR_DEVICE_REMOVED)
             {
-                HRESULT reason = mDevice->GetDeviceRemovedReason();
-                std::cout << "ERROR_DEVICE_WAS_REMOVED " << std::hex << reason << std::endl;
+                hRes = mDevice->GetDeviceRemovedReason();
+                std::cout << "ERROR_DEVICE_WAS_REMOVED " << std::hex << hRes << std::endl;
             }
         }
 
@@ -190,12 +183,23 @@ namespace HEngine
 
     void DX11Renderer::Release()
     {
-        mVertexShader.Reset();
-        mPixelShader.Reset();
+#if defined(DEBUG) || defined(_DEBUG)
+        mDebugInfoManager.Release();
+#endif
+        mShaderCompiler.Release();
+        pCamera = nullptr;
+        mSamplerState.Reset();
+        mBlendState.Reset();
         mInputLayout.Reset();
-        mRenderTargetView.Reset();
+        mInputLayoutGlass.Reset();
+
+        mRasterizer.Reset();
         mDepthStencilView.Reset();
+        mDepthStencilTexture.Reset();
+        mDepthStencilStateTransparent.Reset();
         mDepthStencilState.Reset();
+
+        mRenderTargetView.Reset();
         mSwapChain.Reset();
         mDeviceContext.Reset();
         mDevice.Reset();

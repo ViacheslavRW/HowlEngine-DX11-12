@@ -42,4 +42,37 @@ namespace HEngine
         }
         return mModelMatrix;
     }
+
+    void Mesh::SetPosition(XMFLOAT3 position)
+    {
+        mPosition.x = position.x;
+        mPosition.y = position.y;
+        mPosition.z = position.z;
+        if (childMesh != nullptr)
+        {
+            childMesh->GetPosition().x = position.x;
+            childMesh->GetPosition().y = position.y;
+            childMesh->GetPosition().z = position.z;
+            childMesh->mDirtyTransform = true;
+        }
+        mDirtyTransform = true;
+    }
+
+    void Mesh::SetRotation(XMFLOAT3& rotation)
+    {
+        mRotation.x = rotation.x;
+        mRotation.y = rotation.y;
+        mRotation.z = rotation.z;
+        if (childMesh != nullptr) childMesh->SetRotation(rotation);
+        mDirtyTransform = true;
+    }
+
+    void Mesh::SetScale(XMFLOAT3& scale)
+    {
+        mScale.x = scale.x;
+        mScale.y = scale.y;
+        mScale.z = scale.z;
+        if (childMesh != nullptr) childMesh->SetScale(scale);
+        mDirtyTransform = true;
+    }
 }

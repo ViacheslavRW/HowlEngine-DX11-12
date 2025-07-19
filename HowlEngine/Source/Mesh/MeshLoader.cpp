@@ -36,7 +36,7 @@ namespace HEngine
 				std::filesystem::path fullPath = texturePath.C_Str();
 				std::string textureKey = fullPath.filename().string();
 
-				std::wstring textureFullPath = L"Assets/Textures" + texturesPath + std::wstring(textureKey.begin(), textureKey.end());
+				std::wstring textureFullPath = L"Assets/Textures/" + texturesPath + std::wstring(textureKey.begin(), textureKey.end());
 
 				TextureFormat textureFormat = DetectTextureFormat(textureFullPath);
 				pTextureManager->LoadTexture(textureKey, textureFullPath, pDevice, textureFormat);

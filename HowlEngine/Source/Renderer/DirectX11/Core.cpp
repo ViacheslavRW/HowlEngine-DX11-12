@@ -25,13 +25,13 @@ namespace HEngine
 
         // selecting the best adapter
         ComPtr<IDXGIFactory6> factory;
-        HRESULT fHr = CreateDXGIFactory(IID_PPV_ARGS(&factory));
-        if (FAILED(fHr)) std::cout << "FAILED_TO_CREATE_FACTORY" << std::endl;
+        HRESULT coreHRes = CreateDXGIFactory(IID_PPV_ARGS(&factory));
+        if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_FACTORY" << std::endl;
 
         ComPtr<IDXGIAdapter> adapter;
 
-        HRESULT eRes = factory->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter));
-        if (eRes == DXGI_ERROR_NOT_FOUND) std::cout << "ADAPTER_NOT_FOUND" << std::endl;
+        coreHRes = factory->EnumAdapterByGpuPreference(0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter));
+        if (coreHRes == DXGI_ERROR_NOT_FOUND) std::cout << "ADAPTER_NOT_FOUND" << std::endl;
 
         DXGI_ADAPTER_DESC desc;
         adapter->GetDesc(&desc);
@@ -43,7 +43,7 @@ namespace HEngine
 #endif
 
         D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
-        HRESULT res = D3D11CreateDeviceAndSwapChain(
+        coreHRes = D3D11CreateDeviceAndSwapChain(
             adapter.Get(),
             D3D_DRIVER_TYPE_UNKNOWN,
             nullptr,
@@ -57,17 +57,17 @@ namespace HEngine
             nullptr,
             pDeviceContext.GetAddressOf()
         );
-        if (FAILED(res)) std::cout << "FAILED_TO_CREATE_DEVICE_AND_SWAPCHAIN" << std::endl;
+        if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_DEVICE_AND_SWAPCHAIN" << std::endl;
 	 }
 
      void Core::InitializeRenderTargetView(ComPtr<ID3D11RenderTargetView>& pRTV, ComPtr<ID3D11Device>& pDevice, ComPtr<IDXGISwapChain>& pSwapChain)
      {
          ComPtr<ID3D11Texture2D> backBuffer = nullptr;
-         HRESULT bRes = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
-         if (FAILED(bRes)) std::cout << "FAILED_TO_CREATE_BACK_BUFFER" << std::endl;
+         HRESULT coreHRes = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_BACK_BUFFER" << std::endl;
 
-         HRESULT rtvRes = pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, pRTV.GetAddressOf());
-         if (FAILED(rtvRes)) std::cout << "FAILED_TO_CREATE_RTV" << std::endl;
+         coreHRes = pDevice->CreateRenderTargetView(backBuffer.Get(), nullptr, pRTV.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_RTV" << std::endl;
      }
 
      void Core::SetViewPort(const UINT width, const UINT height, ComPtr<ID3D11DeviceContext>& pDeviceContext, D3D11_VIEWPORT& pViewPort)
@@ -90,8 +90,8 @@ namespace HEngine
          dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
          dsDesc.StencilEnable = false;
 
-         HRESULT hr1 = pDevice->CreateDepthStencilState(&dsDesc, pDepthStencilState.GetAddressOf());
-         if (FAILED(hr1)) std::cout << "FAILED_TO_DEPTH_BUFFER" << std::endl;
+         HRESULT coreHRes = pDevice->CreateDepthStencilState(&dsDesc, pDepthStencilState.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_DEPTH_BUFFER" << std::endl;
 
          // depth stencil texture
          D3D11_TEXTURE2D_DESC tDesc = {};
@@ -105,8 +105,8 @@ namespace HEngine
          tDesc.Usage = D3D11_USAGE_DEFAULT;
          tDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-         HRESULT hr2 = pDevice->CreateTexture2D(&tDesc, nullptr, pDepthStencilTexture.GetAddressOf());
-         if (FAILED(hr2)) std::cout << "FAILED_TO_DEPTH_STENCIL_TEXTURE" << std::endl;
+         coreHRes = pDevice->CreateTexture2D(&tDesc, nullptr, pDepthStencilTexture.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_DEPTH_STENCIL_TEXTURE" << std::endl;
 
          // depth stencil view
          D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
@@ -114,8 +114,20 @@ namespace HEngine
          dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
          dsvDesc.Texture2D.MipSlice = 0;
 
-         HRESULT hr3 = pDevice->CreateDepthStencilView(pDepthStencilTexture.Get(), &dsvDesc, pDepthStencilView.GetAddressOf());
-         if (FAILED(hr3)) std::cout << "FAILED_TO_DEPTH_STENCIL_VIEW" << std::endl;
+         coreHRes = pDevice->CreateDepthStencilView(pDepthStencilTexture.Get(), &dsvDesc, pDepthStencilView.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_DEPTH_STENCIL_VIEW" << std::endl;
+     }
+
+     void Core::InitializeDepthStencilViewTransparent(ComPtr<ID3D11DepthStencilState>& pDepthStencilState, ComPtr<ID3D11Device> pDevice)
+     {
+         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+         dsDesc.DepthEnable = true;
+         dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+         dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+         dsDesc.StencilEnable = false;
+
+         HRESULT coreHRes = pDevice->CreateDepthStencilState(&dsDesc, pDepthStencilState.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_TRANSPARENT_DEPTH_BUFFER" << std::endl;
      }
 
      void Core::InitializeRasterizer(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11DeviceContext>& pDeviceContext, ComPtr<ID3D11RasterizerState>& pRasterizer)
@@ -132,8 +144,74 @@ namespace HEngine
          rasterDesc.ScissorEnable = false;
          rasterDesc.MultisampleEnable = false;
          rasterDesc.AntialiasedLineEnable = false;
-         HRESULT hr = pDevice->CreateRasterizerState(&rasterDesc, &pRasterizer);
-         if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_RASTERIZER" << std::endl;
+         HRESULT coreHRes = pDevice->CreateRasterizerState(&rasterDesc, &pRasterizer);
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_RASTERIZER" << std::endl;
          pDeviceContext->RSSetState(pRasterizer.Get());
+     }
+
+     void Core::InitializeInputLayout(InputLayoutType type, ComPtr<ID3DBlob>& pBlob, ComPtr<ID3D11InputLayout>& pInputLayout, ComPtr<ID3D11Device>& pDevice)
+     {
+         switch (type)
+         {
+         case InputLayoutType::Universal:
+             {
+                 D3D11_INPUT_ELEMENT_DESC layout[] =
+                 {
+                     { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+                           D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                     { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
+                             D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                     { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
+                     D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                 };
+                 HRESULT coreHRes = pDevice->CreateInputLayout(layout, (UINT)std::size(layout), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
+                 if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
+             } break;
+         case InputLayoutType::Glass:
+             {
+                 D3D11_INPUT_ELEMENT_DESC layout[] =
+                 {
+                     { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+                           D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                     { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
+                             D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                     { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
+                     D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                 };
+                 HRESULT coreHRes = pDevice->CreateInputLayout(layout, (UINT)std::size(layout), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
+                 if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
+             } break;
+         }
+     }
+
+     void Core::InitializeBlendState(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11BlendState>& pBlendState)
+     {
+         D3D11_BLEND_DESC blendDesc = {};
+         blendDesc.RenderTarget[0].BlendEnable = true;
+         blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+         blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+         blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+         blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+         blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+         blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+         HRESULT coreHRes = pDevice->CreateBlendState(&blendDesc, pBlendState.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_BLEND_STATE" << std::endl;
+     }
+
+     void Core::InitializeTextureSampler(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11DeviceContext>& pDeviceContext, ComPtr<ID3D11SamplerState>& pSampleState)
+     {
+         D3D11_SAMPLER_DESC sampDesc = {};
+         sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+         sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+         sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+         sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+         HRESULT coreHRes = pDevice->CreateSamplerState(&sampDesc, pSampleState.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_SAMPLER_STATE" << std::endl;
+         pDeviceContext->PSSetSamplers(0, 1, pSampleState.GetAddressOf());
      }
 }

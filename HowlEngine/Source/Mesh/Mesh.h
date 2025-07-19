@@ -27,12 +27,18 @@ namespace HEngine
 		void Draw(XMMATRIX& viewMatrix);
 
 		std::vector<SubMesh> subMeshes;
+		Mesh* childMesh = nullptr;
 	public:
 		XMMATRIX GetModelMartix();
 
 		inline XMFLOAT3& GetPosition() { return mPosition; };
 		inline XMFLOAT3& GetRotation() { return mRotation; };
 		inline XMFLOAT3& GetScale() { return mScale; };
+		void SetPosition(XMFLOAT3 position);
+		void SetRotation(XMFLOAT3& rotation);
+		void SetScale(XMFLOAT3& scale);
+
+		inline void SetDirtyTransform(const bool& isDirty) { mDirtyTransform = isDirty; };
 
 	private:
 		XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };

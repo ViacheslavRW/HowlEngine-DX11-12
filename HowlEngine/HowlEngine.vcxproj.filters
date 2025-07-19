@@ -51,7 +51,7 @@
     <ClInclude Include="Source\Renderer\DirectX11\DebugInfoManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\ShaderCompiler.h">
+    <ClInclude Include="Source\Systems\ShaderCompiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\DirectX11\Core.h">
@@ -185,7 +185,7 @@
     <ClCompile Include="Source\Renderer\DirectX11\DebugInfoManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\ShaderCompiler.cpp">
+    <ClCompile Include="Source\Systems\ShaderCompiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\DirectX11\Core.cpp">

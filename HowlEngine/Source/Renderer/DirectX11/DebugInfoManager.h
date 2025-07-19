@@ -12,7 +12,7 @@ namespace HEngine
 
 		void Set() noexcept;
 		std::vector<std::string> GetDebugMessages() const;
-
+		void Release();
 	private:
 		UINT64 index = 0;
 		struct IDXGIInfoQueue* mDXGIInfoQueue = nullptr;

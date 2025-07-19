@@ -46,6 +46,7 @@ namespace HEngine
 
 	void Launch::AppExit()
 	{
+
 	}
 
 	void Launch::CalculateFrameStats() const

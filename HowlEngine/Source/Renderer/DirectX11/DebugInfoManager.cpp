@@ -49,4 +49,10 @@ namespace HEngine
 
 		return messages;
 	}
+
+	void DebugInfoManager::Release()
+	{
+		mDXGIInfoQueue = nullptr;
+		mDXGIDebugLib = nullptr;
+	}
 }
