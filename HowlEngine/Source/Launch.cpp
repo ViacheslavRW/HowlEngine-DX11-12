@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Launch.h"
 #include "Windowsx.h"
-#include "./Window/Window.h"
+#include "../Common/Window.h"
 #include "./Renderer/DX12Renderer.h"
 #include "./Renderer/DX11Renderer.h"
 

@@ -56,6 +56,8 @@ namespace HEngine
 
 	void ShaderCompiler::CompileAll()
 	{
+		Compile(L"Shaders/PBRVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBR);
+		Compile(L"Shaders/PBRPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBR);
 		Compile(L"Shaders/VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobUniversal);
 		Compile(L"Shaders/PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobUniversal);
 		Compile(L"Shaders/GlassVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobGlass);
@@ -65,6 +67,10 @@ namespace HEngine
 	void ShaderCompiler::CreateAll(ComPtr<ID3D11Device>& pDevice)
 	{
 		HRESULT res;
+		res = pDevice->CreateVertexShader(vsBlobPBR->GetBufferPointer(), vsBlobPBR->GetBufferSize(), nullptr, &mPBRVertexShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_PBR" << std::endl;
+		res = pDevice->CreatePixelShader(psBlobPBR->GetBufferPointer(), psBlobPBR->GetBufferSize(), nullptr, &mPBRPixelShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_PBR" << std::endl;
 		res = pDevice->CreateVertexShader(vsBlobUniversal->GetBufferPointer(), vsBlobUniversal->GetBufferSize(), nullptr, &mVertexShaderUniversal);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_UNIVERSAL" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobUniversal->GetBufferPointer(), psBlobUniversal->GetBufferSize(), nullptr, &mPixelShaderUniversal);
@@ -79,6 +85,11 @@ namespace HEngine
 	{
 		switch (pipeline)
 		{
+			case ShaderPipeline::PBR:
+			{
+				pDeviceContext->VSSetShader(mPBRVertexShader.Get(), nullptr, 0);
+				pDeviceContext->PSSetShader(mPBRPixelShader.Get(), nullptr, 0);
+			} break;
 			case ShaderPipeline::UNIVERSAL:
 			{
 				pDeviceContext->VSSetShader(mVertexShaderUniversal.Get(), nullptr, 0);
@@ -94,11 +105,15 @@ namespace HEngine
 
 	void ShaderCompiler::Release()
 	{
+		vsBlobPBR.Reset();
+		psBlobPBR.Reset();
 		vsBlobUniversal.Reset();
 		psBlobUniversal.Reset();
 		vsBlobGlass.Reset();
 		psBlobGlass.Reset();
 
+		mPBRVertexShader.Reset();
+		mPBRPixelShader.Reset();
 		mVertexShaderUniversal.Reset();
 		mPixelShaderUniversal.Reset();
 		mVertexShaderGlass.Reset();

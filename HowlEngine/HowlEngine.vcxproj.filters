@@ -24,7 +24,7 @@
     <ClInclude Include="Source\Launch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Window\Window.h">
+    <ClInclude Include="Source\Common\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Config\EngineGlobalSettings.h">
@@ -57,10 +57,10 @@
     <ClInclude Include="Source\Renderer\DirectX11\Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\DirectX11\Texture.h">
+    <ClInclude Include="Source\Common\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\DirectX11\TextureManager.h">
+    <ClInclude Include="Source\Common\TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Mesh\CubeMesh.h">
@@ -72,7 +72,7 @@
     <ClInclude Include="Source\Mesh\PlaneMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Camera\Camera.h">
+    <ClInclude Include="Source\Common\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\DX12Renderer.h">
@@ -162,6 +162,15 @@
     <ClInclude Include="Source\Editor\ImGui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Mesh\MaterialManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mesh\PBRMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mesh\MeshManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\PCH\pch.cpp">
@@ -170,7 +179,7 @@
     <ClCompile Include="Source\Launch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Window\Window.cpp">
+    <ClCompile Include="Source\Common\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Utils\Utils.cpp">
@@ -191,10 +200,10 @@
     <ClCompile Include="Source\Renderer\DirectX11\Core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\DirectX11\Texture.cpp">
+    <ClCompile Include="Source\Common\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\DirectX11\TextureManager.cpp">
+    <ClCompile Include="Source\Common\TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Mesh\CubeMesh.cpp">
@@ -248,7 +257,7 @@
     <ClCompile Include="Source\Renderer\DirectX12\Resource\DX12Resource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Camera\Camera.cpp">
+    <ClCompile Include="Source\Common\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Input\Keyboard.cpp">
@@ -285,6 +294,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Editor\ImGui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mesh\MaterialManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mesh\PBRMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mesh\MeshManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "../Renderer/DirectX11/TextureManager.h"
+#include "../Common/TextureManager.h"
 
 namespace HEngine
 {

@@ -2,7 +2,7 @@
 #include "Windows.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-#include "../Camera/Camera.h"
+#include "../Common/Camera.h"
 
 namespace HEngine
 {

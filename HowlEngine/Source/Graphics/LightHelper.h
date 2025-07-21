@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#include "../Mesh/Mesh.h"
+#include "../Mesh/PBRMesh.h"
 
 namespace HEngine
 {
@@ -22,8 +22,8 @@ namespace HEngine
 		XMFLOAT4 lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		XMFLOAT4 lightAmbient = { 0.7f, 0.7f, 0.7f, 1.0f };
 		XMFLOAT4 lightDiffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
-		XMFLOAT3 lightAttenuation = { 1.0f, 0.0f, 0.5f };
-		float lightRange = 5.0f;
+		XMFLOAT3 lightAttenuation = { 1.0f, 0.14f, 0.07f };
+		float lightRange = 15.0f;
 	};
 
 	struct PointLightBuffer
@@ -61,7 +61,7 @@ namespace HEngine
 		void SetPointLightRange(const USHORT& index, const float& range);
 		void SetPointLightActive(const USHORT& index, const bool& isActive);
 		inline PointLight& GetPointLightParams(const USHORT& index) { return pointLightParams[index]; };
-		inline void SetPointLightSource(const USHORT& index, Mesh& pMesh) { pointLightSources[index] = &pMesh; };
+		inline void SetPointLightSource(const USHORT& index, PBRMesh& pMesh) { pointLightSources[index] = &pMesh; };
 		inline void RemovePointLightSource(const USHORT& index) { pointLightSources[index] = nullptr; };
 
 	public:
@@ -73,7 +73,7 @@ namespace HEngine
 	private:
 		DirectionalLight directionalLightParams;
 		std::array<PointLight, MAX_POINT_LIGHTS> pointLightParams = {};
-		std::array<Mesh*, MAX_POINT_LIGHTS> pointLightSources = {};
+		std::array<PBRMesh*, MAX_POINT_LIGHTS> pointLightSources = {};
 	};
 }
 

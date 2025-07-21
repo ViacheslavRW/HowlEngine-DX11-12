@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "./Camera/Camera.h"
+#include "./Common/Camera.h"
 #include "Windows.h"
 #include "./Config/EngineDLLConfig.h"
 #include "./Renderer/IRenderer.h"

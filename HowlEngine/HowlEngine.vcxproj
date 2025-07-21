@@ -66,7 +66,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Libs/assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Libs/assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -88,10 +88,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>Libs/assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Libs/assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Mesh\MeshManager.h" />
+    <ClInclude Include="Source\Mesh\PBRMesh.h" />
+    <ClInclude Include="Source\Mesh\MaterialManager.h" />
     <ClInclude Include="Source\Editor\ImGui\imconfig.h" />
     <ClInclude Include="Source\Editor\ImGui\imgui.h" />
     <ClInclude Include="Source\Editor\ImGui\imgui_impl_dx11.h" />
@@ -106,7 +109,7 @@
     <ClInclude Include="Source\Input\Mouse.h" />
     <ClInclude Include="Source\Input\InputManager.h" />
     <ClInclude Include="Source\Input\Keyboard.h" />
-    <ClInclude Include="Source\Camera\Camera.h" />
+    <ClInclude Include="Source\Common\Camera.h" />
     <ClInclude Include="Source\Mesh\PlaneMesh.h" />
     <ClInclude Include="Source\Mesh\Binder.h" />
     <ClInclude Include="Source\Mesh\CubeMesh.h" />
@@ -136,13 +139,16 @@
     <ClInclude Include="Source\Config\EngineDLLConfig.h" />
     <ClInclude Include="Source\PCH\pch.h" />
     <ClInclude Include="Source\Renderer\RenderTypes\GraphicsAPI.h" />
-    <ClInclude Include="Source\Window\Window.h" />
+    <ClInclude Include="Source\Common\Window.h" />
     <ClInclude Include="Source\Utils\Utils.h" />
     <ClInclude Include="Source\Systems\Timer.h" />
-    <ClInclude Include="Source\Renderer\DirectX11\Texture.h" />
-    <ClInclude Include="Source\Renderer\DirectX11\TextureManager.h" />
+    <ClInclude Include="Source\Common\Texture.h" />
+    <ClInclude Include="Source\Common\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Mesh\MeshManager.cpp" />
+    <ClCompile Include="Source\Mesh\PBRMesh.cpp" />
+    <ClCompile Include="Source\Mesh\MaterialManager.cpp" />
     <ClCompile Include="Source\Editor\ImGui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <SupportJustMyCode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</SupportJustMyCode>
@@ -179,7 +185,7 @@
     <ClCompile Include="Source\Input\Mouse.cpp" />
     <ClCompile Include="Source\Input\InputManager.cpp" />
     <ClCompile Include="Source\Input\Keyboard.cpp" />
-    <ClCompile Include="Source\Camera\Camera.cpp" />
+    <ClCompile Include="Source\Common\Camera.cpp" />
     <ClCompile Include="Source\Mesh\PlaneMesh.cpp" />
     <ClCompile Include="Source\Mesh\CubeMesh.cpp" />
     <ClCompile Include="Source\Renderer\DirectX11\Core.cpp" />
@@ -208,11 +214,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Source\Window\Window.cpp" />
+    <ClCompile Include="Source\Common\Window.cpp" />
     <ClCompile Include="Source\Utils\Utils.cpp" />
     <ClCompile Include="Source\Systems\Timer.cpp" />
-    <ClCompile Include="Source\Renderer\DirectX11\Texture.cpp" />
-    <ClCompile Include="Source\Renderer\DirectX11\TextureManager.cpp" />
+    <ClCompile Include="Source\Common\Texture.cpp" />
+    <ClCompile Include="Source\Common\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

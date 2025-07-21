@@ -6,6 +6,7 @@ namespace HEngine
 
 	enum class InputLayoutType
 	{
+		PBR,
 		Universal,
 		Glass
 	};

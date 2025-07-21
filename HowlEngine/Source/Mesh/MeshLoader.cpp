@@ -1,13 +1,21 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "MeshLoader.h"
 #include "../Renderer/RenderTypes/RenderDataTypes.h"
+#include "./MaterialManager.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <filesystem> 
 
 namespace HEngine
 {
-	void MeshLoader::LoadMesh(Mesh* pMesh, const std::string& path, const std::wstring& texturesPath, TextureManager* pTextureManager, ID3D11Device* pDevice)
+	void MeshLoader::Initialize(TextureManager* _textureManager, ID3D11Device* _device, MaterialManager* _materialManager)
+	{
+		pTextureManager = _textureManager;
+		pDevice = _device;
+		pMaterialManager = _materialManager;
+	}
+
+	void MeshLoader::LoadMesh(PBRMesh* pMesh, const std::string& path, const std::wstring& texturesPath)
 	{
 		Assimp::Importer importer;
 
@@ -24,57 +32,93 @@ namespace HEngine
 			return;
 		};
 
-		// Load textures
-		std::unordered_map<UINT, std::string> materialIndexToTextureKey;
-		for (UINT i = 0; i < scene->mNumMaterials; ++i)
-		{
-			aiMaterial* material = scene->mMaterials[i];
-			aiString texturePath;
-
-			if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
-			{
-				std::filesystem::path fullPath = texturePath.C_Str();
-				std::string textureKey = fullPath.filename().string();
-
-				std::wstring textureFullPath = L"Assets/Textures/" + texturesPath + std::wstring(textureKey.begin(), textureKey.end());
-
-				TextureFormat textureFormat = DetectTextureFormat(textureFullPath);
-				pTextureManager->LoadTexture(textureKey, textureFullPath, pDevice, textureFormat);
-
-				materialIndexToTextureKey[i] = textureKey;
-			}
-		}
-
-		ProcessNode(scene->mRootNode, scene, pMesh, materialIndexToTextureKey);
+		ProcessNode(scene->mRootNode, scene, pMesh, texturesPath);
 	}
 
-	void MeshLoader::ProcessNode(aiNode* node, const aiScene* scene, Mesh* pMesh,
-		const std::unordered_map<UINT, std::string>& materialIndexToTextureKey)
+	void MeshLoader::ProcessNode(aiNode* node, const aiScene* scene, PBRMesh* pMesh, const std::wstring& texturesPath)
 	{
 		for (UINT i = 0; i < node->mNumMeshes; ++i)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			SubMesh subMesh;
-			ProcessMesh(mesh, scene, &subMesh, materialIndexToTextureKey);
+			PBRSubMesh subMesh;
+			ProcessMesh(mesh, scene, &subMesh, texturesPath);
 			pMesh->subMeshes.push_back(std::move(subMesh));
 		}
 
 		for (UINT i = 0; i < node->mNumChildren; ++i)
 		{
-			ProcessNode(node->mChildren[i], scene, pMesh, materialIndexToTextureKey);
+			ProcessNode(node->mChildren[i], scene, pMesh, texturesPath);
 		}
 	}
 
-	void MeshLoader::ProcessMesh(aiMesh* mesh, const aiScene* scene, SubMesh* subMesh, 
-		const std::unordered_map<UINT, std::string>& materialIndexToTextureKey)
+	void MeshLoader::ProcessMesh(aiMesh* mesh, const aiScene* scene, PBRSubMesh* subMesh, const std::wstring& texturesPath)
 	{
-		UINT materialIndex = mesh->mMaterialIndex;
-		if (materialIndexToTextureKey.find(materialIndex) != materialIndexToTextureKey.end())
-			subMesh->texture = materialIndexToTextureKey.at(materialIndex);
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		PBRMaterial mat;
+		aiString name;
+		if (material->Get(AI_MATKEY_NAME, name) == AI_SUCCESS)
+			mat.name = name.C_Str();
+		else
+			mat.name = "Unnamed";
+
+		// Helper to load a texture
+		auto loadTexture = [&](aiTextureType type, std::string& pathField, ID3D11ShaderResourceView*& srvField)
+			{
+				aiString path;
+				if (material->GetTexture(type, 0, &path) == AI_SUCCESS)
+				{
+					std::string texName = std::filesystem::path(path.C_Str()).filename().string();
+					std::wstring fullPath = L"Assets/Textures/" + texturesPath + std::wstring(texName.begin(), texName.end());
+
+					TextureFormat format = DetectTextureFormat(fullPath);
+					srvField = pTextureManager->LoadAndGetSRV(texName, fullPath, pDevice, format);
+					pathField = texName;
+				}
+			};
+
+		// Load all maps
+		loadTexture(aiTextureType_DIFFUSE, mat.albedoPath, mat.albedoSRV);
+		loadTexture(aiTextureType_NORMALS, mat.normalPath, mat.normalSRV);
+		loadTexture(aiTextureType_METALNESS, mat.metallicPath, mat.metallicSRV);
+		loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, mat.roughnessPath, mat.roughnessSRV);
+		loadTexture(aiTextureType_AMBIENT_OCCLUSION, mat.aoPath, mat.aoSRV);
+
+		material->Get(AI_MATKEY_METALLIC_FACTOR, mat.metallicFactor);
+		material->Get(AI_MATKEY_ROUGHNESS_FACTOR, mat.roughnessFactor);
+
+		// check for ORM map
+		if (!mat.metallicSRV || !mat.roughnessSRV || !mat.aoSRV)
+		{
+			for (UINT i = 0; i < material->GetTextureCount(aiTextureType_UNKNOWN); ++i)
+			{
+				aiString path;
+				if (material->GetTexture(aiTextureType_UNKNOWN, i, &path) == AI_SUCCESS)
+				{
+					std::string texName = std::filesystem::path(path.C_Str()).filename().string();
+					std::wstring wTexName = std::wstring(texName.begin(), texName.end());
+
+					std::cout << texName << "\n";
+					std::wcout << wTexName << "\n";
+
+					if (texName.find("orm") != std::string::npos || texName.find("occlusion") != std::string::npos)
+					{
+						std::wstring fullPath = L"Assets/Textures/" + texturesPath + wTexName;
+						TextureFormat format = DetectTextureFormat(fullPath);
+						ID3D11ShaderResourceView* srv = pTextureManager->LoadAndGetSRV(texName, fullPath, pDevice, format);
+
+						mat.aoSRV = mat.aoSRV ? mat.aoSRV : srv;
+						mat.roughnessSRV = mat.roughnessSRV ? mat.roughnessSRV : srv;
+						mat.metallicSRV = mat.metallicSRV ? mat.metallicSRV : srv;
+					}
+				}
+			}
+		}
+
+		subMesh->material = std::move(mat);
 
 		for (UINT i = 0; i < mesh->mNumVertices; ++i)
 		{
-			TR::Vertex3T vertex;
+			TR::PBRVertex vertex;
 
 			vertex.position =
 			{
@@ -103,6 +147,28 @@ namespace HEngine
 			}
 			else vertex.textureCoord = { 0.0f, 0.0f };
 
+			if (mesh->HasTangentsAndBitangents())
+			{
+				vertex.tangent =
+				{
+					mesh->mTangents[i].x,
+					mesh->mTangents[i].y,
+					mesh->mTangents[i].z
+				};
+
+				vertex.bitangent =
+				{
+					mesh->mBitangents[i].x,
+					mesh->mBitangents[i].y,
+					mesh->mBitangents[i].z
+				};
+			}
+			else
+			{
+				vertex.tangent = XMFLOAT3(1, 0, 0);
+				vertex.bitangent = XMFLOAT3(0, 1, 0);
+			}
+
 			subMesh->vertices.push_back(vertex);
 		}
 
@@ -127,4 +193,11 @@ namespace HEngine
 
 		return TextureFormat::PNG;
 	}
+
+	void MeshLoader::Release()
+	{
+		pTextureManager = nullptr;
+		pDevice = nullptr;
+		pMaterialManager = nullptr;
+	};
 }

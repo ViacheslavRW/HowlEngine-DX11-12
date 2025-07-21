@@ -79,4 +79,5 @@ float4 main(PS_INPUT input) : SV_Target
     float4 pointLight = CalculatePointLight(input.normal);
     float4 texColor = shaderTexture.Sample(sampleType, input.texCoord);
     return texColor * (dirLight + pointLight);
+    //return float4(1, 0, 0, 1);
 }

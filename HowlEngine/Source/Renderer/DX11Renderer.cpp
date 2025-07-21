@@ -38,7 +38,7 @@ namespace HEngine
 
         // create input layout
         Core::InitializeInputLayout(InputLayoutType::Universal, mShaderCompiler.vsBlobUniversal, mInputLayout, mDevice);
-        Core::InitializeInputLayout(InputLayoutType::Glass, mShaderCompiler.vsBlobGlass, mInputLayoutGlass, mDevice);
+        Core::InitializeInputLayout(InputLayoutType::PBR, mShaderCompiler.vsBlobPBR, mInputLayoutPBR, mDevice);
         // blend state
         Core::InitializeBlendState(mDevice, mBlendState);
 
@@ -52,53 +52,34 @@ namespace HEngine
         mLightHelper.SetPointLightColor(1, { 0.0f, 0.0f, 1.0f, 1.0f });
 
         // load textures
-        //mTextureManager.LoadTexture("metal", L"Assets/Textures/metal.jpg", mDevice.Get(), TextureFormat::JPG);
-        mTextureManager.LoadTexture("desert", L"Assets/Textures/desert.jpg", mDevice.Get(), TextureFormat::JPG);
-        //mTextureManager.LoadTexture("white", L"Assets/Textures/white.jpg", mDevice.Get(), TextureFormat::JPG);
         mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get(), TextureFormat::PNG);
 
         // texture sampler
         Core::InitializeTextureSampler(mDevice, mDeviceContext, mSamplerState);
 
-        // load external mesh
-        mesh1 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        mesh1->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh1.get(), "Models/Monitor.obj", L"", &mTextureManager, mDevice.Get());
-        mesh1->CreateBuffers();
-        mesh1->GetScale() = { 0.3f, 0.3f, 0.3f };
-        mesh1->GetPosition().x = 1.8f;
-        mesh1->GetPosition().y = -1.0f;
-
-        mesh2 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        mesh2->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh2.get(), "Models/Eve_16_2.obj", L"Eve_16/", &mTextureManager, mDevice.Get());
-        mesh2->CreateBuffers();
-        mesh2->GetScale() = { 0.2f, 0.2f, 0.2f };
-        mesh2->GetPosition().y = -1.5f;
-        mesh2->GetRotation().y = 1.5f;
-        
-        mesh3 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayoutGlass.Get(), mTextureManager);
-        mesh3->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh3.get(), "Models/Light/LightBulb1Glass.obj", L"", &mTextureManager, mDevice.Get());
-        mesh3->CreateBuffers();
-        mesh3->GetPosition().x = -1.8f;
-        mesh3->GetPosition().y = -0.2f;
-
-        mesh4 = std::make_unique<Mesh>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        mesh4->Initialize(pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-        mMeshLoader.LoadMesh(mesh4.get(), "Models/Light/LightBulb1Bottom.obj", L"", &mTextureManager, mDevice.Get());
-        mesh4->CreateBuffers();
-        mesh4->GetPosition().x = -1.8f;
-        mesh4->GetPosition().y = -0.2f;
+        mMeshManager.Initialize(mDevice.Get(), mDeviceContext.Get(), mInputLayoutPBR.Get(), 
+            &mTextureManager, &mMeshLoader, pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
+        mMeshLoader.Initialize(&mTextureManager, mDevice.Get(), &mMaterialManager);
+        mMeshManager.InitializeAllMeshes();
+        mMeshManager.CreateAllBuffers();
 
         // link meshes
-        mLightHelper.SetPointLightSource(0, *mesh3);
-        mesh3->childMesh = mesh4.get();
-        // create mesh
-        plane1 = std::make_unique<PlaneMeshT>(*mDevice.Get(), *mDeviceContext.Get(), *mInputLayout.Get(), mTextureManager);
-        plane1->Initialize(6.0f, 6.0f, 1, 1, pCamera->GetViewMatrix(), pCamera->GetProjMatrix(), "desert");
-        plane1->GetPosition().z = 1.0f;
-        plane1->GetPosition().y = -1.5f;
+        mLightHelper.SetPointLightSource(0, *mMeshManager.meshes[2]);
+        mMeshManager.meshes[2]->childMesh = mMeshManager.meshes[3].get();
+
+        // load additional maps
+        // normal maps
+        mMeshManager.meshes[0]->subMeshes[1].material.normalSRV = mTextureManager.
+            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV1_N.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV1_N.tga", mDevice.Get(), TextureFormat::TGA);
+        mMeshManager.meshes[0]->subMeshes[2].material.normalSRV = mTextureManager.
+            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV2_N.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV2_N.tga", mDevice.Get(), TextureFormat::TGA);
+        // ORM maps
+        mMeshManager.meshes[0]->subMeshes[0].material.ormSRV = mTextureManager.
+            LoadAndGetSRV("CH_P_EVE_Nikke_06_Decal_ORM.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_Decal_ORM.tga", mDevice.Get(), TextureFormat::TGA);
+        mMeshManager.meshes[0]->subMeshes[1].material.ormSRV = mTextureManager.
+            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV1_ORM.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV1_ORM.tga", mDevice.Get(), TextureFormat::TGA);
+        mMeshManager.meshes[0]->subMeshes[2].material.ormSRV = mTextureManager.
+            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV2_ORM.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV2_ORM.tga", mDevice.Get(), TextureFormat::TGA);
     }
 
     void DX11Renderer::Update(const float& deltaTime)
@@ -119,17 +100,8 @@ namespace HEngine
         mLightHelper.UpdatePointLightBuffer(*mDeviceContext.Get());
         
         // render world objects
-        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::UNIVERSAL);
-        mesh1->Draw(pCamera->GetViewMatrix());
-        mesh2->Draw(pCamera->GetViewMatrix());
-        mesh4->Draw(pCamera->GetViewMatrix());
-        plane1->Draw(pCamera->GetViewMatrix());
-
-        // render glass objects
-        float blendFactor[4] = { 0, 0, 0, 0 };
-        mDeviceContext->OMSetBlendState(mBlendState.Get(), blendFactor, 0xffffffff);
-        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::GLASS);
-        mesh3->Draw(pCamera->GetViewMatrix());
+        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::PBR);
+        mMeshManager.Render(pCamera->GetViewMatrix());
 
         // draw ui
         ImGui_ImplDX11_NewFrame();
@@ -145,7 +117,7 @@ namespace HEngine
         ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(0).lightAmbient.x, 0.0f, 1.0f);
         ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(0).lightDiffuse.x, 0.0f, 1.0f);
         ImGui::SliderFloat3("Attenuation", &mLightHelper.GetPointLightParams(0).lightAttenuation.x, 0.0f, 1.0f);
-        ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(0).lightRange, 0.0f, 10.0f);
+        ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(0).lightRange, 0.0f, 50.0f);
         ImGui::End();
 
         ImGui::Begin("Point Light 2");
@@ -154,7 +126,7 @@ namespace HEngine
         ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(1).lightAmbient.x, 0.0f, 1.0f);
         ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(1).lightDiffuse.x, 0.0f, 1.0f);
         ImGui::SliderFloat3("Attenuation", &mLightHelper.GetPointLightParams(1).lightAttenuation.x, 0.0f, 1.0f);
-        ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(1).lightRange, 0.0f, 10.0f);
+        ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(1).lightRange, 0.0f, 50.0f);
         ImGui::End();
 
         mLightHelper.mDirtyPointLight = true;
@@ -191,7 +163,7 @@ namespace HEngine
         mSamplerState.Reset();
         mBlendState.Reset();
         mInputLayout.Reset();
-        mInputLayoutGlass.Reset();
+        mInputLayoutPBR.Reset();
 
         mRasterizer.Reset();
         mDepthStencilView.Reset();
@@ -206,6 +178,9 @@ namespace HEngine
 
         mTextureManager.Clear();
         mLightHelper.Release();
+
+        mMeshManager.Release();
+        mMeshLoader.Release();
 
         ImGui_ImplDX11_Shutdown();
         ImGui_ImplWin32_Shutdown();

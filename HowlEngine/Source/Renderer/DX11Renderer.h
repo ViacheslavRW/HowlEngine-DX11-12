@@ -5,12 +5,14 @@
 #include "DirectX11/DebugInfoManager.h"
 #include "./RenderTypes/RenderDataTypes.h"
 #include "../Systems/ShaderCompiler.h"
-#include "./DirectX11/TextureManager.h"
+#include "../Common/TextureManager.h"
 #include "../Mesh/CubeMesh.h"
 #include "../Mesh/PlaneMesh.h"
 #include "../Mesh/Mesh.h"
 #include "../Mesh/MeshLoader.h"
-#include "../Camera/Camera.h"
+#include "../Mesh/MeshManager.h"
+#include "../Mesh/MaterialManager.h"
+#include "../Common/Camera.h"
 #include "../Graphics/LightHelper.h"
 
 namespace HEngine
@@ -43,7 +45,7 @@ namespace HEngine
 		ComPtr<ID3D11RasterizerState> mRasterizer = nullptr;
 		// input layout
 		ComPtr<ID3D11InputLayout> mInputLayout = nullptr;
-		ComPtr<ID3D11InputLayout> mInputLayoutGlass = nullptr;
+		ComPtr<ID3D11InputLayout> mInputLayoutPBR = nullptr;
 		// shaders
 		ShaderCompiler mShaderCompiler;
 		// blend
@@ -62,16 +64,9 @@ namespace HEngine
 		TextureManager mTextureManager = {};
 	private:
 		// Mesh
-		MeshLoader mMeshLoader = {};
-
-		std::unique_ptr<Mesh> mesh1;
-		std::unique_ptr<Mesh> mesh2;
-		std::unique_ptr<Mesh> mesh3;
-		std::unique_ptr<Mesh> mesh4;
-
-		std::unique_ptr<CubeMeshT> cube1;
-
-		std::unique_ptr<PlaneMeshT> plane1;
+		MaterialManager mMaterialManager;
+		MeshLoader mMeshLoader;
+		MeshManager mMeshManager;
 	private:
 		// Debug
 #if defined(DEBUG) || defined(_DEBUG)

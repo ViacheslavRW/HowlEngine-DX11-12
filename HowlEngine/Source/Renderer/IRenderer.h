@@ -1,6 +1,6 @@
 #pragma once
 #include "Windows.h"
-#include "../Camera/Camera.h"
+#include "../Common/Camera.h"
 
 using namespace HEngine;
 

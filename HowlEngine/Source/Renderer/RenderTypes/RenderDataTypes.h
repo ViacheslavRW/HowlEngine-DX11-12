@@ -24,12 +24,6 @@ namespace HEngine
 		};
 
 		// --- Vertices ---
-		struct Vertex3C
-		{
-			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT4 color;
-		};
-
 		struct Vertex3T
 		{
 			DirectX::XMFLOAT3 position;
@@ -37,17 +31,13 @@ namespace HEngine
 			DirectX::XMFLOAT2 textureCoord;
 		};
 
-		struct Vertex3M
+		struct PBRVertex
 		{
 			DirectX::XMFLOAT3 position;
 			DirectX::XMFLOAT3 normal;
-		};
-
-		// --- Material ---
-
-		struct Material
-		{
-			DirectX::XMFLOAT3 albedo = { 0.8f, 0.0f, 0.0f };
+			DirectX::XMFLOAT3 tangent;
+			DirectX::XMFLOAT3 bitangent;
+			DirectX::XMFLOAT2 textureCoord;
 		};
 	}
 }

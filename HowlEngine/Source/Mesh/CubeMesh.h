@@ -41,17 +41,6 @@ namespace HEngine
 		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mConstantBuffer = nullptr;
 	};
-
-	class CubeMeshC : public Binder<TR::Vertex3C>
-	{
-	public:
-	};
-
-	class CubeMeshM : public Binder<TR::Vertex3M>
-	{
-	public:
-
-	};
 }
 
 
