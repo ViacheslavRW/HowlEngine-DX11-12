@@ -24,6 +24,7 @@ namespace HEngine
         Core::InitializeDepthStencilView(mDepthStencilState, mDepthStencilTexture, mDepthStencilView, mDevice, width, height);
         Core::InitializeDepthStencilViewTransparent(mDepthStencilStateTransparent, mDevice);
         Core::InitializeRasterizer(mDevice, mDeviceContext, mRasterizer);
+        pCamera->CreateCameraBuffer(mDevice, mDeviceContext);
 
         // init imgui
         IMGUI_CHECKVERSION();
@@ -46,10 +47,10 @@ namespace HEngine
         mLightHelper.CreateDirectionalLightBuffer(mDevice);
         mLightHelper.CreatePointLightBuffer(mDevice);
 
-        mLightHelper.SetPointLightPosition(0, { -1.8f, -0.2f, 0.0f });
-        
-        mLightHelper.SetPointLightPosition(1, { 1.0f, 0.5f, -0.3f });
-        mLightHelper.SetPointLightColor(1, { 0.0f, 0.0f, 1.0f, 1.0f });
+        mLightHelper.SetPointLightPosition(0, { -1.3f, 0.0f, 0.0f });
+        mLightHelper.SetPointLightPosition(1, { 1.3f, 0.0f, 0.0f });
+        mLightHelper.SetPointLightColor(0, { 0.0f, 0.95f, 0.95f, 1.0f });
+        mLightHelper.SetPointLightColor(1, { 0.2f, 0.2f, 0.8f, 1.0f });
 
         // load textures
         mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get(), TextureFormat::PNG);
@@ -66,20 +67,8 @@ namespace HEngine
         // link meshes
         mLightHelper.SetPointLightSource(0, *mMeshManager.meshes[2]);
         mMeshManager.meshes[2]->childMesh = mMeshManager.meshes[3].get();
-
-        // load additional maps
-        // normal maps
-        mMeshManager.meshes[0]->subMeshes[1].material.normalSRV = mTextureManager.
-            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV1_N.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV1_N.tga", mDevice.Get(), TextureFormat::TGA);
-        mMeshManager.meshes[0]->subMeshes[2].material.normalSRV = mTextureManager.
-            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV2_N.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV2_N.tga", mDevice.Get(), TextureFormat::TGA);
-        // ORM maps
-        mMeshManager.meshes[0]->subMeshes[0].material.ormSRV = mTextureManager.
-            LoadAndGetSRV("CH_P_EVE_Nikke_06_Decal_ORM.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_Decal_ORM.tga", mDevice.Get(), TextureFormat::TGA);
-        mMeshManager.meshes[0]->subMeshes[1].material.ormSRV = mTextureManager.
-            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV1_ORM.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV1_ORM.tga", mDevice.Get(), TextureFormat::TGA);
-        mMeshManager.meshes[0]->subMeshes[2].material.ormSRV = mTextureManager.
-            LoadAndGetSRV("CH_P_EVE_Nikke_06_UV2_ORM.tga", L"Assets/Textures/Nikke_06/CH_P_EVE_Nikke_06_UV2_ORM.tga", mDevice.Get(), TextureFormat::TGA);
+        mLightHelper.SetPointLightSource(1, *mMeshManager.meshes[4]);
+        mMeshManager.meshes[4]->childMesh = mMeshManager.meshes[5].get();
     }
 
     void DX11Renderer::Update(const float& deltaTime)
@@ -121,7 +110,10 @@ namespace HEngine
         ImGui::End();
 
         ImGui::Begin("Point Light 2");
-        ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(1).lightPosition.x, -10.0f, 10.0f);
+        if (ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(1).lightPosition.x, -10.0f, 10.0f))
+        {
+            mLightHelper.SetPointLightPosition(1, mLightHelper.GetPointLightParams(1).lightPosition);
+        }
         ImGui::ColorEdit4("Color", &mLightHelper.GetPointLightParams(1).lightColor.x);
         ImGui::SliderFloat4("Ambient", &mLightHelper.GetPointLightParams(1).lightAmbient.x, 0.0f, 1.0f);
         ImGui::SliderFloat4("Diffuse", &mLightHelper.GetPointLightParams(1).lightDiffuse.x, 0.0f, 1.0f);
@@ -129,7 +121,21 @@ namespace HEngine
         ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(1).lightRange, 0.0f, 50.0f);
         ImGui::End();
 
+        ImGui::Begin("Directional Light");
+        ImGui::SliderFloat4("Direction", &mLightHelper.GetDirectionalLightParams().lightDirection.x, -5.0f, 5.0f);
+        ImGui::ColorEdit4("Color", &mLightHelper.GetDirectionalLightParams().lightColor.x);
+        ImGui::SliderFloat4("Ambient", &mLightHelper.GetDirectionalLightParams().lightAmbient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat4("Diffuse", &mLightHelper.GetDirectionalLightParams().lightDiffuse.x, 0.0f, 1.0f);
+        ImGui::End();
+
+        ImGui::Begin("1");
+        ImGui::SliderFloat3("Pos", &mMeshManager.meshes[0]->mPosition.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3("Rot", &mMeshManager.meshes[0]->mRotation.x, -20.0f, 20.0f);
+        ImGui::End();
+
+        mMeshManager.meshes[0]->mDirtyTransform = true;
         mLightHelper.mDirtyPointLight = true;
+        mLightHelper.mDirtyDirectionalLight = true;
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -159,6 +165,7 @@ namespace HEngine
         mDebugInfoManager.Release();
 #endif
         mShaderCompiler.Release();
+        pCamera->Release();
         pCamera = nullptr;
         mSamplerState.Reset();
         mBlendState.Reset();

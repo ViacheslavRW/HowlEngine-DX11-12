@@ -1,11 +1,20 @@
 #pragma once
+#include "wrl.h"
+#include "d3d11.h"
+#include "Windows.h"
 #include "../Config/EngineDLLConfig.h"
 #include <DirectXMath.h>
-#include "Windows.h"
 
 namespace HEngine
 {
 	using namespace DirectX;
+	using namespace Microsoft::WRL;
+
+	struct CameraBuffer
+	{
+		XMFLOAT3 cameraPosition;
+		float pad;
+	};
 
 	class HE_API Camera
 	{
@@ -18,9 +27,12 @@ namespace HEngine
 
 		void UpdateCameraVectors();
 		XMMATRIX& GetViewMatrix();
-		
 		void SetProjMatrix(UINT width, UINT height);
-
+	public:
+		void CreateCameraBuffer(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11DeviceContext>& pDeviceContext);
+		void UpdateCameraBuffer();
+		void Release();
+	public:
 		inline XMMATRIX& GetProjMatrix() { return mProjMatrix; };
 
 		inline void SetPosition(XMFLOAT3 _position) { position = _position; dirtyView = true; };
@@ -29,18 +41,18 @@ namespace HEngine
 		inline void SetRotationEnabled(bool isEnagle) { isRotationEnabled = isEnagle; };
 		inline bool GetRotationEnabled() const { return isRotationEnabled; };
 		// move
-		void MoveForward(float deltaTime);
-		void MoveBackward(float deltaTime);
-		void MoveLeft(float deltaTime);
-		void MoveRight(float deltaTime);
-		void MoveUp(float deltaTime);
-		void MoveDown(float deltaTime);
+		void MoveForward(const float& deltaTime);
+		void MoveBackward(const float& deltaTime);
+		void MoveLeft(const float& deltaTime);
+		void MoveRight(const float& deltaTime);
+		void MoveUp(const float& deltaTime);
+		void MoveDown(const float& deltaTime);
 		// rotate
 		void RotateByRawMouse(int dx, int dy);
-		void RotateLeft(float deltaTime);
-		void RotateRight(float deltaTime);
-		void RotateDown(float deltaTime);
-		void RotateUp(float deltaTime);
+		void RotateLeft(const float& deltaTime);
+		void RotateRight(const float& deltaTime);
+		void RotateDown(const float& deltaTime);
+		void RotateUp(const float& deltaTime);
 	private:
 		constexpr static float nearZ = 0.1f;
 		constexpr static float farZ = 100.0f;
@@ -51,9 +63,13 @@ namespace HEngine
 
 		bool isRotationEnabled = true;
 
-		constexpr static float cameraSpeed = 7.5f;
+		constexpr static float cameraSpeed = 2.5f;
 		constexpr static float cameraRotSpeed = 2.2f;
 		constexpr static float cameraSensitivity = 0.004f;
+
+		ComPtr<ID3D11Device> mDevice;
+		ComPtr<ID3D11DeviceContext> mDeviceContext;
+		ComPtr<ID3D11Buffer> mCameraBuffer = nullptr;
 
 		XMFLOAT3 position;
 

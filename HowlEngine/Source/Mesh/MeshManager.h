@@ -9,6 +9,7 @@ namespace HEngine
 	{
 		XMMATRIX mvpMatrix;
 		XMMATRIX modelMatrix;
+		XMMATRIX modelMatrixInvTranspose;
 	};
 
 	class MeshManager
@@ -52,6 +53,8 @@ namespace HEngine
 		std::unique_ptr<PBRMesh> mesh2;
 		std::unique_ptr<PBRMesh> mesh3;
 		std::unique_ptr<PBRMesh> mesh4;
+		std::unique_ptr<PBRMesh> mesh5;
+		std::unique_ptr<PBRMesh> mesh6;
 	};
 }
 

@@ -9,10 +9,10 @@ namespace HEngine
 
 	struct DirectionalLight
 	{
-		XMFLOAT4 lightDirection = { -0.5f, -1.0f, 0.5f, 0.0f };
+		XMFLOAT4 lightDirection = { -0.5f, -1.0f, -0.5f, 0.0f };
 		XMFLOAT4 lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		XMFLOAT4 lightAmbient = { 0.7f, 0.7f, 0.7f, 1.0f };
-		XMFLOAT4 lightDiffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+		XMFLOAT4 lightAmbient = { 0.1f, 0.1f, 0.1f, 1.0f };
+		XMFLOAT4 lightDiffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
 	};
 
 	struct PointLight

@@ -43,7 +43,7 @@ namespace HEngine
 		XMMATRIX mViewMatrix = {};
 		XMMATRIX mProjMatrix = {};
 		XMMATRIX mModelMatrix = {};
-	private:
+	public:
 		XMFLOAT3 mPosition = { 0.0f, 0.0f, 0.0f };
 		XMFLOAT3 mRotation = { 0.0f, 0.0f, 0.0f };
 		XMFLOAT3 mScale = { 1.0f, 1.0f, 1.0f };

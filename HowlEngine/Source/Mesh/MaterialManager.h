@@ -9,9 +9,7 @@ namespace HEngine
 
 		std::string albedoPath;
 		std::string normalPath;
-		std::string metallicPath;
-		std::string roughnessPath;
-		std::string aoPath;
+		std::string ormPath;
 
 		float metallicFactor = 0.0f;
 		float roughnessFactor = 0.5f;
@@ -19,9 +17,6 @@ namespace HEngine
 
 		ID3D11ShaderResourceView* albedoSRV = nullptr;
 		ID3D11ShaderResourceView* normalSRV = nullptr;
-		ID3D11ShaderResourceView* metallicSRV = nullptr;
-		ID3D11ShaderResourceView* roughnessSRV = nullptr;
-		ID3D11ShaderResourceView* aoSRV = nullptr;
 		ID3D11ShaderResourceView* ormSRV = nullptr;
 	};
 

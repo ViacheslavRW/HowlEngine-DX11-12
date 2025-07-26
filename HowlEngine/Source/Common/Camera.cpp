@@ -43,6 +43,7 @@ namespace HEngine
 			XMVECTOR upVec = XMLoadFloat3(&up);
 
 			mViewMatrix = XMMatrixLookAtLH(pos, target, upVec);
+			UpdateCameraBuffer();
 			dirtyView = false;
 		}
 
@@ -54,7 +55,44 @@ namespace HEngine
 		mProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), static_cast<float>(width) / static_cast<float>(height), nearZ, farZ);
 	}
 
-	void Camera::MoveForward(float deltaTime)
+	void Camera::CreateCameraBuffer(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11DeviceContext>& pDeviceContext)
+	{
+		mDevice = pDevice;
+		mDeviceContext = pDeviceContext;
+
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.ByteWidth = sizeof(CameraBuffer);
+		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+		HRESULT hr = pDevice->CreateBuffer(&bufferDesc, nullptr, mCameraBuffer.GetAddressOf());
+		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_CAMERA_BUFFER" << std::endl;
+	}
+
+	void Camera::UpdateCameraBuffer()
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = mDeviceContext->Map(mCameraBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		if (SUCCEEDED(hr))
+		{
+			auto* cameraData = reinterpret_cast<CameraBuffer*>(mappedResource.pData);
+			cameraData->cameraPosition = position;
+			cameraData->pad = 0.0f;
+
+			mDeviceContext->Unmap(mCameraBuffer.Get(), 0);
+			mDeviceContext->PSSetConstantBuffers(3, 0, mCameraBuffer.GetAddressOf());
+		}
+	}
+
+	void Camera::Release()
+	{
+		mDevice.Reset();
+		mDeviceContext.Reset();
+		mCameraBuffer.Reset();
+	}
+
+	void Camera::MoveForward(const float& deltaTime)
 	{
 		XMVECTOR f = XMLoadFloat3(&forward);
 		XMVECTOR p = XMLoadFloat3(&position);
@@ -63,7 +101,7 @@ namespace HEngine
 		dirtyView = true;
 	}
 
-	void Camera::MoveBackward(float deltaTime)
+	void Camera::MoveBackward(const float& deltaTime)
 	{
 		XMVECTOR f = XMLoadFloat3(&forward);
 		XMVECTOR p = XMLoadFloat3(&position);
@@ -72,7 +110,7 @@ namespace HEngine
 		dirtyView = true;
 	}
 
-	void Camera::MoveLeft(float deltaTime)
+	void Camera::MoveLeft(const float& deltaTime)
 	{
 		XMVECTOR f = XMLoadFloat3(&right);
 		XMVECTOR p = XMLoadFloat3(&position);
@@ -81,7 +119,7 @@ namespace HEngine
 		dirtyView = true;
 	}
 
-	void Camera::MoveRight(float deltaTime)
+	void Camera::MoveRight(const float& deltaTime)
 	{
 		XMVECTOR f = XMLoadFloat3(&right);
 		XMVECTOR p = XMLoadFloat3(&position);
@@ -90,7 +128,7 @@ namespace HEngine
 		dirtyView = true;
 	}
 
-	void Camera::MoveUp(float deltaTime)
+	void Camera::MoveUp(const float& deltaTime)
 	{
 		XMVECTOR worldUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 		XMVECTOR p = XMLoadFloat3(&position);
@@ -99,7 +137,7 @@ namespace HEngine
 		dirtyView = true;
 	}
 
-	void Camera::MoveDown(float deltaTime)
+	void Camera::MoveDown(const float& deltaTime)
 	{
 		XMVECTOR worldUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 		XMVECTOR p = XMLoadFloat3(&position);
@@ -119,7 +157,7 @@ namespace HEngine
 		dirtyRotation = true;
 	}
 
-	void Camera::RotateLeft(float deltaTime)
+	void Camera::RotateLeft(const float& deltaTime)
 	{
 		if (!isRotationEnabled) return;
 		yaw -= cameraRotSpeed * deltaTime;
@@ -127,7 +165,7 @@ namespace HEngine
 		dirtyRotation = true;
 	}
 
-	void Camera::RotateRight(float deltaTime)
+	void Camera::RotateRight(const float& deltaTime)
 	{
 		if (!isRotationEnabled) return;
 		yaw += cameraRotSpeed * deltaTime;
@@ -135,7 +173,7 @@ namespace HEngine
 		dirtyRotation = true;
 	}
 
-	void Camera::RotateDown(float deltaTime)
+	void Camera::RotateDown(const float& deltaTime)
 	{
 		if (!isRotationEnabled) return;
 		pitch += cameraRotSpeed * deltaTime;
@@ -144,7 +182,7 @@ namespace HEngine
 		dirtyRotation = true;
 	}
 
-	void Camera::RotateUp(float deltaTime)
+	void Camera::RotateUp(const float& deltaTime)
 	{
 		if (!isRotationEnabled) return;
 		pitch -= cameraRotSpeed * deltaTime;

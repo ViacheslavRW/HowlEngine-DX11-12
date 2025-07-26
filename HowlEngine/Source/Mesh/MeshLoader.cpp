@@ -68,7 +68,7 @@ namespace HEngine
 				if (material->GetTexture(type, 0, &path) == AI_SUCCESS)
 				{
 					std::string texName = std::filesystem::path(path.C_Str()).filename().string();
-					std::wstring fullPath = L"Assets/Textures/" + texturesPath + std::wstring(texName.begin(), texName.end());
+					std::wstring fullPath = texturesPath + std::wstring(texName.begin(), texName.end());
 
 					TextureFormat format = DetectTextureFormat(fullPath);
 					srvField = pTextureManager->LoadAndGetSRV(texName, fullPath, pDevice, format);
@@ -79,40 +79,10 @@ namespace HEngine
 		// Load all maps
 		loadTexture(aiTextureType_DIFFUSE, mat.albedoPath, mat.albedoSRV);
 		loadTexture(aiTextureType_NORMALS, mat.normalPath, mat.normalSRV);
-		loadTexture(aiTextureType_METALNESS, mat.metallicPath, mat.metallicSRV);
-		loadTexture(aiTextureType_DIFFUSE_ROUGHNESS, mat.roughnessPath, mat.roughnessSRV);
-		loadTexture(aiTextureType_AMBIENT_OCCLUSION, mat.aoPath, mat.aoSRV);
+		loadTexture(aiTextureType_METALNESS, mat.ormPath, mat.ormSRV); // assimp considers metalness or roughness as ORM
 
-		material->Get(AI_MATKEY_METALLIC_FACTOR, mat.metallicFactor);
-		material->Get(AI_MATKEY_ROUGHNESS_FACTOR, mat.roughnessFactor);
-
-		// check for ORM map
-		if (!mat.metallicSRV || !mat.roughnessSRV || !mat.aoSRV)
-		{
-			for (UINT i = 0; i < material->GetTextureCount(aiTextureType_UNKNOWN); ++i)
-			{
-				aiString path;
-				if (material->GetTexture(aiTextureType_UNKNOWN, i, &path) == AI_SUCCESS)
-				{
-					std::string texName = std::filesystem::path(path.C_Str()).filename().string();
-					std::wstring wTexName = std::wstring(texName.begin(), texName.end());
-
-					std::cout << texName << "\n";
-					std::wcout << wTexName << "\n";
-
-					if (texName.find("orm") != std::string::npos || texName.find("occlusion") != std::string::npos)
-					{
-						std::wstring fullPath = L"Assets/Textures/" + texturesPath + wTexName;
-						TextureFormat format = DetectTextureFormat(fullPath);
-						ID3D11ShaderResourceView* srv = pTextureManager->LoadAndGetSRV(texName, fullPath, pDevice, format);
-
-						mat.aoSRV = mat.aoSRV ? mat.aoSRV : srv;
-						mat.roughnessSRV = mat.roughnessSRV ? mat.roughnessSRV : srv;
-						mat.metallicSRV = mat.metallicSRV ? mat.metallicSRV : srv;
-					}
-				}
-			}
-		}
+		//material->Get(AI_MATKEY_METALLIC_FACTOR, mat.metallicFactor);
+		//material->Get(AI_MATKEY_ROUGHNESS_FACTOR, mat.roughnessFactor);
 
 		subMesh->material = std::move(mat);
 

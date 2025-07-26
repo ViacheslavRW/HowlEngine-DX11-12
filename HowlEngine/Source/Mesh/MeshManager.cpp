@@ -21,42 +21,55 @@ namespace HEngine
 		mesh2 = std::make_unique<PBRMesh>();
 		mesh3 = std::make_unique<PBRMesh>();
 		mesh4 = std::make_unique<PBRMesh>();
+		mesh5 = std::make_unique<PBRMesh>();
+		mesh6 = std::make_unique<PBRMesh>();
 
-		mesh1->modelPath = "Models/Nikke_06.obj";
-		mesh1->texturesPath = L"Nikke_06/";
-		mesh2->modelPath = "Models/Eve_16_2.obj";
-		mesh2->texturesPath = L"Eve_16/";
+		mesh1->modelPath = "Models/Characters/Nikke_06/Nikke_06.gltf";
+		mesh1->texturesPath = L"Models/Characters/Nikke_06/";
+		mesh2->modelPath = "Models/Environment/BrickWall.gltf";
+		mesh2->texturesPath = L"Models/Environment/";
 		mesh3->modelPath = "Models/Light/LightBulb1Glass.obj";
+		mesh3->texturesPath = L"Assets/Textures/";
 		mesh4->modelPath = "Models/Light/LightBulb1Bottom.obj";
+		mesh4->texturesPath = L"Assets/Textures/";
+		mesh5->modelPath = "Models/Light/LightBulb1Glass.obj";
+		mesh5->texturesPath = L"Assets/Textures/";
+		mesh6->modelPath = "Models/Light/LightBulb1Bottom.obj";
+		mesh6->texturesPath = L"Assets/Textures/";
 
 		mMeshLoader->LoadMesh(mesh1.get(), mesh1->modelPath, mesh1->texturesPath);
 		mMeshLoader->LoadMesh(mesh2.get(), mesh2->modelPath, mesh2->texturesPath);
 		mMeshLoader->LoadMesh(mesh3.get(), mesh3->modelPath, mesh3->texturesPath);
 		mMeshLoader->LoadMesh(mesh4.get(), mesh4->modelPath, mesh4->texturesPath);
+		mMeshLoader->LoadMesh(mesh5.get(), mesh5->modelPath, mesh5->texturesPath);
+		mMeshLoader->LoadMesh(mesh6.get(), mesh6->modelPath, mesh6->texturesPath);
 
 		meshes.push_back(std::move(mesh1));
 		meshes.push_back(std::move(mesh2));
 		meshes.push_back(std::move(mesh3));
 		meshes.push_back(std::move(mesh4));
+		meshes.push_back(std::move(mesh5));
+		meshes.push_back(std::move(mesh6));
 
 		for (int i = 0; i < meshes.size(); ++i)
 		{
 			meshes[i]->Initialize(cashedViewMatrix, cashedProjMatrix);
 		}
 
-		meshes[0]->GetScale() = { 1.2f, 1.2f, 1.2f };
+		meshes[0]->GetScale() = { 0.1f, 0.1f, 0.1f };
 		meshes[0]->GetPosition().y = -0.8f;
-		meshes[0]->GetPosition().x = 2.5f;
+		meshes[0]->GetPosition().x = -2.5f;
 		meshes[0]->GetRotation().y = -15.0f;
 
-		meshes[1]->GetScale() = {0.4f, 0.4f, 0.4f};
-		meshes[1]->GetPosition().y = -0.8f;
-		meshes[1]->GetRotation().y = -15.0f;
+		//meshes[1]->GetScale() = {0.4f, 0.4f, 0.4f};
+		//meshes[1]->GetPosition().y = -0.8f;
+		//meshes[1]->GetRotation().y = -15.0f;
 
-		meshes[2]->GetPosition().x = -1.8f;
-		meshes[2]->GetPosition().y = -0.2f;
-		meshes[3]->GetPosition().x = -1.8f;
-		meshes[3]->GetPosition().y = -0.2f;
+		meshes[2]->GetPosition().x = -1.3f;
+		meshes[3]->GetPosition().x = -1.3f;
+
+		meshes[4]->GetPosition().x = 1.3f;
+		meshes[5]->GetPosition().x = 1.3f;
 	}
 
 	void MeshManager::CreateAllBuffers()
@@ -127,6 +140,7 @@ namespace HEngine
 		CBMatrices matrices;
 		matrices.modelMatrix = XMMatrixTranspose(modelMatrix);
 		matrices.mvpMatrix = XMMatrixTranspose(modelMatrix * viewMatrix * cashedProjMatrix);
+		matrices.modelMatrixInvTranspose = XMMatrixTranspose(XMMatrixInverse(nullptr, modelMatrix));
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 		HRESULT hr = mDeviceContext->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -146,10 +160,7 @@ namespace HEngine
 
 		mDeviceContext->PSSetShaderResources(0, 1, &material.albedoSRV);
 		mDeviceContext->PSSetShaderResources(1, 1, &material.normalSRV);
-		mDeviceContext->PSSetShaderResources(2, 1, &material.metallicSRV);
-		mDeviceContext->PSSetShaderResources(3, 1, &material.roughnessSRV);
-		mDeviceContext->PSSetShaderResources(4, 1, &material.aoSRV);
-		mDeviceContext->PSSetShaderResources(5, 1, &material.ormSRV);
+		mDeviceContext->PSSetShaderResources(2, 1, &material.ormSRV);
 	}
 
 	void MeshManager::Draw(const size_t& indices)
