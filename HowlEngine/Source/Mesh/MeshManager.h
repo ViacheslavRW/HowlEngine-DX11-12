@@ -9,7 +9,6 @@ namespace HEngine
 	{
 		XMMATRIX mvpMatrix;
 		XMMATRIX modelMatrix;
-		XMMATRIX modelMatrixInvTranspose;
 	};
 
 	class MeshManager

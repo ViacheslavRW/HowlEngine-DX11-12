@@ -24,8 +24,8 @@ namespace HEngine
 		mesh5 = std::make_unique<PBRMesh>();
 		mesh6 = std::make_unique<PBRMesh>();
 
-		mesh1->modelPath = "Models/Characters/Nikke_06/Nikke_06.gltf";
-		mesh1->texturesPath = L"Models/Characters/Nikke_06/";
+		mesh1->modelPath = "Models/Characters/Raven/Raven.gltf";
+		mesh1->texturesPath = L"Models/Characters/Raven/";
 		mesh2->modelPath = "Models/Environment/BrickWall.gltf";
 		mesh2->texturesPath = L"Models/Environment/";
 		mesh3->modelPath = "Models/Light/LightBulb1Glass.obj";
@@ -56,14 +56,9 @@ namespace HEngine
 			meshes[i]->Initialize(cashedViewMatrix, cashedProjMatrix);
 		}
 
-		meshes[0]->GetScale() = { 0.1f, 0.1f, 0.1f };
-		meshes[0]->GetPosition().y = -0.8f;
-		meshes[0]->GetPosition().x = -2.5f;
-		meshes[0]->GetRotation().y = -15.0f;
-
-		//meshes[1]->GetScale() = {0.4f, 0.4f, 0.4f};
-		//meshes[1]->GetPosition().y = -0.8f;
-		//meshes[1]->GetRotation().y = -15.0f;
+		meshes[0]->GetRotation().y = 45.0f * 0.0174533f;
+		meshes[0]->GetPosition().y = -0.5f;
+		meshes[0]->GetPosition().x = -0.5f;
 
 		meshes[2]->GetPosition().x = -1.3f;
 		meshes[3]->GetPosition().x = -1.3f;
@@ -140,7 +135,6 @@ namespace HEngine
 		CBMatrices matrices;
 		matrices.modelMatrix = XMMatrixTranspose(modelMatrix);
 		matrices.mvpMatrix = XMMatrixTranspose(modelMatrix * viewMatrix * cashedProjMatrix);
-		matrices.modelMatrixInvTranspose = XMMatrixTranspose(XMMatrixInverse(nullptr, modelMatrix));
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 		HRESULT hr = mDeviceContext->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

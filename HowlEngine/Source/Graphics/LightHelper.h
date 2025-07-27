@@ -22,7 +22,7 @@ namespace HEngine
 		XMFLOAT4 lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		XMFLOAT4 lightAmbient = { 0.7f, 0.7f, 0.7f, 1.0f };
 		XMFLOAT4 lightDiffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
-		XMFLOAT3 lightAttenuation = { 1.0f, 0.14f, 0.07f };
+		XMFLOAT3 lightAttenuation = { 0.2f, 0.14f, 0.07f };
 		float lightRange = 15.0f;
 	};
 

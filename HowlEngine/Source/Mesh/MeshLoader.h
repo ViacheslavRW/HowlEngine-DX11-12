@@ -26,6 +26,10 @@ namespace HEngine
 		TextureManager* pTextureManager;
 		ID3D11Device* pDevice;
 		MaterialManager* pMaterialManager;
+
+	private:
+		const std::string defaultTextureName = "no_texture";
+		const std::wstring defaultTexturePath = L"Assets/Textures/";
 	};
 }
 

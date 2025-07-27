@@ -97,6 +97,7 @@ namespace HEngine
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
         ImGui::Begin("Point Light 1");
         if (ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(0).lightPosition.x, -10.0f, 10.0f))
         {
@@ -109,6 +110,7 @@ namespace HEngine
         ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(0).lightRange, 0.0f, 50.0f);
         ImGui::End();
 
+        ImGui::SetNextWindowPos(ImVec2(0, 170), ImGuiCond_Always);
         ImGui::Begin("Point Light 2");
         if (ImGui::SliderFloat3("Position", &mLightHelper.GetPointLightParams(1).lightPosition.x, -10.0f, 10.0f))
         {
@@ -121,6 +123,7 @@ namespace HEngine
         ImGui::SliderFloat("Range", &mLightHelper.GetPointLightParams(1).lightRange, 0.0f, 50.0f);
         ImGui::End();
 
+        ImGui::SetNextWindowPos(ImVec2(910, 0), ImGuiCond_Always);
         ImGui::Begin("Directional Light");
         ImGui::SliderFloat4("Direction", &mLightHelper.GetDirectionalLightParams().lightDirection.x, -5.0f, 5.0f);
         ImGui::ColorEdit4("Color", &mLightHelper.GetDirectionalLightParams().lightColor.x);
@@ -128,9 +131,10 @@ namespace HEngine
         ImGui::SliderFloat4("Diffuse", &mLightHelper.GetDirectionalLightParams().lightDiffuse.x, 0.0f, 1.0f);
         ImGui::End();
 
-        ImGui::Begin("1");
+        ImGui::SetNextWindowPos(ImVec2(910, 125), ImGuiCond_Always);
+        ImGui::Begin("Raven");
         ImGui::SliderFloat3("Pos", &mMeshManager.meshes[0]->mPosition.x, -10.0f, 10.0f);
-        ImGui::SliderFloat3("Rot", &mMeshManager.meshes[0]->mRotation.x, -20.0f, 20.0f);
+        ImGui::SliderFloat3("Rot", &mMeshManager.meshes[0]->mRotation.x, -5.0f, 5.0f);
         ImGui::End();
 
         mMeshManager.meshes[0]->mDirtyTransform = true;

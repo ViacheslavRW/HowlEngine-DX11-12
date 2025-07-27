@@ -22,19 +22,21 @@ cbuffer constBuffer : register(b0)
 {
     matrix worldViewProjMatrix;
     matrix modelMatrix;
-    matrix modelMatrixInvTranspose;
 };
 
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
-    float4 worldPos = mul(float4(input.position, 1.0f), modelMatrix);
 
+    float4 worldPos = mul(float4(input.position, 1.0f), modelMatrix);
+    
     output.position = mul(worldPos, worldViewProjMatrix);
     output.worldPosition = worldPos.xyz;
-    output.normal = normalize(mul(float4(input.normal, 0.0f), modelMatrixInvTranspose).xyz);
-    output.tangent = normalize(mul(float4(input.tangent, 0.0f), modelMatrixInvTranspose).xyz);
-    output.bitangent = normalize(cross(output.normal, output.tangent));
+    
+    output.normal = normalize(mul(float4(input.normal, 0.0f), modelMatrix).xyz);
+    output.tangent = normalize(mul(float4(input.tangent, 0.0f), modelMatrix).xyz);
+    output.bitangent = normalize(mul(float4(input.bitangent, 0.0f), modelMatrix).xyz);
+    
     output.texCoord = input.texCoord;
     
     return output;

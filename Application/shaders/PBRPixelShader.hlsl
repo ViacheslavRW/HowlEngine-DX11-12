@@ -50,7 +50,7 @@ struct PS_INPUT
 float3 GetNormalFromMap(PS_INPUT input)
 {
     float3 tangentNormal = normalMap.Sample(sampleType, input.texCoord).rgb * 2.0f - 1.0f;
-    tangentNormal.y *= -1.0f; // Flip Y if needed
+    //tangentNormal.y *= -1.0f; // Flip Y if needed
     float3 T = normalize(input.tangent);
     float3 N = normalize(input.normal);
     float3 B = normalize(input.bitangent);
@@ -113,48 +113,54 @@ float3 CalculateLight(float3 L, float3 H, float3 V, float3 N, float3 lightColor,
 
 float4 main(PS_INPUT input) : SV_Target
 {
+    // Sample textures
     float3 albedo = pow(albedoMap.Sample(sampleType, input.texCoord).rgb, 2.2f);
     float3 orm = ormMap.Sample(sampleType, input.texCoord).rgb;
-
-    float ao = orm.r;
-    float roughness = clamp(orm.g, 0.05, 1.0);
+    float occlusion = orm.r;
+    float roughness = orm.g;
     float metallic = orm.b;
 
-    float3 norm = GetNormalFromMap(input);
-    //float3 norm = normalize(input.normal);
-    float3 viewDir = normalize(cameraPosition - input.worldPosition);
+    // Get normal from normal map
+    float3 N = GetNormalFromMap(input);
+    float3 V = normalize(cameraPosition - input.worldPosition);
     
-    float3 Lo = float3(0, 0, 0);
+    // Ensure two-sided lighting
+    float NdotV = dot(N, V);
+    if (NdotV < 0.0f) N = -N;
 
+    // Initialize lighting
+    float3 Lo = float3(0.0f, 0.0f, 0.0f);
+    float3 ambient = lightAmbient.rgb * albedo * occlusion;
+    
     // Directional light
-    float3 L = normalize(-lightDirection.xyz);
-    float3 H = normalize(viewDir + L);
-    Lo += CalculateLight(L, H, viewDir, norm, lightColor.rgb, albedo, metallic, roughness);
+    float3 Ld = normalize(lightDirection.xyz);
+    float3 Hd = normalize(V + Ld);
+    Lo += CalculateLight(Ld, Hd, V, N, lightColor.rgb, albedo, metallic, roughness);
 
-    // Point lights
+    // Point light contribution
     for (int i = 0; i < MAX_POINT_LIGHTS; ++i)
     {
         if (pointLights[i].active == 0) continue;
-
-        float3 toLight = pointLights[i].lightPosition - input.worldPosition;
         
+        float3 toLight = pointLights[i].lightPosition - input.worldPosition;
         float dist = length(toLight);
         if (dist > pointLights[i].lightRange) continue;
-
-        float3 Lp = normalize(toLight);
-        float3 Hp = normalize(viewDir + Lp);
-
-        float atten = 1.0f / (pointLights[i].lightAttenuation.x + pointLights[i].lightAttenuation.y * dist + pointLights[i].lightAttenuation.z * dist * dist + 0.0001f);
-        float3 radiance = pointLights[i].lightColor.rgb * atten;
-
-        Lo += CalculateLight(Lp, Hp, viewDir, norm, radiance, albedo, metallic, roughness);
+        
+        float3 L = normalize(toLight);
+        float3 H = normalize(V + L);
+        
+        float atten = 1.0f / (pointLights[i].lightAttenuation.x +
+                             pointLights[i].lightAttenuation.y * dist +
+                             pointLights[i].lightAttenuation.z * dist * dist + 0.0001f);
+        
+        Lo += CalculateLight(L, H, V, N, pointLights[i].lightColor.rgb, albedo, metallic, roughness) * atten;
     }
 
-    float3 ambient = ao * albedo * lightAmbient.rgb;
-    float3 finalColor = ambient + Lo;
+    // Combine lighting
+    float3 color = ambient + Lo;
 
     // Gamma correction
-    finalColor = pow(finalColor, 1.0 / 2.2);
-    
-    return float4(finalColor, 1.0f);
+    color = pow(color, 1.0f / 2.2f);
+
+    return float4(color, 1.0f);
 }
