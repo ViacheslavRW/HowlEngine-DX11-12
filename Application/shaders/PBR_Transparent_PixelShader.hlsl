@@ -113,9 +113,12 @@ float3 CalculateLight(float3 L, float3 H, float3 V, float3 N, float3 lightColor,
 
 float4 main(PS_INPUT input) : SV_Target
 {
-    float3 albedo = pow(albedoMap.Sample(sampleType, input.texCoord).rgb, 2.2f);
+    float4 albedoSample = albedoMap.Sample(sampleType, input.texCoord);
+    float3 albedo = pow(albedoSample.rgb, 2.2f);
+    float alpha = albedoSample.a;
+    
     float3 orm = ormMap.Sample(sampleType, input.texCoord).rgb;
-    float occlusion = orm.r;
+    float occlusion = orm.r * 0.8f;
     float roughness = orm.g;
     float metallic = orm.b;
 
@@ -135,11 +138,13 @@ float4 main(PS_INPUT input) : SV_Target
 
     for (int i = 0; i < MAX_POINT_LIGHTS; ++i)
     {
-        if (pointLights[i].active == 0) continue;
+        if (pointLights[i].active == 0)
+            continue;
         
         float3 toLight = pointLights[i].lightPosition - input.worldPosition;
         float dist = length(toLight);
-        if (dist > pointLights[i].lightRange) continue;
+        if (dist > pointLights[i].lightRange)
+            continue;
         
         float3 L = normalize(toLight);
         float3 H = normalize(V + L);
@@ -154,5 +159,5 @@ float4 main(PS_INPUT input) : SV_Target
     float3 color = ambient + Lo;
     color = pow(color, 1.0f / 2.2f);
 
-    return float4(color, 1.0f);
+    return float4(color, alpha);
 }

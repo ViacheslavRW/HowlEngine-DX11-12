@@ -61,8 +61,8 @@ namespace HEngine
 		else
 			mat.name = "Unnamed";
 
-		// set default texture if none is found
-		subMesh->material.albedoSRV = pTextureManager->LoadAndGetSRV(defaultTextureName, defaultTexturePath, pDevice, TextureFormat::PNG);
+		// set default textures
+		mat.albedoSRV = pTextureManager->LoadAndGetSRV(defaultAlbedoName, defaultTexturePath, pDevice, TextureFormat::PNG);
 
 		// Helper to load a texture
 		auto loadTexture = [&](aiTextureType type, std::string& pathField, ID3D11ShaderResourceView*& srvField)
@@ -84,9 +84,6 @@ namespace HEngine
 		loadTexture(aiTextureType_NORMALS, mat.normalPath, mat.normalSRV);
 		loadTexture(aiTextureType_METALNESS, mat.ormPath, mat.ormSRV); // assimp considers metalness or roughness as ORM
 
-		//material->Get(AI_MATKEY_METALLIC_FACTOR, mat.metallicFactor);
-		//material->Get(AI_MATKEY_ROUGHNESS_FACTOR, mat.roughnessFactor);
-		
 		subMesh->material = std::move(mat);
 
 		for (UINT i = 0; i < mesh->mNumVertices; ++i)

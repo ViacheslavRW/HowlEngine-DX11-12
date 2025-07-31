@@ -9,7 +9,7 @@ namespace HEngine
 
 	struct DirectionalLight
 	{
-		XMFLOAT4 lightDirection = { -0.5f, -1.0f, -0.5f, 0.0f };
+		XMFLOAT4 lightDirection = { 2.0f, -1.0f, -0.5f, 0.0f };
 		XMFLOAT4 lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		XMFLOAT4 lightAmbient = { 0.1f, 0.1f, 0.1f, 1.0f };
 		XMFLOAT4 lightDiffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
@@ -20,10 +20,10 @@ namespace HEngine
 		XMFLOAT3 lightPosition = { 0.0f, 0.0f, 0.0f };
 		UINT active = 1; // bool may be unpredictable in HLSL
 		XMFLOAT4 lightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		XMFLOAT4 lightAmbient = { 0.7f, 0.7f, 0.7f, 1.0f };
+		XMFLOAT4 lightAmbient = { 0.05f, 0.05f, 0.05f, 1.0f };
 		XMFLOAT4 lightDiffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
-		XMFLOAT3 lightAttenuation = { 0.2f, 0.14f, 0.07f };
-		float lightRange = 15.0f;
+		XMFLOAT3 lightAttenuation = { 0.08f, 0.1f, 0.03f };
+		float lightRange = 10.0f;
 	};
 
 	struct PointLightBuffer

@@ -23,13 +23,15 @@ namespace HEngine
 
 		TextureFormat DetectTextureFormat(const std::wstring& filename);
 
-		TextureManager* pTextureManager;
-		ID3D11Device* pDevice;
-		MaterialManager* pMaterialManager;
+		TextureManager* pTextureManager = nullptr;
+		ID3D11Device* pDevice = nullptr;
+		MaterialManager* pMaterialManager = nullptr;
 
 	private:
-		const std::string defaultTextureName = "no_texture";
-		const std::wstring defaultTexturePath = L"Assets/Textures/";
+		const std::string defaultAlbedoName = "DefAlpha";
+		const std::string defaultNormalName = "DefNormal";
+		const std::string defaultORMName = "DefORM";
+		const std::wstring defaultTexturePath = L"Assets/Textures/Default/";
 	};
 }
 

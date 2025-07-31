@@ -58,6 +58,9 @@ namespace HEngine
 	{
 		Compile(L"Shaders/PBRVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBR);
 		Compile(L"Shaders/PBRPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBR);
+		Compile(L"Shaders/PBRVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBRTransparent);
+		Compile(L"Shaders/PBRPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBRTransparent);
+
 		Compile(L"Shaders/VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobUniversal);
 		Compile(L"Shaders/PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobUniversal);
 		Compile(L"Shaders/GlassVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobGlass);
@@ -71,6 +74,11 @@ namespace HEngine
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_PBR" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobPBR->GetBufferPointer(), psBlobPBR->GetBufferSize(), nullptr, &mPBRPixelShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_PBR" << std::endl;
+		res = pDevice->CreateVertexShader(vsBlobPBR->GetBufferPointer(), vsBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentVertexShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_PBR_TRANSPARENT" << std::endl;
+		res = pDevice->CreatePixelShader(psBlobPBR->GetBufferPointer(), psBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentPixelShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_PBR_TRANSPARENT" << std::endl;
+
 		res = pDevice->CreateVertexShader(vsBlobUniversal->GetBufferPointer(), vsBlobUniversal->GetBufferSize(), nullptr, &mVertexShaderUniversal);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_UNIVERSAL" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobUniversal->GetBufferPointer(), psBlobUniversal->GetBufferSize(), nullptr, &mPixelShaderUniversal);
@@ -90,6 +98,11 @@ namespace HEngine
 				pDeviceContext->VSSetShader(mPBRVertexShader.Get(), nullptr, 0);
 				pDeviceContext->PSSetShader(mPBRPixelShader.Get(), nullptr, 0);
 			} break;
+			case ShaderPipeline::PBR_TRANSPARENT:
+			{
+				pDeviceContext->VSSetShader(mPBRTransparentVertexShader.Get(), nullptr, 0);
+				pDeviceContext->PSSetShader(mPBRTransparentPixelShader.Get(), nullptr, 0);
+			} break;
 			case ShaderPipeline::UNIVERSAL:
 			{
 				pDeviceContext->VSSetShader(mVertexShaderUniversal.Get(), nullptr, 0);
@@ -107,6 +120,9 @@ namespace HEngine
 	{
 		vsBlobPBR.Reset();
 		psBlobPBR.Reset();
+		vsBlobPBRTransparent.Reset();
+		psBlobPBRTransparent.Reset();
+
 		vsBlobUniversal.Reset();
 		psBlobUniversal.Reset();
 		vsBlobGlass.Reset();
@@ -114,6 +130,9 @@ namespace HEngine
 
 		mPBRVertexShader.Reset();
 		mPBRPixelShader.Reset();
+		mPBRTransparentVertexShader.Reset();
+		mPixelShaderUniversal.Reset();
+
 		mVertexShaderUniversal.Reset();
 		mPixelShaderUniversal.Reset();
 		mVertexShaderGlass.Reset();

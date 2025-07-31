@@ -53,7 +53,7 @@ namespace HEngine
         mLightHelper.SetPointLightColor(1, { 0.2f, 0.2f, 0.8f, 1.0f });
 
         // load textures
-        mTextureManager.LoadTexture("no_texture", L"Assets/Textures/no_texture.png", mDevice.Get(), TextureFormat::PNG);
+        mTextureManager.LoadTexture("DefAlpha", L"Assets/Textures/Default/DefAlpha.png", mDevice.Get(), TextureFormat::PNG);
 
         // texture sampler
         Core::InitializeTextureSampler(mDevice, mDeviceContext, mSamplerState);

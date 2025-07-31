@@ -10,6 +10,7 @@ namespace HEngine
 		enum class ShaderPipeline
 		{
 			PBR,
+			PBR_TRANSPARENT,
 			UNIVERSAL,
 			GLASS
 		};
@@ -34,6 +35,8 @@ namespace HEngine
 		// blob
 		ComPtr<ID3DBlob> vsBlobPBR;
 		ComPtr<ID3DBlob> psBlobPBR;
+		ComPtr<ID3DBlob> vsBlobPBRTransparent;
+		ComPtr<ID3DBlob> psBlobPBRTransparent;
 		ComPtr<ID3DBlob> vsBlobUniversal;
 		ComPtr<ID3DBlob> psBlobUniversal;
 		ComPtr<ID3DBlob> vsBlobGlass;
@@ -41,6 +44,8 @@ namespace HEngine
 		// shaders
 		ComPtr<ID3D11VertexShader> mPBRVertexShader;
 		ComPtr<ID3D11PixelShader> mPBRPixelShader;
+		ComPtr<ID3D11VertexShader> mPBRTransparentVertexShader;
+		ComPtr<ID3D11PixelShader> mPBRTransparentPixelShader;
 		ComPtr<ID3D11VertexShader> mVertexShaderUniversal;
 		ComPtr<ID3D11PixelShader> mPixelShaderUniversal;
 		ComPtr<ID3D11VertexShader> mVertexShaderGlass;
