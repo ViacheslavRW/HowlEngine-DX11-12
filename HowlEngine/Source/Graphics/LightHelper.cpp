@@ -86,10 +86,6 @@ namespace HEngine
 			if (pointLightSources[index] != nullptr)
 			{
 				pointLightSources[index]->SetPosition(position);
-				/*pointLightSources[index]->GetPosition().x = position.x;
-				pointLightSources[index]->GetPosition().y = position.y;
-				pointLightSources[index]->GetPosition().z = position.z;
-				pointLightSources[index]->SetDirtyTransform(true);*/
 			}
 		}
 	}

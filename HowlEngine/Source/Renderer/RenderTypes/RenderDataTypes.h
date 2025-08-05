@@ -39,5 +39,10 @@ namespace HEngine
 			DirectX::XMFLOAT3 bitangent;
 			DirectX::XMFLOAT2 textureCoord;
 		};
+
+		struct SkyboxVertex
+		{
+			DirectX::XMFLOAT3 position;
+		};
 	}
 }

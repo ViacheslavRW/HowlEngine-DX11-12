@@ -52,8 +52,6 @@ namespace HEngine
 		std::unique_ptr<PBRMesh> mesh2;
 		std::unique_ptr<PBRMesh> mesh3;
 		std::unique_ptr<PBRMesh> mesh4;
-		std::unique_ptr<PBRMesh> mesh5;
-		std::unique_ptr<PBRMesh> mesh6;
 	};
 }
 

@@ -14,6 +14,7 @@
 #include "../Mesh/MaterialManager.h"
 #include "../Common/Camera.h"
 #include "../Graphics/LightHelper.h"
+#include "../Common/Skybox.h"
 
 namespace HEngine
 {
@@ -40,18 +41,22 @@ namespace HEngine
 		// depth stencil
 		ComPtr<ID3D11DepthStencilState> mDepthStencilState = nullptr;
 		ComPtr<ID3D11DepthStencilState> mDepthStencilStateTransparent = nullptr;
+		ComPtr<ID3D11DepthStencilState> mDepthStencilStateSkybox = nullptr;
 		ComPtr<ID3D11Texture2D> mDepthStencilTexture = nullptr;
 		ComPtr<ID3D11DepthStencilView> mDepthStencilView = nullptr;
 		ComPtr<ID3D11RasterizerState> mRasterizer = nullptr;
 		// input layout
 		ComPtr<ID3D11InputLayout> mInputLayout = nullptr;
 		ComPtr<ID3D11InputLayout> mInputLayoutPBR = nullptr;
+		ComPtr<ID3D11InputLayout> mInputLayoutSkybox = nullptr;
 		// shaders
 		ShaderCompiler mShaderCompiler;
 		// blend
 		ComPtr<ID3D11BlendState> mBlendState;
 		// light
 		LightHelper mLightHelper;
+		// skybox
+		Skybox mSkybox;
 	private:
 		// viewport
 		D3D11_VIEWPORT mViewPort = {};

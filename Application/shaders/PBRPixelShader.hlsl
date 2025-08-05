@@ -140,7 +140,7 @@ float4 main(PS_INPUT input) : SV_Target
         float3 toLight = pointLights[i].lightPosition - input.worldPosition;
         float dist = length(toLight);
         if (dist > pointLights[i].lightRange) continue;
-        
+
         float3 L = normalize(toLight);
         float3 H = normalize(V + L);
         

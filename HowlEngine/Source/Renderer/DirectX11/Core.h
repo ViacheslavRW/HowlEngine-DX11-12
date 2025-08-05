@@ -7,6 +7,7 @@ namespace HEngine
 	enum class InputLayoutType
 	{
 		PBR,
+		Skybox,
 		Universal,
 		Glass
 	};
@@ -51,6 +52,11 @@ namespace HEngine
 		);
 
 		static void InitializeDepthStencilViewTransparent(
+			ComPtr<ID3D11DepthStencilState>& pDepthStencilState,
+			ComPtr<ID3D11Device> pDevice
+		);
+
+		static void InitializeDepthStencilViewSkybox(
 			ComPtr<ID3D11DepthStencilState>& pDepthStencilState,
 			ComPtr<ID3D11Device> pDevice
 		);

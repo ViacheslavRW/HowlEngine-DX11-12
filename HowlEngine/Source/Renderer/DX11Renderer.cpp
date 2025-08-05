@@ -23,6 +23,7 @@ namespace HEngine
         Core::SetViewPort(width, height, mDeviceContext, mViewPort);
         Core::InitializeDepthStencilView(mDepthStencilState, mDepthStencilTexture, mDepthStencilView, mDevice, width, height);
         Core::InitializeDepthStencilViewTransparent(mDepthStencilStateTransparent, mDevice);
+        Core::InitializeDepthStencilViewSkybox(mDepthStencilStateSkybox, mDevice);
         Core::InitializeRasterizer(mDevice, mDeviceContext, mRasterizer);
         pCamera->CreateCameraBuffer(mDevice, mDeviceContext);
 
@@ -40,21 +41,17 @@ namespace HEngine
         // create input layout
         Core::InitializeInputLayout(InputLayoutType::Universal, mShaderCompiler.vsBlobUniversal, mInputLayout, mDevice);
         Core::InitializeInputLayout(InputLayoutType::PBR, mShaderCompiler.vsBlobPBR, mInputLayoutPBR, mDevice);
+        Core::InitializeInputLayout(InputLayoutType::Skybox, mShaderCompiler.vsBlobSkybox, mInputLayoutSkybox, mDevice);
         // blend state
         Core::InitializeBlendState(mDevice, mBlendState);
 
         // create light buffers
         mLightHelper.CreateDirectionalLightBuffer(mDevice);
         mLightHelper.CreatePointLightBuffer(mDevice);
-
-        mLightHelper.SetPointLightPosition(0, { -1.3f, 0.0f, 0.0f });
-        mLightHelper.SetPointLightPosition(1, { 1.3f, 0.0f, 0.0f });
-        mLightHelper.SetPointLightColor(0, { 0.0f, 0.95f, 0.95f, 1.0f });
-        mLightHelper.SetPointLightColor(1, { 0.2f, 0.2f, 0.8f, 1.0f });
+        mLightHelper.SetPointLightActive(1, false);
 
         // load textures
         mTextureManager.LoadTexture("DefAlpha", L"Assets/Textures/Default/DefAlpha.png", mDevice.Get(), TextureFormat::PNG);
-
         // texture sampler
         Core::InitializeTextureSampler(mDevice, mDeviceContext, mSamplerState);
 
@@ -63,12 +60,11 @@ namespace HEngine
         mMeshLoader.Initialize(&mTextureManager, mDevice.Get(), &mMaterialManager);
         mMeshManager.InitializeAllMeshes();
         mMeshManager.CreateAllBuffers();
+        mSkybox.Initialize(mDevice.Get(), mDeviceContext.Get(), mInputLayoutSkybox.Get(), pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
 
         // link meshes
         mLightHelper.SetPointLightSource(0, *mMeshManager.meshes[2]);
-        mMeshManager.meshes[2]->childMesh = mMeshManager.meshes[3].get();
-        mLightHelper.SetPointLightSource(1, *mMeshManager.meshes[4]);
-        mMeshManager.meshes[4]->childMesh = mMeshManager.meshes[5].get();
+        mLightHelper.SetPointLightSource(1, *mMeshManager.meshes[3]);
     }
 
     void DX11Renderer::Update(const float& deltaTime)
@@ -91,6 +87,10 @@ namespace HEngine
         // render world objects
         mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::PBR);
         mMeshManager.Render(pCamera->GetViewMatrix());
+
+        mDeviceContext->OMSetDepthStencilState(mDepthStencilStateSkybox.Get(), 1);
+        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::SKYBOX);
+        mSkybox.RenderSkybox(pCamera->GetViewMatrix());
 
         // draw ui
         ImGui_ImplDX11_NewFrame();

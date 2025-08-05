@@ -130,13 +130,25 @@ namespace HEngine
          if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_TRANSPARENT_DEPTH_BUFFER" << std::endl;
      }
 
+     void Core::InitializeDepthStencilViewSkybox(ComPtr<ID3D11DepthStencilState>& pDepthStencilState, ComPtr<ID3D11Device> pDevice)
+     {
+         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+         dsDesc.DepthEnable = true;
+         dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+         dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+         dsDesc.StencilEnable = false;
+
+         HRESULT coreHRes = pDevice->CreateDepthStencilState(&dsDesc, pDepthStencilState.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_SKYBOX_DEPTH_BUFFER" << std::endl;
+     }
+
      void Core::InitializeRasterizer(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11DeviceContext>& pDeviceContext, ComPtr<ID3D11RasterizerState>& pRasterizer)
      {
          D3D11_RASTERIZER_DESC rasterDesc;
          ZeroMemory(&rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
 
          rasterDesc.FillMode = D3D11_FILL_SOLID; // D3D11_FILL_WIREFRAME may be used
-         rasterDesc.CullMode = D3D11_CULL_NONE; // try cull back if current state is incorrect
+         rasterDesc.CullMode = D3D11_CULL_NONE;
          rasterDesc.FrontCounterClockwise = false;
          rasterDesc.DepthBias = 0;
          rasterDesc.SlopeScaledDepthBias = 0.0f;
@@ -171,6 +183,16 @@ namespace HEngine
                  HRESULT coreHRes = pDevice->CreateInputLayout(layout, (UINT)std::size(layout), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
                  if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
              } break;
+         case InputLayoutType::Skybox:
+         {
+             D3D11_INPUT_ELEMENT_DESC layout[] =
+             {
+                 { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+                       D3D11_INPUT_PER_VERTEX_DATA, 0 }
+             };
+             HRESULT coreHRes = pDevice->CreateInputLayout(layout, (UINT)std::size(layout), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
+             if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_INPUT_LAYOUT" << std::endl;
+         } break;
          case InputLayoutType::Universal:
              {
                  D3D11_INPUT_ELEMENT_DESC layout[] =

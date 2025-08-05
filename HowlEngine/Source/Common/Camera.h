@@ -34,6 +34,7 @@ namespace HEngine
 		void Release();
 	public:
 		inline XMMATRIX& GetProjMatrix() { return mProjMatrix; };
+		inline XMFLOAT3 GetPosition() const { return position; };
 
 		inline void SetPosition(XMFLOAT3 _position) { position = _position; dirtyView = true; };
 		inline void SetRotation(float _pitch, float _yaw, float _roll) { pitch = _pitch; yaw = _yaw; roll = _roll; dirtyRotation = true; dirtyView = true; };
@@ -55,7 +56,7 @@ namespace HEngine
 		void RotateUp(const float& deltaTime);
 	private:
 		constexpr static float nearZ = 0.1f;
-		constexpr static float farZ = 100.0f;
+		constexpr static float farZ = 1000.0f;
 		float pitch, yaw, roll;
 	
 		bool dirtyRotation = true;

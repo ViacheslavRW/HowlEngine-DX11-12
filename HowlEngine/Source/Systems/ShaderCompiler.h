@@ -11,6 +11,7 @@ namespace HEngine
 		{
 			PBR,
 			PBR_TRANSPARENT,
+			SKYBOX,
 			UNIVERSAL,
 			GLASS
 		};
@@ -37,6 +38,9 @@ namespace HEngine
 		ComPtr<ID3DBlob> psBlobPBR;
 		ComPtr<ID3DBlob> vsBlobPBRTransparent;
 		ComPtr<ID3DBlob> psBlobPBRTransparent;
+		ComPtr<ID3DBlob> vsBlobSkybox;
+		ComPtr<ID3DBlob> psBlobSkybox;
+
 		ComPtr<ID3DBlob> vsBlobUniversal;
 		ComPtr<ID3DBlob> psBlobUniversal;
 		ComPtr<ID3DBlob> vsBlobGlass;
@@ -46,6 +50,9 @@ namespace HEngine
 		ComPtr<ID3D11PixelShader> mPBRPixelShader;
 		ComPtr<ID3D11VertexShader> mPBRTransparentVertexShader;
 		ComPtr<ID3D11PixelShader> mPBRTransparentPixelShader;
+		ComPtr<ID3D11VertexShader> mSkyboxVertexShader;
+		ComPtr<ID3D11PixelShader> mSkyboxPixelShader;
+
 		ComPtr<ID3D11VertexShader> mVertexShaderUniversal;
 		ComPtr<ID3D11PixelShader> mPixelShaderUniversal;
 		ComPtr<ID3D11VertexShader> mVertexShaderGlass;
