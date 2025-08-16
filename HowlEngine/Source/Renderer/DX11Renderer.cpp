@@ -133,11 +133,11 @@ namespace HEngine
 
         ImGui::SetNextWindowPos(ImVec2(910, 125), ImGuiCond_Always);
         ImGui::Begin("Raven");
-        ImGui::SliderFloat3("Pos", &mMeshManager.meshes[0]->mPosition.x, -10.0f, 10.0f);
-        ImGui::SliderFloat3("Rot", &mMeshManager.meshes[0]->mRotation.x, -5.0f, 5.0f);
+        ImGui::SliderFloat3("Pos", &mMeshManager.meshes[0]->transform.mPosition.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3("Rot", &mMeshManager.meshes[0]->transform.mRotation.x, -5.0f, 5.0f);
         ImGui::End();
 
-        mMeshManager.meshes[0]->mDirtyTransform = true;
+        mMeshManager.meshes[0]->transform.mDirtyTransform = true;
         mLightHelper.mDirtyPointLight = true;
         mLightHelper.mDirtyDirectionalLight = true;
         ImGui::Render();

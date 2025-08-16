@@ -42,18 +42,13 @@ namespace HEngine
 		meshes.push_back(std::move(mesh3));
 		meshes.push_back(std::move(mesh4));
 
-		for (int i = 0; i < meshes.size(); ++i)
-		{
-			meshes[i]->Initialize(cashedViewMatrix, cashedProjMatrix);
-		}
+		//meshes[0]->transform.GetRotation().y = 45.0f * 0.0174533f;
+		meshes[0]->transform.GetPosition().y = -0.5f;
+		meshes[0]->transform.GetPosition().x = -1.5f;
 
-		//meshes[0]->GetRotation().y = 45.0f * 0.0174533f;
-		meshes[0]->GetPosition().y = -0.5f;
-		meshes[0]->GetPosition().x = -1.5f;
+		meshes[1]->transform.GetPosition().y = -0.8f;
 
-		meshes[1]->GetPosition().y = -0.8f;
-
-		meshes[3]->GetPosition().x = 1.3f;
+		meshes[3]->transform.GetPosition().x = 1.3f;
 	}
 
 	void MeshManager::CreateAllBuffers()
@@ -157,7 +152,7 @@ namespace HEngine
 		{
 			for (const auto& subMesh : meshes[i]->subMeshes)
 			{
-				Bind(subMesh.mVertexBuffer, subMesh.mIndexBuffer, subMesh.mConstantBuffer, meshes[i]->GetModelMartix(), viewMatrix, subMesh.material, sizeof(TR::PBRVertex));
+				Bind(subMesh.mVertexBuffer, subMesh.mIndexBuffer, subMesh.mConstantBuffer, meshes[i]->transform.GetModelMartix(), viewMatrix, subMesh.material, sizeof(TR::PBRVertex));
 				Draw(subMesh.indices.size());
 			}
 		}

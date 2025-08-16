@@ -3,27 +3,13 @@
 
 namespace HEngine
 {
-    void PBRMesh::Initialize(XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix)
+    /*void PBRMesh::Initialize(XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix)
     {
         mViewMatrix = _viewMatrix;
         mProjMatrix = _projectionMatrix;
-    }
+    }*/
 
-    XMMATRIX PBRMesh::GetModelMartix()
-    {
-        if (mDirtyTransform)
-        {
-            XMMATRIX scale = XMMatrixScaling(mScale.x, mScale.y, mScale.z);
-            XMMATRIX rotation = XMMatrixRotationRollPitchYaw(mRotation.x, mRotation.y, mRotation.z);
-            XMMATRIX position = XMMatrixTranslation(mPosition.x, mPosition.y, mPosition.z);
-
-            mModelMatrix = scale * rotation * position;
-            mDirtyTransform = false;
-        }
-        return mModelMatrix;
-    }
-
-    void PBRMesh::SetPosition(XMFLOAT3 position)
+    /*void PBRMesh::SetPosition(XMFLOAT3 position)
     {
         mPosition.x = position.x;
         mPosition.y = position.y;
@@ -54,5 +40,5 @@ namespace HEngine
         mScale.z = scale.z;
         if (childMesh != nullptr) childMesh->SetScale(scale);
         mDirtyTransform = true;
-    }
+    }*/
 }

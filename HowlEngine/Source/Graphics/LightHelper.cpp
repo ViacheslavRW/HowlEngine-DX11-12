@@ -85,7 +85,7 @@ namespace HEngine
 
 			if (pointLightSources[index] != nullptr)
 			{
-				pointLightSources[index]->SetPosition(position);
+				pointLightSources[index]->transform.SetPosition(position);
 			}
 		}
 	}

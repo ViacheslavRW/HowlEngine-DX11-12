@@ -27,10 +27,9 @@ cbuffer constBuffer : register(b0)
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
+    output.position = mul(float4(input.position, 1.0f), worldViewProjMatrix);
 
     float4 worldPos = mul(float4(input.position, 1.0f), modelMatrix);
-    
-    output.position = mul(worldPos, worldViewProjMatrix);
     output.worldPosition = worldPos.xyz;
     
     output.normal = normalize(mul(float4(input.normal, 0.0f), modelMatrix).xyz);
