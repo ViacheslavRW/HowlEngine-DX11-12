@@ -14,12 +14,22 @@ namespace HEngine
 		TextureManager& operator=(const TextureManager&) = delete;
 
 		bool LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format);
+		void LoadDefaultTextures(ID3D11Device* pDevice);
 		ComPtr<ID3D11ShaderResourceView> GetTextureSRV(const std::string& name);
 		ID3D11ShaderResourceView* LoadAndGetSRV(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format);
 		void Clear();
 
 	private:
 		std::unordered_map<std::string, std::unique_ptr<Texture>> mTextures;
+
+		const std::string defColorTexName = "Def_NoTexture";
+		const std::wstring defColorTexNamePath = L"Assets/Textures/Default/Def_NoTexture.png";
+
+		const std::string defNormalTexName = "Def_NoTexture_N";
+		const std::wstring defNormalTexNamePath = L"Assets/Textures/Default/Def_NoTexture_N.png";
+
+		const std::string defORMTexName = "Def_NoTexture_ORM";
+		const std::wstring defORMTexNamePath = L"Assets/Textures/Default/Def_NoTexture_ORM.png";
 	};
 }
 

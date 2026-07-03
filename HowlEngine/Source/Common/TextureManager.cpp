@@ -15,6 +15,13 @@ namespace HEngine
 		return true;
 	}
 
+	void TextureManager::LoadDefaultTextures(ID3D11Device* pDevice)
+	{
+		LoadTexture(defColorTexName, defColorTexNamePath, pDevice, TextureFormat::PNG);
+		LoadTexture(defNormalTexName, defNormalTexNamePath, pDevice, TextureFormat::PNG);
+		LoadTexture(defORMTexName, defORMTexNamePath, pDevice, TextureFormat::PNG);
+	}
+
 	ComPtr<ID3D11ShaderResourceView> TextureManager::GetTextureSRV(const std::string& name)
 	{
 		auto tex = mTextures.find(name);

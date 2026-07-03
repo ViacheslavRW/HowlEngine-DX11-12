@@ -127,8 +127,8 @@ float4 main(PS_INPUT input) : SV_Target
     if (NdotV < 0.0f) N = -N;
 
     float3 Lo = float3(0.0f, 0.0f, 0.0f);
-    //float3 ambient = lightAmbient.rgb * albedo * occlusion;
-    float3 ambient = lightAmbient.rgb * albedo;
+    float3 ambient = lightAmbient.rgb * albedo * occlusion;
+    //float3 ambient = lightAmbient.rgb * albedo;
     
     float3 Ld = normalize(lightDirection.xyz);
     float3 Hd = normalize(V + Ld);

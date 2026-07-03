@@ -48,11 +48,10 @@ namespace HEngine
         // create light buffers
         mLightHelper.CreateDirectionalLightBuffer(mDevice);
         mLightHelper.CreatePointLightBuffer(mDevice);
-        mLightHelper.SetPointLightActive(1, false);
+        //mLightHelper.SetPointLightActive(1, false);
 
         // load default textures
-        mTextureManager.LoadTexture("Def_NoTexture", L"Assets/Textures/Default/Def_NoTexture.png", mDevice.Get(), TextureFormat::PNG);
-        mTextureManager.LoadTexture("Def_NoTexture_N", L"Assets/Textures/Default/Def_NoTexture_N.png", mDevice.Get(), TextureFormat::PNG);
+        mTextureManager.LoadDefaultTextures(mDevice.Get());
         // texture sampler
         Core::InitializeTextureSampler(mDevice, mDeviceContext, mSamplerState);
 

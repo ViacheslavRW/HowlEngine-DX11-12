@@ -30,7 +30,7 @@ namespace HEngine
 	private:
 		const std::string defaultAlbedoName = "Def_NoTexture";
 		const std::string defaultNormalName = "Def_NoTexture_N";
-		const std::string defaultORMName = "DefORM";
+		const std::string defaultORMName = "Def_NoTexture_ORM";
 		const std::wstring defaultTexturePath = L"Assets/Textures/Default/";
 	};
 }
