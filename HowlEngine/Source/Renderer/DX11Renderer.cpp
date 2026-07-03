@@ -50,8 +50,9 @@ namespace HEngine
         mLightHelper.CreatePointLightBuffer(mDevice);
         mLightHelper.SetPointLightActive(1, false);
 
-        // load textures
-        mTextureManager.LoadTexture("DefAlpha", L"Assets/Textures/Default/DefAlpha.png", mDevice.Get(), TextureFormat::PNG);
+        // load default textures
+        mTextureManager.LoadTexture("Def_NoTexture", L"Assets/Textures/Default/Def_NoTexture.png", mDevice.Get(), TextureFormat::PNG);
+        mTextureManager.LoadTexture("Def_NoTexture_N", L"Assets/Textures/Default/Def_NoTexture_N.png", mDevice.Get(), TextureFormat::PNG);
         // texture sampler
         Core::InitializeTextureSampler(mDevice, mDeviceContext, mSamplerState);
 
@@ -59,8 +60,14 @@ namespace HEngine
             &mTextureManager, &mMeshLoader, pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
         mMeshLoader.Initialize(&mTextureManager, mDevice.Get(), &mMaterialManager);
         mMeshManager.InitializeAllMeshes();
-        mMeshManager.CreateAllBuffers();
+        //mMeshManager.CreateAllBuffers();
+        mSceneSerializer.LoadJson(mMeshManager, "Data/TestScene.json");
+        //mSceneSerializer.LoadBinary(mMeshManager, "Data/TestScene.sav");
+
         mSkybox.Initialize(mDevice.Get(), mDeviceContext.Get(), mInputLayoutSkybox.Get(), pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
+
+        //mSceneSerializer.SaveBinary(mMeshManager, "Data/TestScene.sav");
+        //mSceneSerializer.SaveJson(mMeshManager, "Data/TestScene.json");
 
         // link meshes
         mLightHelper.SetPointLightSource(0, *mMeshManager.meshes[2]);

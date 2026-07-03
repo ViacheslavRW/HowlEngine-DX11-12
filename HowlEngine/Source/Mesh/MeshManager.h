@@ -35,7 +35,10 @@ namespace HEngine
 		void Render(const XMMATRIX& viewMatrix);
 
 		void Release();
+
+	public:
 		std::vector<std::unique_ptr<PBRMesh>> meshes;
+		MeshLoader* mMeshLoader;
 
 	private:
 		XMMATRIX cashedViewMatrix;
@@ -45,7 +48,6 @@ namespace HEngine
 		ID3D11DeviceContext* mDeviceContext;
 		ID3D11InputLayout* mInputLayout;
 		TextureManager* mTextureManager;
-		MeshLoader* mMeshLoader;
 
 		HRESULT mmRes;
 		std::unique_ptr<PBRMesh> mesh1;

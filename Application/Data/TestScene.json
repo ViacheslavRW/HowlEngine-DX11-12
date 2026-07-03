@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "meshes": [
+    {
+      "modelPath": "Models/Characters/Raven/Raven.gltf",
+      "texturesPath": "Models/Characters/Raven/",
+      "position": [-1.5, -0.5, 0],
+      "rotation": [0, 0, 0],
+      "scale": [1, 1, 1]
+    },
+    {
+      "modelPath": "Models/Environment/Buildings/Living_Sector.gltf",
+      "texturesPath": "",
+      "position": [0, -0.8, 0],
+      "rotation": [0, 0, 0],
+      "scale": [1, 1, 1]
+    },
+    {
+      "modelPath": "Models/Light/LightBulb1.gltf",
+      "texturesPath": "Models/Light/",
+      "position": [0, 0, 0],
+      "rotation": [0, 0, 0],
+      "scale": [1, 1, 1]
+    },
+    {
+      "modelPath": "Models/Light/LightBulb1.gltf",
+      "texturesPath": "Models/Light/",
+      "position": [1.3, 0, 0],
+      "rotation": [0, 0, 0],
+      "scale": [1, 1, 1]
+    }
+  ]
+}

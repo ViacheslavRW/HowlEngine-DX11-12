@@ -28,8 +28,8 @@ namespace HEngine
 		MaterialManager* pMaterialManager = nullptr;
 
 	private:
-		const std::string defaultAlbedoName = "DefAlpha";
-		const std::string defaultNormalName = "DefNormal";
+		const std::string defaultAlbedoName = "Def_NoTexture";
+		const std::string defaultNormalName = "Def_NoTexture_N";
 		const std::string defaultORMName = "DefORM";
 		const std::wstring defaultTexturePath = L"Assets/Textures/Default/";
 	};

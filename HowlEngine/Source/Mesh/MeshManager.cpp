@@ -22,10 +22,9 @@ namespace HEngine
 		mesh3 = std::make_unique<PBRMesh>();
 		mesh4 = std::make_unique<PBRMesh>();
 
-		mesh1->modelPath = "Models/Characters/Raven/Raven.gltf";
+		/*mesh1->modelPath = "Models/Characters/Raven/Raven.gltf";
 		mesh1->texturesPath = L"Models/Characters/Raven/";
-		mesh2->modelPath = "Models/Environment/Buildings/Cabin/Cabin.gltf";
-		mesh2->texturesPath = L"Models/Environment/Buildings/Cabin/";
+		mesh2->modelPath = "Models/Environment/Buildings/Living_Sector.gltf";
 
 		mesh3->modelPath = "Models/Light/LightBulb1.gltf";
 		mesh3->texturesPath = L"Models/Light/";
@@ -42,13 +41,12 @@ namespace HEngine
 		meshes.push_back(std::move(mesh3));
 		meshes.push_back(std::move(mesh4));
 
-		//meshes[0]->transform.GetRotation().y = 45.0f * 0.0174533f;
 		meshes[0]->transform.GetPosition().y = -0.5f;
 		meshes[0]->transform.GetPosition().x = -1.5f;
 
 		meshes[1]->transform.GetPosition().y = -0.8f;
 
-		meshes[3]->transform.GetPosition().x = 1.3f;
+		meshes[3]->transform.GetPosition().x = 1.3f;*/
 	}
 
 	void MeshManager::CreateAllBuffers()

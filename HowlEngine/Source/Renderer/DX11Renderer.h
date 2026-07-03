@@ -11,6 +11,7 @@
 #include "../Mesh/Mesh.h"
 #include "../Mesh/MeshLoader.h"
 #include "../Mesh/MeshManager.h"
+#include "../Mesh/SceneSerializer.h"
 #include "../Mesh/MaterialManager.h"
 #include "../Common/Camera.h"
 #include "../Graphics/LightHelper.h"
@@ -72,6 +73,7 @@ namespace HEngine
 		MaterialManager mMaterialManager;
 		MeshLoader mMeshLoader;
 		MeshManager mMeshManager;
+		SceneSerializer mSceneSerializer;
 	private:
 		// Debug
 #if defined(DEBUG) || defined(_DEBUG)

@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Mesh\SceneSerializer.h" />
     <ClInclude Include="Source\Common\Skybox.h" />
     <ClInclude Include="Source\Mesh\MeshManager.h" />
     <ClInclude Include="Source\Mesh\PBRMesh.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="Source\Common\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Mesh\SceneSerializer.cpp" />
     <ClCompile Include="Source\Common\Skybox.cpp" />
     <ClCompile Include="Source\Mesh\MeshManager.cpp" />
     <ClCompile Include="Source\Mesh\PBRMesh.cpp" />

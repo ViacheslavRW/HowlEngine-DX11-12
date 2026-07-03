@@ -63,6 +63,7 @@ namespace HEngine
 
 		// set default textures
 		mat.albedoSRV = pTextureManager->LoadAndGetSRV(defaultAlbedoName, defaultTexturePath, pDevice, TextureFormat::PNG);
+		mat.normalSRV = pTextureManager->LoadAndGetSRV(defaultNormalName, defaultTexturePath, pDevice, TextureFormat::PNG);
 
 		// Helper to load a texture
 		auto loadTexture = [&](aiTextureType type, std::string& pathField, ID3D11ShaderResourceView*& srvField)
