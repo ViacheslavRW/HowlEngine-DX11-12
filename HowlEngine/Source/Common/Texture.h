@@ -14,7 +14,7 @@ namespace HEngine
 	class Texture
 	{
 	public:
-		bool LoadFromFile(const std::wstring& filepath, ID3D11Device* pDevice, TextureFormat format);
+		bool LoadFromFile(const std::wstring& filepath, ID3D11Device* pDevice, TextureFormat format, bool generateMips = true);
 
 		inline ID3D11ShaderResourceView* GetSRV() const { return mShaderResView.Get(); };
 	private:

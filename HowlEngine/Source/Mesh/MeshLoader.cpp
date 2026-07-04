@@ -15,7 +15,7 @@ namespace HEngine
 		pMaterialManager = _materialManager;
 	}
 
-	void MeshLoader::LoadMesh(PBRMesh* pMesh, const std::string& path, const std::wstring& texturesPath)
+	void MeshLoader::LoadMesh(PBRMesh* pMesh, const std::string& path, const std::wstring& texturesPath, bool generateMips)
 	{
 		Assimp::Importer importer;
 
@@ -32,26 +32,26 @@ namespace HEngine
 			return;
 		};
 
-		ProcessNode(scene->mRootNode, scene, pMesh, texturesPath);
+		ProcessNode(scene->mRootNode, scene, pMesh, texturesPath, generateMips);
 	}
 
-	void MeshLoader::ProcessNode(aiNode* node, const aiScene* scene, PBRMesh* pMesh, const std::wstring& texturesPath)
+	void MeshLoader::ProcessNode(aiNode* node, const aiScene* scene, PBRMesh* pMesh, const std::wstring& texturesPath, bool generateMips)
 	{
 		for (UINT i = 0; i < node->mNumMeshes; ++i)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 			PBRSubMesh subMesh;
-			ProcessMesh(mesh, scene, &subMesh, texturesPath);
+			ProcessMesh(mesh, scene, &subMesh, texturesPath, generateMips);
 			pMesh->subMeshes.push_back(std::move(subMesh));
 		}
 
 		for (UINT i = 0; i < node->mNumChildren; ++i)
 		{
-			ProcessNode(node->mChildren[i], scene, pMesh, texturesPath);
+			ProcessNode(node->mChildren[i], scene, pMesh, texturesPath, generateMips);
 		}
 	}
 
-	void MeshLoader::ProcessMesh(aiMesh* mesh, const aiScene* scene, PBRSubMesh* subMesh, const std::wstring& texturesPath)
+	void MeshLoader::ProcessMesh(aiMesh* mesh, const aiScene* scene, PBRSubMesh* subMesh, const std::wstring& texturesPath, bool generateMips)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 		PBRMaterial mat;
@@ -62,9 +62,9 @@ namespace HEngine
 			mat.name = "Unnamed";
 
 		// set default textures
-		mat.albedoSRV = pTextureManager->LoadAndGetSRV(defaultAlbedoName, defaultTexturePath, pDevice, TextureFormat::PNG);
-		mat.normalSRV = pTextureManager->LoadAndGetSRV(defaultNormalName, defaultTexturePath, pDevice, TextureFormat::PNG);
-		mat.ormSRV = pTextureManager->LoadAndGetSRV(defaultORMName, defaultTexturePath, pDevice, TextureFormat::PNG);
+		mat.albedoSRV = pTextureManager->LoadAndGetSRV(defaultAlbedoName, defaultTexturePath, pDevice, TextureFormat::PNG, generateMips);
+		mat.normalSRV = pTextureManager->LoadAndGetSRV(defaultNormalName, defaultTexturePath, pDevice, TextureFormat::PNG, generateMips);
+		mat.ormSRV = pTextureManager->LoadAndGetSRV(defaultORMName, defaultTexturePath, pDevice, TextureFormat::PNG, generateMips);
 
 		// Helper to load a texture
 		auto loadTexture = [&](aiTextureType type, std::string& pathField, ID3D11ShaderResourceView*& srvField)
@@ -76,7 +76,7 @@ namespace HEngine
 					std::wstring fullPath = texturesPath + std::wstring(texName.begin(), texName.end());
 
 					TextureFormat format = DetectTextureFormat(fullPath);
-					srvField = pTextureManager->LoadAndGetSRV(texName, fullPath, pDevice, format);
+					srvField = pTextureManager->LoadAndGetSRV(texName, fullPath, pDevice, format, generateMips);
 					pathField = texName;
 				}
 			};

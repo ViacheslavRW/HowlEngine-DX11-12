@@ -15,11 +15,11 @@ namespace HEngine
 		MeshLoader& operator=(const MeshLoader&) = delete;
 	public:
 		void Initialize(TextureManager* _textureManager, ID3D11Device* _device, MaterialManager* _materialManager);
-		void LoadMesh(PBRMesh* pMesh, const std::string& path, const std::wstring& texturesPath);
+		void LoadMesh(PBRMesh* pMesh, const std::string& path, const std::wstring& texturesPath, bool generateMips = true);
 		void Release();
 	private:
-		void ProcessNode(aiNode* node, const aiScene* scene, PBRMesh* pMesh, const std::wstring& texturesPath);
-		void ProcessMesh(aiMesh* mesh, const aiScene* scene, PBRSubMesh* subMesh, const std::wstring& texturesPath);
+		void ProcessNode(aiNode* node, const aiScene* scene, PBRMesh* pMesh, const std::wstring& texturesPath, bool generateMips = true);
+		void ProcessMesh(aiMesh* mesh, const aiScene* scene, PBRSubMesh* subMesh, const std::wstring& texturesPath, bool generateMips = true);
 
 		TextureFormat DetectTextureFormat(const std::wstring& filename);
 

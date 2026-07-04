@@ -10,10 +10,10 @@ namespace HEngine
 	{
 	public:
 		static bool SaveBinary(MeshManager& meshManager, const std::string& fileName);
-		static bool LoadBinary(MeshManager& meshManager, const std::string& fileName);
+		static bool LoadBinary(MeshManager& meshManager, const std::string& fileName, bool generateMips = true);
 
 		static bool SaveJson(MeshManager& meshManager, const std::string& fileName);
-		static bool LoadJson(MeshManager& meshManager, const std::string& fileName);
+		static bool LoadJson(MeshManager& meshManager, const std::string& fileName, bool generateMips = true);
 	};
 }
 

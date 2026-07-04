@@ -41,7 +41,7 @@ namespace HEngine
 		return true;
 	}
 
-	bool SceneSerializer::LoadBinary(MeshManager& meshManager, const std::string& fileName)
+	bool SceneSerializer::LoadBinary(MeshManager& meshManager, const std::string& fileName, bool generateMips)
 	{
 		std::ifstream file(fileName, std::ios::binary);
 		if (!file.is_open())
@@ -84,7 +84,7 @@ namespace HEngine
 
 			if (meshManager.mMeshLoader)
 			{
-				meshManager.mMeshLoader->LoadMesh(mesh.get(), mesh->modelPath, mesh->texturesPath);
+				meshManager.mMeshLoader->LoadMesh(mesh.get(), mesh->modelPath, mesh->texturesPath, generateMips);
 			}
 
 			meshManager.meshes.push_back(std::move(mesh));
@@ -137,7 +137,7 @@ namespace HEngine
 		return true;
 	}
 
-	bool SceneSerializer::LoadJson(MeshManager& meshManager, const std::string& fileName)
+	bool SceneSerializer::LoadJson(MeshManager& meshManager, const std::string& fileName, bool generateMips)
 	{
 		std::ifstream file(fileName);
 		if (!file.is_open())
@@ -234,7 +234,7 @@ namespace HEngine
 				// Load the model
 				if (meshManager.mMeshLoader && !mesh->modelPath.empty())
 				{
-					meshManager.mMeshLoader->LoadMesh(mesh.get(), mesh->modelPath, mesh->texturesPath);
+					meshManager.mMeshLoader->LoadMesh(mesh.get(), mesh->modelPath, mesh->texturesPath, generateMips);
 				}
 
 				meshManager.meshes.push_back(std::move(mesh));

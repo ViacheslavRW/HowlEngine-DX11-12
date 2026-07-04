@@ -51,7 +51,7 @@ namespace HEngine
         //mLightHelper.SetPointLightActive(1, false);
 
         // load default textures
-        mTextureManager.LoadDefaultTextures(mDevice.Get());
+        mTextureManager.LoadDefaultTextures(mDevice.Get(), true);
         // texture sampler
         Core::InitializeTextureSampler(mDevice, mDeviceContext, mSamplerState);
 
@@ -60,7 +60,7 @@ namespace HEngine
         mMeshLoader.Initialize(&mTextureManager, mDevice.Get(), &mMaterialManager);
         mMeshManager.InitializeAllMeshes();
         //mMeshManager.CreateAllBuffers();
-        mSceneSerializer.LoadJson(mMeshManager, "Data/TestScene.json");
+        mSceneSerializer.LoadJson(mMeshManager, "Data/TestScene.json", true);
         //mSceneSerializer.LoadBinary(mMeshManager, "Data/TestScene.sav");
 
         mSkybox.Initialize(mDevice.Get(), mDeviceContext.Get(), mInputLayoutSkybox.Get(), pCamera->GetViewMatrix(), pCamera->GetProjMatrix());

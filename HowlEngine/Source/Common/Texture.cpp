@@ -3,7 +3,7 @@
 
 namespace HEngine
 {
-	bool Texture::LoadFromFile(const std::wstring& filepath, ID3D11Device* pDevice, TextureFormat format)
+	bool Texture::LoadFromFile(const std::wstring& filepath, ID3D11Device* pDevice, TextureFormat format, bool generateMips)
 	{
 		DirectX::ScratchImage image;
 		DirectX::TexMetadata metadata;
@@ -29,12 +29,16 @@ namespace HEngine
 			return false;
 		}
 
-		// check for alpha
-		//bool hasAlpha = DirectX::HasAlpha(metadata.format);
-		//if (hasAlpha)
-		//	std::wcout << L"Texture has alpha: " << filepath << std::endl;
-		//else
-		//	std::wcout << L"Texture has NO alpha: " << filepath << std::endl;
+		if (generateMips && image.GetImageCount() == 1)
+		{
+			DirectX::ScratchImage mipChain;
+			hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
+
+			if (SUCCEEDED(hr))
+			{
+				image = std::move(mipChain);
+			}
+		}
 
 		hr = DirectX::CreateShaderResourceView(pDevice, image.GetImages(), image.GetImageCount(), image.GetMetadata(), mShaderResView.GetAddressOf());
 		if (FAILED(hr))

@@ -13,10 +13,10 @@ namespace HEngine
 		TextureManager(const TextureManager&) = delete;
 		TextureManager& operator=(const TextureManager&) = delete;
 
-		bool LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format);
-		void LoadDefaultTextures(ID3D11Device* pDevice);
+		bool LoadTexture(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format, bool generateMips = true);
+		void LoadDefaultTextures(ID3D11Device* pDevice, bool generateMips = true);
 		ComPtr<ID3D11ShaderResourceView> GetTextureSRV(const std::string& name);
-		ID3D11ShaderResourceView* LoadAndGetSRV(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format);
+		ID3D11ShaderResourceView* LoadAndGetSRV(const std::string& name, const std::wstring& path, ID3D11Device* pDevice, TextureFormat format, bool generateMips = true);
 		void Clear();
 
 	private:
