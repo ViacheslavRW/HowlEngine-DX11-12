@@ -6,28 +6,177 @@
       "texturesPath": "Models/Characters/Raven/",
       "position": [-1.5, -0.5, 0],
       "rotation": [0, 0, 0],
-      "scale": [1, 1, 1]
+      "scale": [1, 1, 1],
+      "subMeshes": [
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        }
+      ]
     },
     {
       "modelPath": "Models/Environment/Buildings/Living_Sector.gltf",
       "texturesPath": "",
       "position": [0, -0.8, 0],
       "rotation": [0, 0, 0],
-      "scale": [1, 1, 1]
+      "scale": [1, 1, 1],
+      "subMeshes": [
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        },
+        {
+          "useAlpha": false
+        }
+      ]
+    },
+    {
+      "modelPath": "Models/Environment/Buildings/Coffee_Shop.gltf",
+      "texturesPath": "",
+      "position": [0, -0.8, 0],
+      "rotation": [0, 0, 0],
+      "scale": [1, 1, 1],
+      "subMeshes": [
+        {
+          "useAlpha": false
+        }
+      ]
     },
     {
       "modelPath": "Models/Light/LightBulb1.gltf",
       "texturesPath": "Models/Light/",
       "position": [0, 0, 0],
       "rotation": [0, 0, 0],
-      "scale": [1, 1, 1]
+      "scale": [1, 1, 1],
+      "subMeshes": [
+        {
+          "useAlpha": true
+        }
+      ]
     },
     {
       "modelPath": "Models/Light/LightBulb1.gltf",
       "texturesPath": "Models/Light/",
       "position": [1.3, 0, 0],
       "rotation": [0, 0, 0],
-      "scale": [1, 1, 1]
+      "scale": [1, 1, 1],
+      "subMeshes": [
+        {
+          "useAlpha": true
+        }
+      ]
     }
   ]
 }

@@ -50,7 +50,7 @@ struct PS_INPUT
 float3 GetNormalFromMap(PS_INPUT input)
 {
     float3 tangentNormal = normalMap.Sample(sampleType, input.texCoord).rgb * 2.0f - 1.0f;
-    //tangentNormal.y *= -1.0f; // Flip Y if needed
+    
     float3 T = normalize(input.tangent);
     float3 N = normalize(input.normal);
     float3 B = normalize(input.bitangent);
@@ -115,6 +115,7 @@ float4 main(PS_INPUT input) : SV_Target
 {
     float3 albedo = pow(albedoMap.Sample(sampleType, input.texCoord).rgb, 2.2f);
     float3 orm = ormMap.Sample(sampleType, input.texCoord).rgb;
+    
     float occlusion = orm.r;
     float roughness = orm.g;
     float metallic = orm.b;
@@ -123,12 +124,10 @@ float4 main(PS_INPUT input) : SV_Target
     float3 V = normalize(cameraPosition - input.worldPosition);
     
     // Ensure two-sided lighting
-    float NdotV = dot(N, V);
-    if (NdotV < 0.0f) N = -N;
+    if (dot(N, V) < 0.0f) N = -N;
 
     float3 Lo = float3(0.0f, 0.0f, 0.0f);
     float3 ambient = lightAmbient.rgb * albedo * occlusion;
-    //float3 ambient = lightAmbient.rgb * albedo;
     
     float3 Ld = normalize(lightDirection.xyz);
     float3 Hd = normalize(V + Ld);

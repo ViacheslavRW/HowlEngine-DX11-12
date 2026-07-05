@@ -224,12 +224,12 @@ namespace HEngine
          }
      }
 
-     void Core::InitializeBlendState(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11BlendState>& pBlendState)
+     void Core::InitializeBlendState(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11BlendState>& pBlendStateOpaque, ComPtr<ID3D11BlendState>& pBlendStateAlpha)
      {
          D3D11_BLEND_DESC blendDesc = {};
-         blendDesc.RenderTarget[0].BlendEnable = true;
-         blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-         blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+         blendDesc.RenderTarget[0].BlendEnable = false;
+         blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+         blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
          blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 
          blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
@@ -238,8 +238,23 @@ namespace HEngine
 
          blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-         HRESULT coreHRes = pDevice->CreateBlendState(&blendDesc, pBlendState.GetAddressOf());
-         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_BLEND_STATE" << std::endl;
+         HRESULT coreHRes = pDevice->CreateBlendState(&blendDesc, pBlendStateOpaque.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_BLEND_STATE_OPAQUE" << std::endl;
+
+         D3D11_BLEND_DESC blendDescAlpha = {};
+         blendDescAlpha.RenderTarget[0].BlendEnable = true;
+         blendDescAlpha.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+         blendDescAlpha.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+         blendDescAlpha.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+         blendDescAlpha.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+         blendDescAlpha.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+         blendDescAlpha.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+         blendDescAlpha.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+         coreHRes = pDevice->CreateBlendState(&blendDescAlpha, pBlendStateAlpha.GetAddressOf());
+         if (FAILED(coreHRes)) std::cout << "FAILED_TO_CREATE_BLEND_STATE_ALPHA" << std::endl;
      }
 
      void Core::InitializeTextureSampler(ComPtr<ID3D11Device>& pDevice, ComPtr<ID3D11DeviceContext>& pDeviceContext, ComPtr<ID3D11SamplerState>& pSampleState)

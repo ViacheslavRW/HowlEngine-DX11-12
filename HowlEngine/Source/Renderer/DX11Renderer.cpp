@@ -43,7 +43,8 @@ namespace HEngine
         Core::InitializeInputLayout(InputLayoutType::PBR, mShaderCompiler.vsBlobPBR, mInputLayoutPBR, mDevice);
         Core::InitializeInputLayout(InputLayoutType::Skybox, mShaderCompiler.vsBlobSkybox, mInputLayoutSkybox, mDevice);
         // blend state
-        Core::InitializeBlendState(mDevice, mBlendState);
+        Core::InitializeBlendState(mDevice, mBlendStateOpaque, mBlendStateAlpha);
+        SetBlendStateTransparent(false);
 
         // create light buffers
         mLightHelper.CreateDirectionalLightBuffer(mDevice);
@@ -66,11 +67,11 @@ namespace HEngine
         mSkybox.Initialize(mDevice.Get(), mDeviceContext.Get(), mInputLayoutSkybox.Get(), pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
 
         //mSceneSerializer.SaveBinary(mMeshManager, "Data/TestScene.sav");
-        //mSceneSerializer.SaveJson(mMeshManager, "Data/TestScene.json");
+        mSceneSerializer.SaveJson(mMeshManager, "Data/TestScene.json");
 
         // link meshes
-        mLightHelper.SetPointLightSource(0, *mMeshManager.meshes[2]);
-        mLightHelper.SetPointLightSource(1, *mMeshManager.meshes[3]);
+        mLightHelper.SetPointLightSource(0, *mMeshManager.meshesTransparent[0]);
+        mLightHelper.SetPointLightSource(1, *mMeshManager.meshesTransparent[1]);
     }
 
     void DX11Renderer::Update(const float& deltaTime)
@@ -86,6 +87,7 @@ namespace HEngine
 
         mDeviceContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
         mDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
+        mDeviceContext->OMSetBlendState(mBlendStateOpaque.Get(), nullptr, 0xffffffff);
 
         mLightHelper.UpdateDirectionalLightBuffer(*mDeviceContext.Get());
         mLightHelper.UpdatePointLightBuffer(*mDeviceContext.Get());
@@ -94,6 +96,12 @@ namespace HEngine
         mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::PBR);
         mMeshManager.Render(pCamera->GetViewMatrix());
 
+        // render objects with transparency
+        mDeviceContext->OMSetBlendState(mBlendStateAlpha.Get(), nullptr, 0xffffffff);
+        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::PBR_TRANSPARENT);
+        mMeshManager.RenderTransparent(pCamera->GetViewMatrix());
+
+        // render skybox
         mDeviceContext->OMSetDepthStencilState(mDepthStencilStateSkybox.Get(), 1);
         mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::SKYBOX);
         mSkybox.RenderSkybox(pCamera->GetViewMatrix());
@@ -178,7 +186,8 @@ namespace HEngine
         pCamera->Release();
         pCamera = nullptr;
         mSamplerState.Reset();
-        mBlendState.Reset();
+        mBlendStateOpaque.Reset();
+        mBlendStateAlpha.Reset();
         mInputLayout.Reset();
         mInputLayoutPBR.Reset();
 
@@ -202,5 +211,11 @@ namespace HEngine
         ImGui_ImplDX11_Shutdown();
         ImGui_ImplWin32_Shutdown();
         ImGui::DestroyContext();
+    }
+
+    void DX11Renderer::SetBlendStateTransparent(bool isTransparent)
+    {
+        if (isTransparent) mDeviceContext->OMSetBlendState(mBlendStateAlpha.Get(), nullptr, 0xffffffff);
+        else mDeviceContext->OMSetBlendState(mBlendStateOpaque.Get(), nullptr, 0xffffffff);
     }
 }

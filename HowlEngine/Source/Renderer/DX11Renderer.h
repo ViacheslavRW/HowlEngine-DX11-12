@@ -53,7 +53,9 @@ namespace HEngine
 		// shaders
 		ShaderCompiler mShaderCompiler;
 		// blend
-		ComPtr<ID3D11BlendState> mBlendState;
+		ComPtr<ID3D11BlendState> mBlendStateOpaque;
+		ComPtr<ID3D11BlendState> mBlendStateAlpha;
+		void SetBlendStateTransparent(bool isTransparent);
 		// light
 		LightHelper mLightHelper;
 		// skybox

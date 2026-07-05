@@ -105,15 +105,11 @@ namespace HEngine
 			return false;
 		}
 
-		file << "{\n";
-		file << "  \"version\": 1,\n";
-		file << "  \"meshes\": [\n";
+		file << "{\n  \"version\": 1,\n  \"meshes\": [\n";
 
-		for (size_t i = 0; i < meshManager.meshes.size(); ++i)
+		auto WriteMesh = [&](const auto& mesh, bool isTransparent)
 		{
-			const auto& mesh = meshManager.meshes[i];
 			auto& t = mesh->transform;
-
 			file << "    {\n";
 			file << "      \"modelPath\": \"" << mesh->modelPath << "\",\n";
 
@@ -122,10 +118,36 @@ namespace HEngine
 
 			file << "      \"position\": [" << t.GetPosition().x << ", " << t.GetPosition().y << ", " << t.GetPosition().z << "],\n";
 			file << "      \"rotation\": [" << t.GetRotation().x << ", " << t.GetRotation().y << ", " << t.GetRotation().z << "],\n";
-			file << "      \"scale\": [" << t.GetScale().x << ", " << t.GetScale().y << ", " << t.GetScale().z << "]\n";
+			file << "      \"scale\": [" << t.GetScale().x << ", " << t.GetScale().y << ", " << t.GetScale().z << "],\n";
 
+			file << "      \"subMeshes\": [\n";
+
+			for (size_t j = 0; j < mesh->subMeshes.size(); ++j)
+			{
+				const auto& sub = mesh->subMeshes[j];
+				file << "        {\n";
+				file << "          \"useAlpha\": " << (sub.material.useAlpha ? "true" : "false") << "\n";
+				file << "        }";
+				if (j < mesh->subMeshes.size() - 1) file << ",";
+				file << "\n";
+			}
+
+			file << "      ]\n";
 			file << "    }";
-			if (i < meshManager.meshes.size() - 1) file << ",";
+		};
+
+		for (size_t i = 0; i < meshManager.meshes.size(); ++i)
+		{
+			WriteMesh(meshManager.meshes[i], false);
+			if (i < meshManager.meshes.size() - 1 || !meshManager.meshesTransparent.empty())
+				file << ",";
+			file << "\n";
+		}
+
+		for (size_t i = 0; i < meshManager.meshesTransparent.size(); ++i)
+		{
+			WriteMesh(meshManager.meshesTransparent[i], true);
+			if (i < meshManager.meshesTransparent.size() - 1) file << ",";
 			file << "\n";
 		}
 
@@ -147,6 +169,7 @@ namespace HEngine
 		}
 
 		meshManager.meshes.clear();
+		meshManager.meshesTransparent.clear();
 
 		std::string line;
 		int meshCount = 0;
@@ -157,13 +180,10 @@ namespace HEngine
 			{
 				auto mesh = std::make_unique<PBRMesh>();
 
-				// === 1. modelPath ===
 				size_t start = line.find('"', line.find(":")) + 1;
 				size_t end = line.find('"', start);
-				if (start < end)
-					mesh->modelPath = line.substr(start, end - start);
+				if (start < end) mesh->modelPath = line.substr(start, end - start);
 
-				// === 2. texturesPath ===
 				std::getline(file, line);
 				if (line.find("texturesPath") != std::string::npos)
 				{
@@ -176,11 +196,10 @@ namespace HEngine
 					}
 				}
 
-				// === 3. position ===
+				// transform
 				std::getline(file, line);
 				if (line.find("position") != std::string::npos)
 				{
-					// Example: "position": [-1.5, -0.5, 0]
 					DirectX::XMFLOAT3 pos = { 0, 0, 0 };
 					size_t first = line.find('[') + 1;
 					size_t comma1 = line.find(',', first);
@@ -195,7 +214,6 @@ namespace HEngine
 					mesh->transform.SetPosition(pos);
 				}
 
-				// === 4. rotation ===
 				std::getline(file, line);
 				if (line.find("rotation") != std::string::npos)
 				{
@@ -213,7 +231,6 @@ namespace HEngine
 					mesh->transform.SetRotation(rot);
 				}
 
-				// === 5. scale ===
 				std::getline(file, line);
 				if (line.find("scale") != std::string::npos)
 				{
@@ -237,7 +254,31 @@ namespace HEngine
 					meshManager.mMeshLoader->LoadMesh(mesh.get(), mesh->modelPath, mesh->texturesPath, generateMips);
 				}
 
-				meshManager.meshes.push_back(std::move(mesh));
+				// check for alpha and sort
+				bool hasAlpha = false;
+				int subIndex = 0;
+				while (std::getline(file, line))
+				{
+					if (line.find("useAlpha") != std::string::npos)
+					{
+						if (subIndex < mesh->subMeshes.size())
+						{
+							bool alpha = (line.find("true") != std::string::npos);
+							mesh->subMeshes[subIndex].material.useAlpha = alpha;
+							if (alpha) hasAlpha = true;
+						}
+						subIndex++;
+					}
+
+					if (line.find("]") != std::string::npos && line.find("subMeshes") == std::string::npos)
+						break;
+				}
+
+				if (hasAlpha)
+					meshManager.meshesTransparent.push_back(std::move(mesh));
+				else 
+					meshManager.meshes.push_back(std::move(mesh));
+				
 				meshCount++;
 			}
 		}

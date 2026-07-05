@@ -58,8 +58,8 @@ namespace HEngine
 	{
 		Compile(L"Shaders/PBRVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBR);
 		Compile(L"Shaders/PBRPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBR);
-		Compile(L"Shaders/PBRVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBRTransparent);
-		Compile(L"Shaders/PBRPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBRTransparent);
+		Compile(L"Shaders/PBR_Transparent_VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBRTransparent);
+		Compile(L"Shaders/PBR_Transparent_PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBRTransparent);
 		Compile(L"Shaders/SkyboxVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobSkybox);
 		Compile(L"Shaders/SkyboxPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobSkybox);
 
@@ -77,9 +77,9 @@ namespace HEngine
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_PBR" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobPBR->GetBufferPointer(), psBlobPBR->GetBufferSize(), nullptr, &mPBRPixelShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_PBR" << std::endl;
-		res = pDevice->CreateVertexShader(vsBlobPBR->GetBufferPointer(), vsBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentVertexShader);
+		res = pDevice->CreateVertexShader(vsBlobPBRTransparent->GetBufferPointer(), vsBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentVertexShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_PBR_TRANSPARENT" << std::endl;
-		res = pDevice->CreatePixelShader(psBlobPBR->GetBufferPointer(), psBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentPixelShader);
+		res = pDevice->CreatePixelShader(psBlobPBRTransparent->GetBufferPointer(), psBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentPixelShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_PBR_TRANSPARENT" << std::endl;
 		// Skybox
 		res = pDevice->CreateVertexShader(vsBlobSkybox->GetBufferPointer(), vsBlobSkybox->GetBufferSize(), nullptr, &mSkyboxVertexShader);

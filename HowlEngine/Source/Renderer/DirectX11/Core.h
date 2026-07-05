@@ -76,7 +76,8 @@ namespace HEngine
 
 		static void InitializeBlendState(
 			ComPtr<ID3D11Device>& pDevice,
-			ComPtr<ID3D11BlendState>& pBlendState
+			ComPtr<ID3D11BlendState>& pBlendStateOpaque,
+			ComPtr<ID3D11BlendState>& pBlendStateAlpha
 		);
 
 		static void InitializeTextureSampler(

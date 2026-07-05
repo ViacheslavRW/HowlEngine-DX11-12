@@ -21,32 +21,7 @@ namespace HEngine
 		mesh2 = std::make_unique<PBRMesh>();
 		mesh3 = std::make_unique<PBRMesh>();
 		mesh4 = std::make_unique<PBRMesh>();
-
-		/*mesh1->modelPath = "Models/Characters/Raven/Raven.gltf";
-		mesh1->texturesPath = L"Models/Characters/Raven/";
-		mesh2->modelPath = "Models/Environment/Buildings/Living_Sector.gltf";
-
-		mesh3->modelPath = "Models/Light/LightBulb1.gltf";
-		mesh3->texturesPath = L"Models/Light/";
-		mesh4->modelPath = "Models/Light/LightBulb1.gltf";
-		mesh4->texturesPath = L"Models/Light/";
-
-		mMeshLoader->LoadMesh(mesh1.get(), mesh1->modelPath, mesh1->texturesPath);
-		mMeshLoader->LoadMesh(mesh2.get(), mesh2->modelPath, mesh2->texturesPath);
-		mMeshLoader->LoadMesh(mesh3.get(), mesh3->modelPath, mesh3->texturesPath);
-		mMeshLoader->LoadMesh(mesh4.get(), mesh4->modelPath, mesh4->texturesPath);
-
-		meshes.push_back(std::move(mesh1));
-		meshes.push_back(std::move(mesh2));
-		meshes.push_back(std::move(mesh3));
-		meshes.push_back(std::move(mesh4));
-
-		meshes[0]->transform.GetPosition().y = -0.5f;
-		meshes[0]->transform.GetPosition().x = -1.5f;
-
-		meshes[1]->transform.GetPosition().y = -0.8f;
-
-		meshes[3]->transform.GetPosition().x = 1.3f;*/
+		mesh5 = std::make_unique<PBRMesh>();
 	}
 
 	void MeshManager::CreateAllBuffers()
@@ -54,6 +29,16 @@ namespace HEngine
 		for (int i = 0; i < meshes.size(); ++i)
 		{
 			for (auto& subMesh : meshes[i]->subMeshes)
+			{
+				CreateVertexBuffer(subMesh.vertices, subMesh.mVertexBuffer);
+				CreateIndexBuffer(subMesh.indices, subMesh.mIndexBuffer);
+				CreateConstantBuffer(subMesh.mConstantBuffer);
+			}
+		}
+
+		for (int j = 0; j < meshesTransparent.size(); ++j)
+		{
+			for (auto& subMesh : meshesTransparent[j]->subMeshes)
 			{
 				CreateVertexBuffer(subMesh.vertices, subMesh.mVertexBuffer);
 				CreateIndexBuffer(subMesh.indices, subMesh.mIndexBuffer);
@@ -151,6 +136,18 @@ namespace HEngine
 			for (const auto& subMesh : meshes[i]->subMeshes)
 			{
 				Bind(subMesh.mVertexBuffer, subMesh.mIndexBuffer, subMesh.mConstantBuffer, meshes[i]->transform.GetModelMartix(), viewMatrix, subMesh.material, sizeof(TR::PBRVertex));
+				Draw(subMesh.indices.size());
+			}
+		}
+	}
+
+	void MeshManager::RenderTransparent(const XMMATRIX& viewMatrix)
+	{
+		for (int i = 0; i < meshesTransparent.size(); ++i)
+		{
+			for (const auto& subMesh : meshesTransparent[i]->subMeshes)
+			{
+				Bind(subMesh.mVertexBuffer, subMesh.mIndexBuffer, subMesh.mConstantBuffer, meshesTransparent[i]->transform.GetModelMartix(), viewMatrix, subMesh.material, sizeof(TR::PBRVertex));
 				Draw(subMesh.indices.size());
 			}
 		}

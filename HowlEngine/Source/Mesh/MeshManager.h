@@ -33,11 +33,13 @@ namespace HEngine
 			const XMMATRIX& modelMatrix, const XMMATRIX& viewMatrix, const PBRMaterial& material, const UINT& vertexSize);
 		void Draw(const size_t& indices);
 		void Render(const XMMATRIX& viewMatrix);
+		void RenderTransparent(const XMMATRIX& viewMatrix);
 
 		void Release();
 
 	public:
 		std::vector<std::unique_ptr<PBRMesh>> meshes;
+		std::vector<std::unique_ptr<PBRMesh>> meshesTransparent;
 		MeshLoader* mMeshLoader;
 
 	private:
@@ -54,6 +56,7 @@ namespace HEngine
 		std::unique_ptr<PBRMesh> mesh2;
 		std::unique_ptr<PBRMesh> mesh3;
 		std::unique_ptr<PBRMesh> mesh4;
+		std::unique_ptr<PBRMesh> mesh5;
 	};
 }
 
