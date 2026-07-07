@@ -19,7 +19,7 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
 
-    output.position = mul(float4(input.position, 1.0f), viewProjMatrix);
+    output.position = mul(float4(input.position, 1.0f), viewProjMatrix).xyww;
     output.texCoord = input.position;
     
     return output;

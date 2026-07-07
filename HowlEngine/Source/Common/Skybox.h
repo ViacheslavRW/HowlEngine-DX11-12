@@ -17,13 +17,23 @@ namespace HEngine
 	public:
 		void Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, ID3D11InputLayout* pInputLayout,
 			XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix);
+
+		// HDRI
+		void LoadHDRI();
+		void CreateHDRIBuffers();
+		void RenderHDRI(const XMMATRIX& viewMatrix);
+
+		// Cubemap
 		void LoadSkyboxTexture();
 		void CreateSkyboxBuffers();
 		void Bind(const XMMATRIX& viewMatrix);
 		void Draw();
 		void RenderSkybox(const XMMATRIX& viewMatrix);
 
+		void Release();
 	private:
+		const std::wstring HDRIPath = L"Assets/Skybox/Space1.hdr";
+
 		static constexpr USHORT faces = 6;
 		static constexpr float cubeSize = 1000.0f;
 
@@ -58,11 +68,16 @@ namespace HEngine
 
 	private:
 		ComPtr<ID3D11ShaderResourceView> mSkyboxSRV;
+		ComPtr<ID3D11ShaderResourceView> mHDRI_SRV;
 		ComPtr<ID3D11Texture2D> mSkyboxTexture2D;
 
 		ComPtr<ID3D11Buffer> mVertexBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mConstantBuffer = nullptr;
+
+		ComPtr<ID3D11Buffer> mVertexBufferHDRI = nullptr;
+		ComPtr<ID3D11Buffer> mIndexBufferHDRI = nullptr;
+		ComPtr<ID3D11Buffer> mConstantBufferHDRI = nullptr;
 
 	private:
 		XMMATRIX cashedViewMatrix;

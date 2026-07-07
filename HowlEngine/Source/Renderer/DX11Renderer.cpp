@@ -39,7 +39,6 @@ namespace HEngine
         mShaderCompiler.CreateAll(mDevice);
 
         // create input layout
-        Core::InitializeInputLayout(InputLayoutType::Universal, mShaderCompiler.vsBlobUniversal, mInputLayout, mDevice);
         Core::InitializeInputLayout(InputLayoutType::PBR, mShaderCompiler.vsBlobPBR, mInputLayoutPBR, mDevice);
         Core::InitializeInputLayout(InputLayoutType::Skybox, mShaderCompiler.vsBlobSkybox, mInputLayoutSkybox, mDevice);
         // blend state
@@ -65,9 +64,12 @@ namespace HEngine
         //mSceneSerializer.LoadBinary(mMeshManager, "Data/TestScene.sav");
 
         mSkybox.Initialize(mDevice.Get(), mDeviceContext.Get(), mInputLayoutSkybox.Get(), pCamera->GetViewMatrix(), pCamera->GetProjMatrix());
-
+        mSkybox.LoadHDRI();
+        mSkybox.CreateHDRIBuffers();
+        //mSkybox.LoadSkyboxTexture();
+        //mSkybox.CreateSkyboxBuffers();
         //mSceneSerializer.SaveBinary(mMeshManager, "Data/TestScene.sav");
-        mSceneSerializer.SaveJson(mMeshManager, "Data/TestScene.json");
+        //mSceneSerializer.SaveJson(mMeshManager, "Data/TestScene.json");
 
         // link meshes
         mLightHelper.SetPointLightSource(0, *mMeshManager.meshesTransparent[0]);
@@ -103,8 +105,8 @@ namespace HEngine
 
         // render skybox
         mDeviceContext->OMSetDepthStencilState(mDepthStencilStateSkybox.Get(), 1);
-        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::SKYBOX);
-        mSkybox.RenderSkybox(pCamera->GetViewMatrix());
+        mShaderCompiler.SetShadersToPipeline(mDeviceContext, ShaderCompiler::ShaderPipeline::SKYBOX_HDRI);
+        mSkybox.RenderHDRI(pCamera->GetViewMatrix());
 
         // draw ui
         ImGui_ImplDX11_NewFrame();
@@ -207,6 +209,7 @@ namespace HEngine
 
         mMeshManager.Release();
         mMeshLoader.Release();
+        mSkybox.Release();
 
         ImGui_ImplDX11_Shutdown();
         ImGui_ImplWin32_Shutdown();

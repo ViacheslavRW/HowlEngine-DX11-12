@@ -11,9 +11,102 @@ namespace HEngine
 		mInputLayout = pInputLayout;
 		cashedViewMatrix = _viewMatrix;
 		cashedProjMatrix = _projectionMatrix;
+	}
 
-		LoadSkyboxTexture();
-		CreateSkyboxBuffers();
+	void Skybox::LoadHDRI()
+	{
+		ScratchImage image;
+		TexMetadata metadata;
+
+		HRESULT hr = LoadFromHDRFile(HDRIPath.c_str(), &metadata, image);
+		if (FAILED(hr))
+		{
+			std::wcout << "FAILED_TO_LOAD_HDRI: " << HDRIPath << "\n";
+		}
+
+		hr = CreateShaderResourceView(mDevice, image.GetImages(), image.GetImageCount(), 
+			metadata, mHDRI_SRV.GetAddressOf());
+
+		if (FAILED(hr))
+		{
+			std::cout << "FAILED_TO_CREATE_SRV_FOR_HDRI" << "\n";
+		}
+	}
+
+	void Skybox::CreateHDRIBuffers()
+	{
+		HRESULT hr;
+		const float s = 1000.0f;
+		const TR::SkyboxVertex vertices[] = {
+			{XMFLOAT3(- s, -s, -s)}, {XMFLOAT3(s, -s, -s)}, {XMFLOAT3(s,  s, -s)}, {XMFLOAT3(- s,  s, -s)}, // Front
+			{XMFLOAT3(- s, -s,  s)}, {XMFLOAT3(s, -s,  s)}, {XMFLOAT3(s,  s,  s)}, {XMFLOAT3(- s,  s,  s)}, // Back
+		};
+
+		const UINT indices[] = {
+			0,1,2, 0,2,3,    // Front
+			5,4,7, 5,7,6,    // Back
+			1,5,6, 1,6,2,    // Right
+			4,0,3, 4,3,7,    // Left
+			3,2,6, 3,6,7,    // Top
+			4,5,1, 4,1,0     // Bottom
+		};
+
+		// vertex buffer
+		D3D11_BUFFER_DESC vbDesc = {};
+		vbDesc.ByteWidth = sizeof(vertices);
+		vbDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbDesc.CPUAccessFlags = 0;
+		vbDesc.MiscFlags = 0;
+		D3D11_SUBRESOURCE_DATA vbSubData = { vertices, 0, 0 };
+
+		hr = mDevice->CreateBuffer(&vbDesc, &vbSubData, mVertexBufferHDRI.GetAddressOf());
+		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_VERTEX_BUFFER_HDRI" << std::endl;
+
+		// index buffer
+		D3D11_BUFFER_DESC indBuffDesc = {};
+		indBuffDesc.ByteWidth = sizeof(indices);
+		indBuffDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		indBuffDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		indBuffDesc.CPUAccessFlags = 0;
+		indBuffDesc.MiscFlags = 0;
+		D3D11_SUBRESOURCE_DATA ibSubData = { indices, 0, 0};
+
+		hr = mDevice->CreateBuffer(&indBuffDesc, &ibSubData, mIndexBufferHDRI.GetAddressOf());
+		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_INDEX_BUFFER_HDRI" << std::endl;
+
+		// constant buffer
+		D3D11_BUFFER_DESC cbDesc = {};
+		cbDesc.ByteWidth = sizeof(SkyboxCB);
+		cbDesc.Usage = D3D11_USAGE_DEFAULT;
+		cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cbDesc.CPUAccessFlags = 0;
+		cbDesc.MiscFlags = 0;
+
+		hr = mDevice->CreateBuffer(&cbDesc, nullptr, mConstantBufferHDRI.GetAddressOf());
+		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_CONSTANT_BUFFER_HDRI" << std::endl;
+	}
+
+	void Skybox::RenderHDRI(const XMMATRIX& viewMatrix)
+	{
+		SkyboxCB cb = {};
+		XMMATRIX view = viewMatrix;
+		view.r[3] = XMVECTOR{ 0.0f, 0.0f, 0.0f, 1.0f };
+		cb.viewProjMatrix = XMMatrixTranspose(view * cashedProjMatrix);
+		mDeviceContext->UpdateSubresource(mConstantBufferHDRI.Get(), 0, nullptr, &cb, 0, 0);
+
+		mDeviceContext->VSSetConstantBuffers(0, 1, mConstantBufferHDRI.GetAddressOf());
+
+		UINT stride = sizeof(TR::SkyboxVertex);
+		UINT offset = 0;
+		mDeviceContext->IASetVertexBuffers(0, 1, mVertexBufferHDRI.GetAddressOf(), &stride, &offset);
+		mDeviceContext->IASetIndexBuffer(mIndexBufferHDRI.Get(), DXGI_FORMAT_R32_UINT, 0);
+		mDeviceContext->IASetInputLayout(mInputLayout);
+
+		ID3D11ShaderResourceView* srv = mHDRI_SRV.Get();
+		mDeviceContext->PSSetShaderResources(0 , 1, &srv);
+
+		mDeviceContext->DrawIndexed(36, 0, 0);
 	}
 
 	void Skybox::LoadSkyboxTexture()
@@ -111,7 +204,7 @@ namespace HEngine
 		hr = mDevice->CreateBuffer(&bDesc, &srData, mVertexBuffer.GetAddressOf());
 		if (FAILED(hr)) std::cout << "FAILED_TO_CREATE_VERTEX_BUFFER" << std::endl;
 
-		// invex buffer
+		// index buffer
 		D3D11_BUFFER_DESC indBuffDesc = {};
 		indBuffDesc.ByteWidth = static_cast<UINT>(sizeof(UINT32) * indices.size());
 		indBuffDesc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -168,5 +261,24 @@ namespace HEngine
 	{
 		Bind(viewMatrix);
 		Draw();
+	}
+	
+	void Skybox::Release()
+	{
+		mSkyboxSRV.Reset();
+		mHDRI_SRV.Reset();
+		mSkyboxTexture2D.Reset();
+
+		mVertexBuffer.Reset();
+		mIndexBuffer.Reset();
+		mConstantBuffer.Reset();
+
+		mVertexBufferHDRI.Reset();
+		mIndexBufferHDRI.Reset();
+		mConstantBufferHDRI.Reset();
+
+		mDevice = nullptr;
+		mDeviceContext = nullptr;
+		mInputLayout = nullptr;
 	}
 }

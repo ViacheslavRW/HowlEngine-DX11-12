@@ -56,17 +56,16 @@ namespace HEngine
 
 	void ShaderCompiler::CompileAll()
 	{
+		// PBR
 		Compile(L"Shaders/PBRVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBR);
 		Compile(L"Shaders/PBRPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBR);
 		Compile(L"Shaders/PBR_Transparent_VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobPBRTransparent);
 		Compile(L"Shaders/PBR_Transparent_PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobPBRTransparent);
+		// Skybox
 		Compile(L"Shaders/SkyboxVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobSkybox);
 		Compile(L"Shaders/SkyboxPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobSkybox);
-
-		Compile(L"Shaders/VertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobUniversal);
-		Compile(L"Shaders/PixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobUniversal);
-		Compile(L"Shaders/GlassVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobGlass);
-		Compile(L"Shaders/GlassPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobGlass);
+		Compile(L"Shaders/SkyboxHDRIVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobSkyboxHDRI);
+		Compile(L"Shaders/SkyboxHDRIPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobSkyboxHDRI);
 	}
 
 	void ShaderCompiler::CreateAll(ComPtr<ID3D11Device>& pDevice)
@@ -77,24 +76,22 @@ namespace HEngine
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_PBR" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobPBR->GetBufferPointer(), psBlobPBR->GetBufferSize(), nullptr, &mPBRPixelShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_PBR" << std::endl;
+
 		res = pDevice->CreateVertexShader(vsBlobPBRTransparent->GetBufferPointer(), vsBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentVertexShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_PBR_TRANSPARENT" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobPBRTransparent->GetBufferPointer(), psBlobPBRTransparent->GetBufferSize(), nullptr, &mPBRTransparentPixelShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_PBR_TRANSPARENT" << std::endl;
+
 		// Skybox
 		res = pDevice->CreateVertexShader(vsBlobSkybox->GetBufferPointer(), vsBlobSkybox->GetBufferSize(), nullptr, &mSkyboxVertexShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_SKYBOX" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobSkybox->GetBufferPointer(), psBlobSkybox->GetBufferSize(), nullptr, &mSkyboxPixelShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_SKYBOX" << std::endl;
-		// Old
-		res = pDevice->CreateVertexShader(vsBlobUniversal->GetBufferPointer(), vsBlobUniversal->GetBufferSize(), nullptr, &mVertexShaderUniversal);
-		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_UNIVERSAL" << std::endl;
-		res = pDevice->CreatePixelShader(psBlobUniversal->GetBufferPointer(), psBlobUniversal->GetBufferSize(), nullptr, &mPixelShaderUniversal);
-		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_UNIVERSAL" << std::endl;
-		res = pDevice->CreateVertexShader(vsBlobGlass->GetBufferPointer(), vsBlobGlass->GetBufferSize(), nullptr, &mVertexShaderGlass);
-		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_GLASS" << std::endl;
-		res = pDevice->CreatePixelShader(psBlobGlass->GetBufferPointer(), psBlobGlass->GetBufferSize(), nullptr, &mPixelShaderGlass);
-		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_GLASS" << std::endl;
+
+		res = pDevice->CreateVertexShader(vsBlobSkyboxHDRI->GetBufferPointer(), vsBlobSkyboxHDRI->GetBufferSize(), nullptr, &mSkyboxHDRIVertexShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_SKYBOX_HDRI" << std::endl;
+		res = pDevice->CreatePixelShader(psBlobSkyboxHDRI->GetBufferPointer(), psBlobSkyboxHDRI->GetBufferSize(), nullptr, &mSkyboxHDRIPixelShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_SKYBOX_HDRI" << std::endl;
 	}
 
 	void ShaderCompiler::SetShadersToPipeline(ComPtr<ID3D11DeviceContext>& pDeviceContext, ShaderPipeline pipeline) const
@@ -116,15 +113,10 @@ namespace HEngine
 				pDeviceContext->VSSetShader(mSkyboxVertexShader.Get(), nullptr, 0);
 				pDeviceContext->PSSetShader(mSkyboxPixelShader.Get(), nullptr, 0);
 			} break;
-			case ShaderPipeline::UNIVERSAL:
+			case ShaderPipeline::SKYBOX_HDRI:
 			{
-				pDeviceContext->VSSetShader(mVertexShaderUniversal.Get(), nullptr, 0);
-				pDeviceContext->PSSetShader(mPixelShaderUniversal.Get(), nullptr, 0);
-			} break;
-			case ShaderPipeline::GLASS:
-			{
-				pDeviceContext->VSSetShader(mVertexShaderGlass.Get(), nullptr, 0);
-				pDeviceContext->PSSetShader(mPixelShaderGlass.Get(), nullptr, 0);
+				pDeviceContext->VSSetShader(mSkyboxHDRIVertexShader.Get(), nullptr, 0);
+				pDeviceContext->PSSetShader(mSkyboxHDRIPixelShader.Get(), nullptr, 0);
 			} break;
 		}
 	}
@@ -135,25 +127,21 @@ namespace HEngine
 		psBlobPBR.Reset();
 		vsBlobPBRTransparent.Reset();
 		psBlobPBRTransparent.Reset();
+
 		vsBlobSkybox.Reset();
 		psBlobSkybox.Reset();
-
-		vsBlobUniversal.Reset();
-		psBlobUniversal.Reset();
-		vsBlobGlass.Reset();
-		psBlobGlass.Reset();
+		vsBlobSkyboxHDRI.Reset();
+		psBlobSkyboxHDRI.Reset();
 
 		mPBRVertexShader.Reset();
 		mPBRPixelShader.Reset();
 		mPBRTransparentVertexShader.Reset();
 		mPBRTransparentPixelShader.Reset();
+
 		mSkyboxVertexShader.Reset();
 		mSkyboxPixelShader.Reset();
-
-		mVertexShaderUniversal.Reset();
-		mPixelShaderUniversal.Reset();
-		mVertexShaderGlass.Reset();
-		mPixelShaderGlass.Reset();
+		mSkyboxHDRIVertexShader.Reset();
+		mSkyboxHDRIPixelShader.Reset();
 	}
 
 	std::string ShaderCompiler::EnumToString(ShaderType type)

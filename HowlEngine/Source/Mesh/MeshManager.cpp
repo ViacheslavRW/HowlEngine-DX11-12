@@ -22,6 +22,7 @@ namespace HEngine
 		mesh3 = std::make_unique<PBRMesh>();
 		mesh4 = std::make_unique<PBRMesh>();
 		mesh5 = std::make_unique<PBRMesh>();
+		mesh6 = std::make_unique<PBRMesh>();
 	}
 
 	void MeshManager::CreateAllBuffers()

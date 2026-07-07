@@ -12,8 +12,7 @@ namespace HEngine
 			PBR,
 			PBR_TRANSPARENT,
 			SKYBOX,
-			UNIVERSAL,
-			GLASS
+			SKYBOX_HDRI,
 		};
 
 		enum class ShaderType
@@ -38,25 +37,23 @@ namespace HEngine
 		ComPtr<ID3DBlob> psBlobPBR;
 		ComPtr<ID3DBlob> vsBlobPBRTransparent;
 		ComPtr<ID3DBlob> psBlobPBRTransparent;
+
 		ComPtr<ID3DBlob> vsBlobSkybox;
 		ComPtr<ID3DBlob> psBlobSkybox;
+		ComPtr<ID3DBlob> vsBlobSkyboxHDRI;
+		ComPtr<ID3DBlob> psBlobSkyboxHDRI;
 
-		ComPtr<ID3DBlob> vsBlobUniversal;
-		ComPtr<ID3DBlob> psBlobUniversal;
-		ComPtr<ID3DBlob> vsBlobGlass;
-		ComPtr<ID3DBlob> psBlobGlass;
 		// shaders
 		ComPtr<ID3D11VertexShader> mPBRVertexShader;
 		ComPtr<ID3D11PixelShader> mPBRPixelShader;
 		ComPtr<ID3D11VertexShader> mPBRTransparentVertexShader;
 		ComPtr<ID3D11PixelShader> mPBRTransparentPixelShader;
+
 		ComPtr<ID3D11VertexShader> mSkyboxVertexShader;
 		ComPtr<ID3D11PixelShader> mSkyboxPixelShader;
+		ComPtr<ID3D11VertexShader> mSkyboxHDRIVertexShader;
+		ComPtr<ID3D11PixelShader> mSkyboxHDRIPixelShader;
 
-		ComPtr<ID3D11VertexShader> mVertexShaderUniversal;
-		ComPtr<ID3D11PixelShader> mPixelShaderUniversal;
-		ComPtr<ID3D11VertexShader> mVertexShaderGlass;
-		ComPtr<ID3D11PixelShader> mPixelShaderGlass;
 	private:
 		std::string EnumToString(ShaderType type);
 	};
