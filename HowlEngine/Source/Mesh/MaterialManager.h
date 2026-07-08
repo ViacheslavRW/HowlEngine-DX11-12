@@ -10,12 +10,14 @@ namespace HEngine
 		std::string albedoPath;
 		std::string normalPath;
 		std::string ormPath;
+		std::string emissivePath;
 
 		bool useAlpha = false;
 
 		ID3D11ShaderResourceView* albedoSRV = nullptr;
 		ID3D11ShaderResourceView* normalSRV = nullptr;
 		ID3D11ShaderResourceView* ormSRV = nullptr;
+		ID3D11ShaderResourceView* emissiveSRV = nullptr;
 	};
 
 	class MaterialManager

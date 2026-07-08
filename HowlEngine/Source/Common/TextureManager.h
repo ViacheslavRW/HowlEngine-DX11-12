@@ -30,6 +30,9 @@ namespace HEngine
 
 		const std::string defORMTexName = "Def_NoTexture_ORM";
 		const std::wstring defORMTexNamePath = L"Assets/Textures/Default/Def_NoTexture_ORM.png";
+
+		const std::string defEmissiveTexName = "Def_NoTexture_E";
+		const std::wstring defEmissiveTexNamePath = L"Assets/Textures/Default/Def_NoTexture_E.png";
 	};
 }
 

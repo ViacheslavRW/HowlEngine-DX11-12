@@ -123,6 +123,7 @@ namespace HEngine
 		mDeviceContext->PSSetShaderResources(0, 1, &material.albedoSRV);
 		mDeviceContext->PSSetShaderResources(1, 1, &material.normalSRV);
 		mDeviceContext->PSSetShaderResources(2, 1, &material.ormSRV);
+		mDeviceContext->PSSetShaderResources(3, 1, &material.emissiveSRV);
 	}
 
 	void MeshManager::Draw(const size_t& indices)

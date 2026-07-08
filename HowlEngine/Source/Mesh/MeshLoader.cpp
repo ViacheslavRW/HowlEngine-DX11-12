@@ -62,9 +62,10 @@ namespace HEngine
 			mat.name = "Unnamed";
 
 		// set default textures
-		mat.albedoSRV = pTextureManager->LoadAndGetSRV(defaultAlbedoName, defaultTexturePath, pDevice, TextureFormat::PNG, generateMips);
-		mat.normalSRV = pTextureManager->LoadAndGetSRV(defaultNormalName, defaultTexturePath, pDevice, TextureFormat::PNG, generateMips);
-		mat.ormSRV = pTextureManager->LoadAndGetSRV(defaultORMName, defaultTexturePath, pDevice, TextureFormat::PNG, generateMips);
+		mat.albedoSRV = pTextureManager->GetTextureSRV(defaultAlbedoName).Get();
+		mat.normalSRV = pTextureManager->GetTextureSRV(defaultNormalName).Get();
+		mat.ormSRV = pTextureManager->GetTextureSRV(defaultORMName).Get();
+		mat.emissiveSRV = pTextureManager->GetTextureSRV(defaultEmissiveName).Get();
 
 		// Helper to load a texture
 		auto loadTexture = [&](aiTextureType type, std::string& pathField, ID3D11ShaderResourceView*& srvField)
@@ -72,6 +73,9 @@ namespace HEngine
 				aiString path;
 				if (material->GetTexture(type, 0, &path) == AI_SUCCESS)
 				{
+					// don't generate mip maps for N & ORM
+					if (type == aiTextureType_NORMALS || type == aiTextureType_METALNESS) generateMips = false;
+
 					std::string texName = std::filesystem::path(path.C_Str()).filename().string();
 					std::wstring fullPath = texturesPath + std::wstring(texName.begin(), texName.end());
 
@@ -85,6 +89,7 @@ namespace HEngine
 		loadTexture(aiTextureType_DIFFUSE, mat.albedoPath, mat.albedoSRV);
 		loadTexture(aiTextureType_NORMALS, mat.normalPath, mat.normalSRV);
 		loadTexture(aiTextureType_METALNESS, mat.ormPath, mat.ormSRV); // assimp considers metalness or roughness as ORM
+		loadTexture(aiTextureType_EMISSIVE, mat.emissivePath, mat.emissiveSRV);
 
 		subMesh->material = std::move(mat);
 

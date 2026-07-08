@@ -4,6 +4,7 @@
 Texture2D albedoMap : register(t0);
 Texture2D normalMap : register(t1);
 Texture2D ormMap : register(t2);
+Texture2D emissiveMap : register(t3);
 
 SamplerState sampleType : register(s0);
 
@@ -115,6 +116,7 @@ float4 main(PS_INPUT input) : SV_Target
 {
     float3 albedo = pow(albedoMap.Sample(sampleType, input.texCoord).rgb, 2.2f);
     float3 orm = ormMap.Sample(sampleType, input.texCoord).rgb;
+    float3 emissive = emissiveMap.Sample(sampleType, input.texCoord).rgb;
     
     float occlusion = orm.r;
     float roughness = orm.g;
@@ -152,7 +154,8 @@ float4 main(PS_INPUT input) : SV_Target
     }
 
     float3 color = ambient + Lo;
-    color = pow(color, 1.0f / 2.2f);
+    color = pow(color, 1.0f / 2.2f) + emissive;
 
     return float4(color, 1.0f);
+    //return float4(occlusion, roughness, metallic, 1.0f);
 }

@@ -18,8 +18,9 @@ namespace HEngine
 	void TextureManager::LoadDefaultTextures(ID3D11Device* pDevice, bool generateMips)
 	{
 		LoadTexture(defColorTexName, defColorTexNamePath, pDevice, TextureFormat::PNG, generateMips);
-		LoadTexture(defNormalTexName, defNormalTexNamePath, pDevice, TextureFormat::PNG, generateMips);
-		LoadTexture(defORMTexName, defORMTexNamePath, pDevice, TextureFormat::PNG, generateMips);
+		LoadTexture(defNormalTexName, defNormalTexNamePath, pDevice, TextureFormat::PNG, false);
+		LoadTexture(defORMTexName, defORMTexNamePath, pDevice, TextureFormat::PNG, false);
+		LoadTexture(defEmissiveTexName, defEmissiveTexNamePath, pDevice, TextureFormat::PNG, true);
 	}
 
 	ComPtr<ID3D11ShaderResourceView> TextureManager::GetTextureSRV(const std::string& name)
