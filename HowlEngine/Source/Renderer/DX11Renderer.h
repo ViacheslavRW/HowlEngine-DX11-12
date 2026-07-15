@@ -47,9 +47,9 @@ namespace HEngine
 		ComPtr<ID3D11DepthStencilView> mDepthStencilView = nullptr;
 		ComPtr<ID3D11RasterizerState> mRasterizer = nullptr;
 		// input layout
-		ComPtr<ID3D11InputLayout> mInputLayout = nullptr;
 		ComPtr<ID3D11InputLayout> mInputLayoutPBR = nullptr;
 		ComPtr<ID3D11InputLayout> mInputLayoutSkybox = nullptr;
+		ComPtr<ID3D11InputLayout> mInputLayoutBox = nullptr;
 		// shaders
 		ShaderCompiler mShaderCompiler;
 		// blend
@@ -70,12 +70,13 @@ namespace HEngine
 		// textures
 		ComPtr<ID3D11SamplerState> mSamplerState = nullptr;
 		TextureManager mTextureManager = {};
-	private:
+	public:
 		// Mesh
 		MaterialManager mMaterialManager;
 		MeshLoader mMeshLoader;
 		MeshManager mMeshManager;
 		SceneSerializer mSceneSerializer;
+
 	private:
 		// Debug
 #if defined(DEBUG) || defined(_DEBUG)

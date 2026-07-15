@@ -40,6 +40,8 @@ namespace HEngine
 		for (UINT i = 0; i < node->mNumMeshes; ++i)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+
 			PBRSubMesh subMesh;
 			ProcessMesh(mesh, scene, &subMesh, texturesPath, generateMips);
 			pMesh->subMeshes.push_back(std::move(subMesh));
@@ -93,6 +95,9 @@ namespace HEngine
 
 		subMesh->material = std::move(mat);
 
+		subMesh->aabb.min = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
+		subMesh->aabb.max = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
 		for (UINT i = 0; i < mesh->mNumVertices; ++i)
 		{
 			TR::PBRVertex vertex;
@@ -103,6 +108,15 @@ namespace HEngine
 				mesh->mVertices[i].y,
 				mesh->mVertices[i].z
 			};
+
+			// aabb
+			subMesh->aabb.min.x = std::min(subMesh->aabb.min.x, vertex.position.x);
+			subMesh->aabb.min.y = std::min(subMesh->aabb.min.y, vertex.position.y);
+			subMesh->aabb.min.z = std::min(subMesh->aabb.min.z, vertex.position.z);
+
+			subMesh->aabb.max.x = std::max(subMesh->aabb.max.x, vertex.position.x);
+			subMesh->aabb.max.y = std::max(subMesh->aabb.max.y, vertex.position.y);
+			subMesh->aabb.max.z = std::max(subMesh->aabb.max.z, vertex.position.z);
 
 			if (mesh->HasNormals())
 			{

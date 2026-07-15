@@ -13,6 +13,7 @@ namespace HEngine
 			PBR_TRANSPARENT,
 			SKYBOX,
 			SKYBOX_HDRI,
+			BOX
 		};
 
 		enum class ShaderType
@@ -43,6 +44,9 @@ namespace HEngine
 		ComPtr<ID3DBlob> vsBlobSkyboxHDRI;
 		ComPtr<ID3DBlob> psBlobSkyboxHDRI;
 
+		ComPtr<ID3DBlob> vsBlobBox;
+		ComPtr<ID3DBlob> psBlobBox;
+
 		// shaders
 		ComPtr<ID3D11VertexShader> mPBRVertexShader;
 		ComPtr<ID3D11PixelShader> mPBRPixelShader;
@@ -53,6 +57,9 @@ namespace HEngine
 		ComPtr<ID3D11PixelShader> mSkyboxPixelShader;
 		ComPtr<ID3D11VertexShader> mSkyboxHDRIVertexShader;
 		ComPtr<ID3D11PixelShader> mSkyboxHDRIPixelShader;
+
+		ComPtr<ID3D11VertexShader> mBoxVertexShader;
+		ComPtr<ID3D11PixelShader> mBoxPixelShader;
 
 	private:
 		std::string EnumToString(ShaderType type);

@@ -25,7 +25,7 @@ namespace HEngine
 
 		Launch* mLaunchPtr = nullptr;
 		std::vector<BYTE> rawData;
-	private:
+	public:
 		UINT mLastWidth = 0;
 		UINT mLastHeight = 0;
 	};

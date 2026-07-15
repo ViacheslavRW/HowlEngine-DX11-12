@@ -189,6 +189,18 @@
           "useAlpha": true
         }
       ]
+    },
+    {
+      "modelPath": "Models/Environment/Buildings/Observatory.gltf",
+      "texturesPath": "Models/Environment/Buildings/",
+      "position": [ 0, 0, 0 ],
+      "rotation": [ 0, 0, 0 ],
+      "scale": [ 1, 1, 1 ],
+      "subMeshes": [
+        {
+          "useAlpha": false
+        }
+      ]
     }
   ]
 }

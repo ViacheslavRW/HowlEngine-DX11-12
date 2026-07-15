@@ -66,6 +66,9 @@ namespace HEngine
 		Compile(L"Shaders/SkyboxPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobSkybox);
 		Compile(L"Shaders/SkyboxHDRIVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobSkyboxHDRI);
 		Compile(L"Shaders/SkyboxHDRIPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobSkyboxHDRI);
+		// Box
+		Compile(L"Shaders/BoxVertexShader.hlsl", ShaderCompiler::ShaderType::VERTEX, GraphicsAPI::DirectX11, &vsBlobBox);
+		Compile(L"Shaders/BoxPixelShader.hlsl", ShaderCompiler::ShaderType::PIXEL, GraphicsAPI::DirectX11, &psBlobBox);
 	}
 
 	void ShaderCompiler::CreateAll(ComPtr<ID3D11Device>& pDevice)
@@ -92,6 +95,12 @@ namespace HEngine
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_SKYBOX_HDRI" << std::endl;
 		res = pDevice->CreatePixelShader(psBlobSkyboxHDRI->GetBufferPointer(), psBlobSkyboxHDRI->GetBufferSize(), nullptr, &mSkyboxHDRIPixelShader);
 		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_SKYBOX_HDRI" << std::endl;
+
+		// Box
+		res = pDevice->CreateVertexShader(vsBlobBox->GetBufferPointer(), vsBlobBox->GetBufferSize(), nullptr, &mBoxVertexShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_VERTEX_SHADER_BOX" << std::endl;
+		res = pDevice->CreatePixelShader(psBlobBox->GetBufferPointer(), psBlobBox->GetBufferSize(), nullptr, &mBoxPixelShader);
+		if (FAILED(res)) std::cout << "FAILED_TO_CREATE_PIXEL_SHADER_BOX" << std::endl;
 	}
 
 	void ShaderCompiler::SetShadersToPipeline(ComPtr<ID3D11DeviceContext>& pDeviceContext, ShaderPipeline pipeline) const
@@ -118,20 +127,29 @@ namespace HEngine
 				pDeviceContext->VSSetShader(mSkyboxHDRIVertexShader.Get(), nullptr, 0);
 				pDeviceContext->PSSetShader(mSkyboxHDRIPixelShader.Get(), nullptr, 0);
 			} break;
+			case ShaderPipeline::BOX:
+			{
+				pDeviceContext->VSSetShader(mBoxVertexShader.Get(), nullptr, 0);
+				pDeviceContext->PSSetShader(mBoxPixelShader.Get(), nullptr, 0);
+			} break;
 		}
 	}
 
 	void ShaderCompiler::Release()
 	{
+		// PBR blob
 		vsBlobPBR.Reset();
 		psBlobPBR.Reset();
 		vsBlobPBRTransparent.Reset();
 		psBlobPBRTransparent.Reset();
-
+		// Skybox blob
 		vsBlobSkybox.Reset();
 		psBlobSkybox.Reset();
 		vsBlobSkyboxHDRI.Reset();
 		psBlobSkyboxHDRI.Reset();
+		// Box blob
+		vsBlobBox.Reset();
+		psBlobBox.Reset();
 
 		mPBRVertexShader.Reset();
 		mPBRPixelShader.Reset();
@@ -142,6 +160,9 @@ namespace HEngine
 		mSkyboxPixelShader.Reset();
 		mSkyboxHDRIVertexShader.Reset();
 		mSkyboxHDRIPixelShader.Reset();
+
+		mBoxVertexShader.Reset();
+		mBoxPixelShader.Reset();
 	}
 
 	std::string ShaderCompiler::EnumToString(ShaderType type)

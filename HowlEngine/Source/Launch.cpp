@@ -20,7 +20,8 @@ namespace HEngine
 		mRenderer->Initialize(WndHandle, mMainWindowWidth, mMainWindowHeight, &mCamera);
 
 		mInputManager.Initialize(&mCamera);
-
+		mInputManager.SetRenderer(mRenderer.get());
+		
 		gTimer.Reset();
 
 		isAppInitialized = true;

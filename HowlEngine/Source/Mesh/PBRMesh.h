@@ -55,11 +55,18 @@ namespace HEngine
 		inline void SetDirtyTransform(const bool& isDirty) { mDirtyTransform = isDirty; };
 	};
 
+	struct AABB
+	{
+		XMFLOAT3 min;
+		XMFLOAT3 max;
+	};
+
 	struct PBRSubMesh
 	{
 		std::vector<TR::PBRVertex> vertices;
 		std::vector<UINT32> indices;
 		PBRMaterial material;
+		AABB aabb;
 
 		ComPtr<ID3D11Buffer> mVertexBuffer = nullptr;
 		ComPtr<ID3D11Buffer> mIndexBuffer = nullptr;

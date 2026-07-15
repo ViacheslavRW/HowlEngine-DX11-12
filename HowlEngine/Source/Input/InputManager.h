@@ -1,11 +1,16 @@
 #pragma once
 #include "Windows.h"
 #include "Keyboard.h"
-#include "Mouse.h"
 #include "../Common/Camera.h"
+#include "../Renderer/IRenderer.h"
 
 namespace HEngine
 {
+	struct Ray
+	{
+		XMVECTOR origin;
+		XMVECTOR direction;
+	};
 	enum class InputMode
 	{
 		EditorMode,
@@ -15,13 +20,13 @@ namespace HEngine
 	struct EditorInputMode
 	{
 	public:
-		void HandleInput(Keyboard& keyboard, Mouse& mouse, Camera* pCamera, float& deltaTime);
+		void HandleInput(Keyboard& keyboard, Camera* pCamera, float& deltaTime);
 	};
 
 	struct GameInputMode
 	{
 	public:
-		void HandleInput(Keyboard& keyboard, Mouse& mouse, Camera* pCamera, float& deltaTime);
+		void HandleInput(Keyboard& keyboard, Camera* pCamera, float& deltaTime);
 	};
 
 	struct InputManager
@@ -33,10 +38,19 @@ namespace HEngine
 		inline InputMode GetInputMode() const { return currentInputMode; };
 		inline void SetInputMode(InputMode newMode)  { currentInputMode = newMode; };
 
+		inline void SetCamera(Camera* camera) { pCamera = camera; };
+		inline void SetRenderer(IRenderer* renderer) { pRenderer = renderer; };
+
+		void PickMesh(const int screenX, const int screenY, const int wndWidth, const int wndHeight);
+
+		Ray CreateMouseRay(const int screenX, const int screenY, const int wndWidth, const int wndHeight);
+
 		Camera* pCamera = nullptr;
-	private:
+		IRenderer* pRenderer = nullptr;
+	public:
 		Keyboard mKeyboard;
-		Mouse mMouse;
+
+	private:
 		InputMode currentInputMode = InputMode::EditorMode;
 		GameInputMode mGameInputMode;
 		EditorInputMode mEditorInputMode;

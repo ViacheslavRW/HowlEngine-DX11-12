@@ -50,6 +50,13 @@ namespace HEngine
 
 				break;
 			} 
+			case WM_LBUTTONDOWN:
+			{
+				int mouseX = LOWORD(lParam);
+				int mouseY = HIWORD(lParam);
+				pWnd->mLaunchPtr->mInputManager.PickMesh(mouseX, mouseY, pWnd->mLastWidth, pWnd->mLastHeight);
+				break;
+			}
 			case WM_DESTROY:
 			{
 				pWnd->OnWindowDestroy();

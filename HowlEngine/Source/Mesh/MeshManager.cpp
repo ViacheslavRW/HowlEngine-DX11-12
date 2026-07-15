@@ -3,12 +3,11 @@
 
 namespace HEngine
 {
-	void HEngine::MeshManager::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, ID3D11InputLayout* pInputLayout,
+	void HEngine::MeshManager::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,
 		TextureManager* pTextureManager, MeshLoader* pMeshLoader, XMMATRIX& _viewMatrix, XMMATRIX& _projectionMatrix)
 	{
 		mDevice = pDevice;
 		mDeviceContext = pDeviceContext;
-		mInputLayout = pInputLayout;
 		mTextureManager = pTextureManager;
 		mMeshLoader = pMeshLoader;
 		cashedViewMatrix = _viewMatrix;
@@ -118,7 +117,7 @@ namespace HEngine
 		UINT offset = 0;
 		mDeviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
 		mDeviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		mDeviceContext->IASetInputLayout(mInputLayout);
+		mDeviceContext->IASetInputLayout(mInputLayoutPBR);
 
 		mDeviceContext->PSSetShaderResources(0, 1, &material.albedoSRV);
 		mDeviceContext->PSSetShaderResources(1, 1, &material.normalSRV);
@@ -159,9 +158,200 @@ namespace HEngine
 	{
 		mDevice = nullptr;
 		mDeviceContext = nullptr;
-		mInputLayout = nullptr;
+		mInputLayoutPBR = nullptr;
+		mInputLayoutBox = nullptr;
 		mTextureManager = nullptr;
 		mMeshLoader = nullptr;
-	};
+	}
+
+	bool MeshManager::RayAABBIntersect(const Ray& ray, const XMFLOAT3& aabbMin, const XMFLOAT3& aabbMax, float& t)
+	{
+		XMFLOAT3 origin;
+		XMFLOAT3 dir;
+
+		XMStoreFloat3(&origin, ray.origin);
+		XMStoreFloat3(&dir, ray.direction);
+
+		float tmin = 0.0f;
+		float tmax = FLT_MAX;
+
+		const float epsilon = 1e-8f;
+
+		for (int i = 0; i < 3; i++)
+		{
+			float o, d, mn, mx;
+
+			if (i == 0)
+			{
+				o = origin.x;
+				d = dir.x;
+				mn = aabbMin.x;
+				mx = aabbMax.x;
+			}
+			else if (i == 1)
+			{
+				o = origin.y;
+				d = dir.y;
+				mn = aabbMin.y;
+				mx = aabbMax.y;
+			}
+			else
+			{
+				o = origin.z;
+				d = dir.z;
+				mn = aabbMin.z;
+				mx = aabbMax.z;
+			}
+
+			if (fabs(d) < epsilon)
+			{
+				if (o < mn || o > mx) return false;
+			}
+			else
+			{
+				float inv = 1.0f / d;
+
+				float t1 = (mn - o) * inv;
+				float t2 = (mx - o) * inv;
+
+				if (t1 > t2) std::swap(t1, t2);
+
+				tmin = std::max(tmin, t1);
+				tmax = std::min(tmax, t2);
+
+				if (tmin > tmax) return false;
+			}
+		}
+		t = tmin;
+
+		return true;
+	}
+
+	void MeshManager::CreateDebugBoxBuffers()
+	{
+		// vert buffer
+		D3D11_BUFFER_DESC vbDesc = {};
+		vbDesc.ByteWidth = sizeof(TR::DebugVertex) * 2048;
+		vbDesc.Usage = D3D11_USAGE_DYNAMIC;
+		vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		mmRes = mDevice->CreateBuffer(&vbDesc, nullptr, mDebugBoxSharedVBuffer.GetAddressOf());
+		if (FAILED(mmRes)) std::cout << "FAILED_TO_CREATE_VERTEX_BOX_BUFFER" << std::endl;
+
+		// const buffer
+		D3D11_BUFFER_DESC cbDesc = {};
+		cbDesc.ByteWidth = sizeof(XMMATRIX);
+		cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+		cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		mmRes = mDevice->CreateBuffer(&cbDesc, nullptr, mDebugBoxSharedCBuffer.GetAddressOf());
+		if (FAILED(mmRes)) std::cout << "FAILED_TO_CREATE_CONSTANT_BOX_BUFFER" << std::endl;
+
+		mDebugVertices.reserve(2048);
+	}
+
+	void MeshManager::DrawDebugBox(const XMFLOAT3& min, const XMFLOAT3& max)
+	{
+		static constexpr int edges[12][2] =
+		{
+			{0,1},{1,2},{2,3},{3,0},
+			{4,5},{5,6},{6,7},{7,4},
+			{0,4},{1,5},{2,6},{3,7}
+		};
+
+		XMFLOAT3 p[8] = {
+			{min.x, min.y, min.z}, {max.x, min.y, min.z},
+			{max.x, max.y, min.z}, {min.x, max.y, min.z},
+			{min.x, min.y, max.z}, {max.x, min.y, max.z},
+			{max.x, max.y, max.z}, {min.x, max.y, max.z}
+		};
+
+		for (int i = 0; i < 12; ++i)
+		{
+			mDebugVertices.push_back({ p[edges[i][0]], boxColor });
+			mDebugVertices.push_back({ p[edges[i][1]], boxColor });
+		}
+	}
+
+	void MeshManager::UploadDebugVertices()
+	{
+
+		if (mDebugVertices.empty()) return;
+
+		D3D11_MAPPED_SUBRESOURCE mapped;
+
+		mDeviceContext->Map(mDebugBoxSharedVBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+		memcpy(mapped.pData, mDebugVertices.data(), mDebugVertices.size() * sizeof(TR::DebugVertex));
+		mDeviceContext->Unmap(mDebugBoxSharedVBuffer.Get(),0);
+	}
+
+	void MeshManager::RenderDebugVertices()
+	{
+		if (mDebugVertices.empty()) return;
+
+		UINT stride = sizeof(TR::DebugVertex);
+		UINT offset = 0;
+
+		mDeviceContext->IASetInputLayout(mInputLayoutBox);
+		mDeviceContext->IASetVertexBuffers(0, 1, mDebugBoxSharedVBuffer.GetAddressOf(), &stride, &offset);
+		mDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+		mDeviceContext->Draw(static_cast<UINT>(mDebugVertices.size()),0);
+	}
+
+	void MeshManager::DebugDrawAllAABBs(const XMMATRIX& viewMatrix)
+	{
+		mDebugVertices.clear();
+
+		XMMATRIX viewProj = XMMatrixTranspose(viewMatrix * cashedProjMatrix);
+		D3D11_MAPPED_SUBRESOURCE mapped;
+		mDeviceContext->Map(mDebugBoxSharedCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+		memcpy(mapped.pData, &viewProj, sizeof(XMMATRIX));
+		mDeviceContext->Unmap(mDebugBoxSharedCBuffer.Get(), 0);
+		mDeviceContext->VSSetConstantBuffers(0, 1, mDebugBoxSharedCBuffer.GetAddressOf());
+
+		for (const auto& mesh : meshes)
+		{
+			XMMATRIX world = mesh->transform.GetModelMartix();
+
+			for (const auto& sub : mesh->subMeshes)
+			{
+				XMVECTOR localMin = XMLoadFloat3(&sub.aabb.min);
+				XMVECTOR localMax = XMLoadFloat3(&sub.aabb.max);
+
+				XMVECTOR wMin = XMVector3Transform(localMin, world);
+				XMVECTOR wMax = XMVector3Transform(localMax, world);
+
+				XMFLOAT3 min, max;
+				XMStoreFloat3(&min, wMin);
+				XMStoreFloat3(&max, wMax);
+
+				DrawDebugBox(min, max);
+			}
+		}
+
+		for (const auto& meshTr : meshesTransparent)
+		{
+			XMMATRIX world = meshTr->transform.GetModelMartix();
+
+			for (const auto& subTr : meshTr->subMeshes)
+			{
+				XMVECTOR localMin = XMLoadFloat3(&subTr.aabb.min);
+				XMVECTOR localMax = XMLoadFloat3(&subTr.aabb.max);
+
+				XMVECTOR wMin = XMVector3Transform(localMin, world);
+				XMVECTOR wMax = XMVector3Transform(localMax, world);
+
+				XMFLOAT3 min, max;
+				XMStoreFloat3(&min, wMin);
+				XMStoreFloat3(&max, wMax);
+
+				DrawDebugBox(min, max);
+			}
+		}
+
+		UploadDebugVertices();
+		RenderDebugVertices();
+	}
 }
 

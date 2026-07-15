@@ -8,8 +8,7 @@ namespace HEngine
 	{
 		PBR,
 		Skybox,
-		Universal,
-		Glass
+		Box
 	};
 
 	class Core

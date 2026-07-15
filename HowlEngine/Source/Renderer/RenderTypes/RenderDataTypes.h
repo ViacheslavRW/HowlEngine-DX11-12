@@ -44,5 +44,11 @@ namespace HEngine
 		{
 			DirectX::XMFLOAT3 position;
 		};
+
+		struct DebugVertex
+		{
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT4 color;
+		};
 	}
 }
